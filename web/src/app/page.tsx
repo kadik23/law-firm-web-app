@@ -6,7 +6,6 @@ import Map from "@/components/Map";
 import ServiceCard from "@/components/ServiceCard";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import { motion } from "framer-motion";
-import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 
 export default function Home() {
