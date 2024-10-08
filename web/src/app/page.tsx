@@ -1,95 +1,35 @@
 "use client"
 import AvisCard from "@/components/AvisCard";
 import AvocatCard from "@/components/AvocatCard";
-import Footer from "@/components/Footer";
 import Map from "@/components/Map";
 import ServiceCard from "@/components/ServiceCard";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import useCarousel from "@/hooks/useCarousel";
 
 export default function Home() {
   const directions = ['Résoudre mon probèlme', "Enrichir ma culture juridique", "Je veux être informé sur n'importe quelle question"]
   const serviceItems = Array(6).fill(null);
   const avocatItems = Array(12).fill(null);
   const avisItems = Array(12).fill(null);
-  const [currentServiceIndex, setCurrentServiceIndex] = useState(0);
-  const [serviceVisibleItems, setServiceVisibleItems] = useState(3.5);
-  const [serviceOffset, setServiceOffset] = useState(160);
 
-  const handlePrevService = () => {
-    if (currentServiceIndex > 0) {
-      setCurrentServiceIndex(currentServiceIndex - 1);
-    }
-  };
-  
-  const handleNextService = () => {
-    if (currentServiceIndex < serviceItems.length - serviceVisibleItems) {
-      setCurrentServiceIndex(currentServiceIndex + 1);
-    }
-  };
-  
-  const handleServiceIndicatorClick = (index: number) => {
-    setCurrentServiceIndex(index);
-  };
-  
-  const updateServiceVisibleItems = () => {
-    if (window.innerWidth >= 1024) {
-      setServiceVisibleItems(3.5);
-      setServiceOffset(100);
-    } else if (window.innerWidth >= 768) {
-      setServiceVisibleItems(2);
-      setServiceOffset(200);
-    } else {
-      setServiceVisibleItems(1);
-      setServiceOffset(100);
-    }
-  };
+  const {
+    currentIndex: currentServiceIndex,
+    handlePrev: handlePrevService,
+    handleNext: handleNextService,
+    handleIndicatorClick: handleServiceIndicatorClick,
+    offset: serviceOffset,
+    visibleItems: serviceVisibleItems,
+  } = useCarousel(serviceItems.length, 3.5);
 
-  const [currentAvisIndex, setCurrentAvisIndex] = useState(0);
-  const [avisVisibleItems, setAvisVisibleItems] = useState(3.5);
-  const [avisOffset, setAvisOffset] = useState(160);
-
-  const handlePrevAvis = () => {
-    if (currentAvisIndex > 0) {
-      setCurrentAvisIndex(currentAvisIndex - 1);
-    }
-  };
-
-  const handleNextAvis = () => {
-    if (currentAvisIndex < avisItems.length - avisVisibleItems) {
-      setCurrentAvisIndex(currentAvisIndex + 1);
-    }
-  };
-
-  const handleAvisIndicatorClick = (index: number) => {
-    setCurrentAvisIndex(index);
-  };
-
-  const updateAvisVisibleItems = () => {
-    if (window.innerWidth >= 1024) {
-      setAvisVisibleItems(3.5);
-      setAvisOffset(100);
-    } else if (window.innerWidth >= 768) {
-      setAvisVisibleItems(2);
-      setAvisOffset(200);
-    } else {
-      setAvisVisibleItems(1);
-      setAvisOffset(100);
-    }
-  };
-
-  useEffect(() => {
-
-    updateAvisVisibleItems(); 
-    window.addEventListener("resize", updateAvisVisibleItems);
-    updateServiceVisibleItems();
-    window.addEventListener("resize", updateServiceVisibleItems);
-    return () => {
-      window.removeEventListener("resize", updateAvisVisibleItems);
-      window.removeEventListener("resize", updateServiceVisibleItems);
-    };
-  }, []);
+  const {
+    currentIndex: currentAvisIndex,
+    handlePrev: handlePrevAvis,
+    handleNext: handleNextAvis,
+    handleIndicatorClick: handleAvisIndicatorClick,
+    offset: avisOffset,
+    visibleItems: avisVisibleItems,
+  } = useCarousel(avisItems.length, 3.5);
 
   return (
     <div className="min-h-screen mt-8">
@@ -180,19 +120,19 @@ export default function Home() {
               <div className="md:w-5/12 w-full flex flex-col gap-4 border border-white rounded-lg p-4">
                 <div className="flex flex-col justify-start gap-2">
                   <div className="text-textColor text-sm font-semibold">Name</div>
-                  <input type="text" placeholder="Value" className="py-1 px-4 outline-none text-white rounded-lg border border-white bg-transparent"/>
+                  <input type="text" placeholder="Enter your name" className="py-1 px-4 outline-none text-white rounded-lg border border-white bg-transparent"/>
                 </div>
                 <div className="flex flex-col justify-start gap-2">
                   <div className="text-textColor text-sm font-semibold">Surname</div>
-                  <input type="text" placeholder="Value" className="py-1 px-4 outline-none text-white rounded-lg border border-white bg-transparent"/>
+                  <input type="text" placeholder="Enter your surname" className="py-1 px-4 outline-none text-white rounded-lg border border-white bg-transparent"/>
                 </div>
                 <div className="flex flex-col justify-start gap-2">
                   <div className="text-textColor text-sm font-semibold">Email</div>
-                  <input type="email" placeholder="Value" className="py-1 px-4 outline-none text-white rounded-lg border border-white bg-transparent"/>
+                  <input type="email" placeholder="Enter your email" className="py-1 px-4 outline-none text-white rounded-lg border border-white bg-transparent"/>
                 </div>
                 <div className="flex flex-col justify-start gap-2">
                   <div className="text-textColor text-sm font-semibold">Message</div>
-                  <textarea placeholder="Value" className="py-1 px-4 outline-none w-full text-white rounded-lg border border-white bg-transparent"/>
+                  <textarea placeholder="Enter your message" className="py-1 px-4 outline-none w-full text-white rounded-lg border border-white bg-transparent"/>
                 </div>
                 <button className="btn bg-textColor py-1 px-4 text-center rounded-md text-white">Submit</button>
               </div>
@@ -235,7 +175,6 @@ export default function Home() {
           <a href="#voirplus" className="btn bg-[#C2E6F1] rounded-md py-1 px-4 text-primary font-semibold">Voir plus{'>'}</a>
         </div>
       </section>
-      <Footer />
     </div>
   );
 }
