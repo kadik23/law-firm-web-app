@@ -8,7 +8,7 @@ const userRouter = require('express').Router()
 
 
 
-//userRouter.post('/',  userRouter.addUser);
+userRouter.post('/signup',  userController.signUp);
 
 
 

@@ -33,7 +33,7 @@ const db = {}
 db.Sequelize = Sequelize
 db.sequelize = sequelize
 
-//db.transformateur = require('./Users.js')(sequelize, DataTypes)
+db.users = require('./Users.js')(sequelize, DataTypes)
 
 db.sequelize.sync({ force: false })
 .then(() => {
