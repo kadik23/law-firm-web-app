@@ -33,13 +33,19 @@ const db = {}
 db.Sequelize = Sequelize
 db.sequelize = sequelize
 
-//db.transformateur = require('./Users.js')(sequelize, DataTypes)
+db.users = require('./Users.js')(sequelize, DataTypes)
+db.files = require('./FIles.js')(sequelize, DataTypes)
 
-db.sequelize.sync({ force: false })
+db.sequelize.sync({ force: true })
 .then(() => {
     console.log('yes re-sync done!')
 })
 
-
+db.files.belongsTo(db.users,{
+    foreignKey:'userId',
+    allowNull:false,
+    onDelete:"CASCADE",
+    onUpdate:"CASCADE",
+})
 
 module.exports = db
