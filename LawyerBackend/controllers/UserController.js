@@ -85,31 +85,8 @@ const addFiles = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 };
-const signIn = async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        const user = await users.findOne({ where: { email } });
-
-        if (!user) {
-            return res.status(401).send('Invalid email or password.');
-        }
-        const isMatch = await bcrypt.compare(password, user.password);
-
-        if (!isMatch) {
-            return res.status(401).send('Invalid email or password.');
-        }
-        const token = jwt.sign({ user: { id: user.id, email: user.email } }, "itisasecret", { expiresIn: '7d' });
-
-        console.log("Successful sign in");
-        res.status(200).send({ token });
-    } catch (error) {
-        console.error('Error during sign in:', error);
-        res.status(500).send('Internal Server Error');
-    }
-};
 
 module.exports = {
     signUp,
-    addFiles,
-    signIn
-};
+    addFiles
+}
