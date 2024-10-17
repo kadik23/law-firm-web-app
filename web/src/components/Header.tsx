@@ -3,11 +3,13 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import Signup from "./Signup";
+import Signin from "./Signin";
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<null | string>(null);
-  const [isModalOpen, setModalOpen] = useState(false);
+  const [isSigninModalOpen, setSigninModalOpen] = useState(false);
+  const [isSignupModalOpen, setSignupModalOpen] = useState(false);
   const links = [
     { name: "accueil", href: "#accueil" },
     { name: "services", href: "#services" },
@@ -54,9 +56,13 @@ function Header() {
         priority
       />
       <Signup
-        isModalOpen={isModalOpen}
-        setModalOpen={setModalOpen}
+        isModalOpen={isSignupModalOpen}
+        setModalOpen={setSignupModalOpen}
         isUploadFiles={false}
+      />
+      <Signin
+        isModalOpen={isSigninModalOpen}
+        setModalOpen={setSigninModalOpen}
       />
       <div className="hidden lg:flex items-center justify-between gap-4 cursor-pointer">
         {links.map((link, index) => (
@@ -80,11 +86,14 @@ function Header() {
       <div className="hidden md:flex items-center justify-between gap-4">
         <button
           className="bg-primary rounded-md p-2 btn font-semibold shadow-lg"
-          onClick={() => setModalOpen(true)}
+          onClick={() => setSigninModalOpen(true)}
         >
           connexion
         </button>
-        <button className="bg-secondary rounded-md p-2 btn font-semibold shadow-lg">
+        <button
+          className="bg-secondary rounded-md p-2 btn font-semibold shadow-lg"
+          onClick={() => setSignupModalOpen(true)}
+        >
           inscription
         </button>
       </div>
@@ -113,10 +122,17 @@ function Header() {
             </a>
           ))}
           <div className="flex flex-col gap-2 mt-4">
-            <button className="bg-primary text-white rounded-md p-2 font-semibold shadow-lg">
+            <button
+              onClick={() => {setSigninModalOpen(true); setMenuOpen(false)}}
+              className="bg-primary text-white rounded-md p-2 font-semibold shadow-lg"
+              
+            >
               connexion
             </button>
-            <button className="bg-secondary rounded-md p-2 font-semibold shadow-lg">
+            <button
+              className="bg-secondary rounded-md p-2 font-semibold shadow-lg"
+              onClick={() => {setSignupModalOpen(true); setMenuOpen(false)}}
+            >
               inscription
             </button>
           </div>

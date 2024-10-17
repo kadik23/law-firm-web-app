@@ -66,13 +66,13 @@ function StepOne({
     <div className="flex flex-col items-start gap-4">
       <div className="text-xl">Crée un compte</div>
       <div>Entrer vos informations svp !</div>
-      <div className="flex gap-16">
+      <div className="flex gap-4 md:gap-16 w-full">
         <div className="flex flex-col justify-start gap-2">
           <div className="text-textColor text-sm font-semibold">Name</div>
           <input
             type="text"
             placeholder="Enter votre name"
-            className="py-1 px-4 outline-none text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
+            className="py-1 px-4 w-full outline-none text-sm md:text-base text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
           />
         </div>
         <div className="flex flex-col justify-start gap-2">
@@ -80,7 +80,7 @@ function StepOne({
           <input
             type="text"
             placeholder="Enter votre surname"
-            className="py-1 px-4 outline-none text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
+            className="py-1 px-4 w-full outline-none text-sm md:text-base text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
           />
         </div>
       </div>
@@ -89,7 +89,7 @@ function StepOne({
         <input
           type="email"
           placeholder="Enter votre email"
-          className="py-1 px-4 outline-none text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
+          className="py-1 px-4 outline-none text-sm md:text-base text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
         />
       </div>
       <div className="flex flex-col justify-start gap-2 w-full">
@@ -97,7 +97,7 @@ function StepOne({
         <input
           type="text"
           placeholder="Enter votre mot de passe"
-          className="py-1 px-4 outline-none text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
+          className="py-1 px-4 outline-none text-sm md:text-base text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
         />
       </div>
       <div className="flex flex-col justify-start gap-2 w-full">
@@ -105,10 +105,10 @@ function StepOne({
         <input
           type="text"
           placeholder="Confirmer votre mot de passe"
-          className="py-1 px-4 outline-none text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
+          className="py-1 px-4 outline-none text-sm md:text-base text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
         />
       </div>
-      <div className="hidden md:flex items-center justify-between w-full gap-8">
+      <div className="flex flex-row items-center justify-between w-full gap-8">
         <button
           onClick={() => setModalOpen(false)}
           className="bg-textColor text-sm rounded-md p-2 btn font-semibold shadow-lg w-full"
@@ -140,7 +140,7 @@ function StepTwo({
   isUploadFiles: boolean;
 }) {
   return (
-    <div className="flex flex-col items-start gap-4 w-[32rem]">
+    <div className="flex flex-col items-start gap-4 md:w-[32rem]">
       <div className="flex flex-col justify-start gap-2 w-full">
         <div className="text-textColor text-sm font-semibold">
           Numéro de telephone
@@ -148,7 +148,7 @@ function StepTwo({
         <input
           type="text"
           placeholder="Entre votre numéro de telephone"
-          className="py-1 px-4 outline-none text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
+          className="py-1 px-4 outline-none w-full text-sm md:text-base text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
         />
       </div>
       <div className="flex flex-col justify-start gap-2  w-full">
@@ -156,7 +156,7 @@ function StepTwo({
         <input
           type="text"
           placeholder="Enter votre pays"
-          className="py-1 px-4 outline-none text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
+          className="py-1 px-4 outline-none w-full text-sm md:text-base text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
         />
       </div>
       <div className="flex flex-col justify-start gap-2 w-full">
@@ -164,7 +164,7 @@ function StepTwo({
         <input
           type="text"
           placeholder="Enter votre ville"
-          className="py-1 px-4 outline-none text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
+          className="py-1 px-4 outline-none w-full text-sm md:text-base text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
         />
       </div>
       <div className="flex flex-col justify-start gap-2 w-full">
@@ -172,12 +172,12 @@ function StepTwo({
         <input
           type="text"
           placeholder="Enter votre age"
-          className="py-1 px-4 outline-none text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
+          className="py-1 px-4 outline-none w-full text-sm md:text-base text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
         />
       </div>
       <div className="flex flex-col justify-start gap-2 w-full">
         <div className="text-textColor text-sm font-semibold">Sex</div>
-        <div className="flex items-center w-full justify-center text-base gap-4">
+        <div className="flex items-center w-full justify-center text-sm md:text-base gap-4">
           <div className="flex items-center gap-2">
             <div>Home</div>
             <input type="radio" name="gender" />
@@ -194,8 +194,8 @@ function StepTwo({
           J’accepte tout
         </div>
       </div>
-      <div className="hidden md:flex items-center justify-between gap-4 w-full">
-        <div className="hidden md:flex items-center justify-between w-full gap-8">
+      <div className="flex items-center justify-between gap-4 w-full">
+        <div className="flex items-center justify-between w-full gap-8">
           <button
             onClick={() => moveNewStep(2, 1)}
             className="bg-textColor text-sm rounded-md p-2 btn font-semibold shadow-lg w-full"
