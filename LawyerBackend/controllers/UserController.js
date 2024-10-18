@@ -45,7 +45,7 @@ const signUp = async (req, res) => {
                 return res.status(401).send('Error creating user.');
             }
             console.log(process.env.SECRET)
-            const token = jwt.sign({user : newUser}, "itsasecret", {expiresIn: "7d"})
+            const token = jwt.sign({user : newUser}, process.env.SECRET, {expiresIn: "7d"})
             console.log("Success sign in")
             res.status(200).send({token:token})
 
@@ -100,7 +100,7 @@ const signIn = async (req, res) => {
         if (!isMatch) {
             return res.status(401).send('Invalid email or password.');
         }
-        const token = jwt.sign({ user: { id: user.id, email: user.email } }, "itisasecret", { expiresIn: '7d' });
+        const token = jwt.sign({ user: { id: user.id, email: user.email } }, process.env.SECRET, { expiresIn: '7d' });
 
         console.log("Successful sign in");
         res.status(200).send({ token });

@@ -15,8 +15,10 @@ app.use(express.urlencoded({ extended: true }))
 
 
 const userRouter=require('./routes/UsersRouter.js')
+const adminRouter=require('./routes/AdminRouter.js')
 
 app.use('/user', userRouter)
+app.use('/admin', adminRouter)
 
 const PORT = process.env.PORT || 8080
 
