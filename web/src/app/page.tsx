@@ -12,7 +12,6 @@ export default function Home() {
   const serviceItems = Array(6).fill(null);
   const avocatItems = Array(12).fill(null);
   const avisItems = Array(12).fill(null);
-
   const {
     currentIndex: currentServiceIndex,
     handlePrev: handlePrevService,
@@ -62,7 +61,7 @@ export default function Home() {
           <div className="text-sm font-light text-center md:text-start text-opacity-50 mb-8">
             Our corporate law services assist businesses of all sizes with legal guidance throughout their<br className="hidden md:block"/>
             lifecycle. From incorporation to mergers and acquisitions, we offer comprehensive legal<br className="hidden md:block"/>
-            support tailored to the specific needs of your business.
+            support tailored to the specific needs of votre business.
           </div>
         </div>
         <div className="overflow-hidden py-4">
@@ -112,7 +111,7 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <section id="blog" className="md:bg-[url('/images/contactBg.png')] bg-primary lg:h-screen">
+      <section id="contact" className="md:bg-[url('/images/contactBg.png')] bg-primary lg:h-screen">
         <div className="p-4 md:p-8">
           <div className=" font-bold text-3xl md:text-4xl text-center text-white py-4">Contactez Nous !</div>
             <div className="p-4 md:p-8 flex flex-col md:flex-row items-center gap-4 lg:gap-0 lg:justify-between">
@@ -120,26 +119,26 @@ export default function Home() {
               <div className="md:w-5/12 w-full flex flex-col gap-4 border border-white rounded-lg p-4">
                 <div className="flex flex-col justify-start gap-2">
                   <div className="text-textColor text-sm font-semibold">Name</div>
-                  <input type="text" placeholder="Enter your name" className="py-1 px-4 outline-none text-white rounded-lg border border-white bg-transparent"/>
+                  <input type="text" placeholder="Enter votre name" className="py-1 px-4 outline-none text-white rounded-lg border border-white bg-transparent"/>
                 </div>
                 <div className="flex flex-col justify-start gap-2">
                   <div className="text-textColor text-sm font-semibold">Surname</div>
-                  <input type="text" placeholder="Enter your surname" className="py-1 px-4 outline-none text-white rounded-lg border border-white bg-transparent"/>
+                  <input type="text" placeholder="Enter votre surname" className="py-1 px-4 outline-none text-white rounded-lg border border-white bg-transparent"/>
                 </div>
                 <div className="flex flex-col justify-start gap-2">
                   <div className="text-textColor text-sm font-semibold">Email</div>
-                  <input type="email" placeholder="Enter your email" className="py-1 px-4 outline-none text-white rounded-lg border border-white bg-transparent"/>
+                  <input type="email" placeholder="Enter votre email" className="py-1 px-4 outline-none text-white rounded-lg border border-white bg-transparent"/>
                 </div>
                 <div className="flex flex-col justify-start gap-2">
                   <div className="text-textColor text-sm font-semibold">Message</div>
-                  <textarea placeholder="Enter your message" className="py-1 px-4 outline-none w-full text-white rounded-lg border border-white bg-transparent"/>
+                  <textarea placeholder="Enter votre message" className="py-1 px-4 outline-none w-full text-white rounded-lg border border-white bg-transparent"/>
                 </div>
                 <button className="btn bg-textColor py-1 px-4 text-center rounded-md text-white">Submit</button>
               </div>
             </div>
         </div>
       </section>
-      <section id="contact" className="p-4 md:p-8 bg-[#dddddd]/30">
+      <section className="p-4 md:p-8 bg-[#dddddd]/30">
         <div className="">
           <div className=" font-bold text-3xl md:text-4xl text-center text-primary py-4">L’Avis de nos clients</div>
         </div>
