@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import Signup from "./Signup";
 import Signin from "./Signin";
+import Link from "next/link";
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -48,13 +49,15 @@ function Header() {
 
   return (
     <div className="flex justify-between items-center fixed top-0 left-0 w-full z-50 bg-third py-2 shadow-lg px-4 md:px-8 text-white">
-      <Image
-        src="/images/Logo.png"
-        alt="logo"
-        width={125}
-        height={125}
-        priority
-      />
+      <Link href={"/"}>
+        <Image
+          src="/images/Logo.png"
+          alt="logo"
+          width={125}
+          height={125}
+          priority
+        />
+      </Link>
       <Signup
         isModalOpen={isSignupModalOpen}
         setModalOpen={setSignupModalOpen}
@@ -123,15 +126,20 @@ function Header() {
           ))}
           <div className="flex flex-col gap-2 mt-4">
             <button
-              onClick={() => {setSigninModalOpen(true); setMenuOpen(false)}}
+              onClick={() => {
+                setSigninModalOpen(true);
+                setMenuOpen(false);
+              }}
               className="bg-primary text-white rounded-md p-2 font-semibold shadow-lg"
-              
             >
               connexion
             </button>
             <button
               className="bg-secondary rounded-md p-2 font-semibold shadow-lg"
-              onClick={() => {setSignupModalOpen(true); setMenuOpen(false)}}
+              onClick={() => {
+                setSignupModalOpen(true);
+                setMenuOpen(false);
+              }}
             >
               inscription
             </button>
