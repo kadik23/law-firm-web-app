@@ -23,7 +23,9 @@ const signUp = async (req, res) => {
 
             const { name, surname, email, password, phone_number, pays, ville, age, sex,terms_accepted } = req.body;
 
-            console.log(password)
+           if(terms_accepted===false){
+               return res.status(401).send('You have to accept the terms');
+           }
 
             const salt = await bcrypt.genSalt(10)
             const hashedPassword = await bcrypt.hash(password, salt)
@@ -38,7 +40,8 @@ const signUp = async (req, res) => {
                 ville,
                 age,
                 sex,
-                terms_accepted
+                terms_accepted,
+                type:"client"
             });
 
             if (!newUser) {
@@ -109,7 +112,6 @@ const signIn = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 };
-
 module.exports = {
     signUp,
     addFiles,

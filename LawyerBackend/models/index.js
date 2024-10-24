@@ -35,8 +35,9 @@ db.sequelize = sequelize
 
 db.users = require('./Users.js')(sequelize, DataTypes)
 db.files = require('./FIles.js')(sequelize, DataTypes)
+db.categories = require('./Categories.js')(sequelize, DataTypes)
 
-db.sequelize.sync({ force: true })
+db.sequelize.sync({ force: false })
 .then(() => {
     console.log('yes re-sync done!')
 })

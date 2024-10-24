@@ -1,6 +1,7 @@
 const nodemailer = require("nodemailer");
 require('dotenv').config();
-
+const db = require('../models')
+const categories=db.categories
 const contactForm = async (req, res) =>  {
     try {
         const {name, surname, email, message} = req.body;
@@ -30,7 +31,26 @@ const contactForm = async (req, res) =>  {
         res.status(500).send('Internal Server Error');
     }
 }
+const addCategory = async (req,res)=> {
+    try {
+        console.log("controller:" + req.body)
+        const {name} = req.body;
+        let newCategory = await categories.create({
+            name
+        });
+
+        if (!newCategory) {
+            return res.status(401).send('Error creating category');
+        }else {
+            return res.status(200).send(newCategory);
+        }
+    } catch (e) {
+        console.error('Error creating category', e);
+        res.status(500).send('Internal Server Error');
+    }
+};
 
 module.exports = {
-    contactForm
+    contactForm,
+    addCategory
 };
