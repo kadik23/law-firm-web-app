@@ -9,7 +9,10 @@ const adminRouter = require('express').Router()
 
 
 adminRouter.post('/contactus' ,adminController.contactForm);
-adminRouter.post('/addcategory',authMiddleware,checkAdminMiddleware,adminController.addCategory);
+adminRouter.post('/categories/add',authMiddleware,checkAdminMiddleware,adminController.addCategory);
+adminRouter.get('/categories/all',authMiddleware,checkAdminMiddleware,adminController.getAllCategories);
+adminRouter.get('/categories/name',authMiddleware,checkAdminMiddleware,adminController.getCategoryByName);
+adminRouter.delete('/categories/delete',authMiddleware,checkAdminMiddleware,adminController.deleteCategory);
 
 
 

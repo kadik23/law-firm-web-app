@@ -50,7 +50,50 @@ const addCategory = async (req,res)=> {
     }
 };
 
+const getAllCategories= async (req,res)=>{
+    try {
+
+        let categoryList = await categories.findAll();
+
+
+        return res.status(200).send(categoryList);
+    } catch (e) {
+        console.error('Error fetching categories', e);
+        res.status(500).send('Internal Server Error');
+    }
+};
+const getCategoryByName= async (req,res)=>{
+    try {
+        const {name} = req.body;
+        let category = await categories.findAll({ where: { name } });
+
+
+        return res.status(200).send(category);
+    } catch (e) {
+        console.error('Error fetching categories', e);
+        res.status(500).send('Internal Server Error');
+    }
+};
+const deleteCategory= async (req,res)=>{
+    try {
+        const {id} = req.body;
+        let category = await categories.findByPk(id);
+
+        if (!category) {
+            return res.status(404).json("Category not found");
+        }
+
+        await category.destroy();
+        return res.status(200).send(category);
+    } catch (e) {
+        console.error('Error deleting category', e);
+        res.status(500).send('Internal Server Error');
+    }
+};
 module.exports = {
     contactForm,
-    addCategory
+    addCategory,
+    getCategoryByName,
+    getAllCategories,
+    deleteCategory
 };
