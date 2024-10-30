@@ -2,9 +2,17 @@ require('dotenv').config();
 const db = require('../../models')
 const {upload} = require("../../middlewares/FilesMiddleware");
 const blogs=db.blogs
+const fs = require('fs');
 const uploadFiles = upload.fields([
     { name: 'image', maxCount: 1 },
 ]);
+
+// Delete old files if new files are provided
+const deleteFile = (filePath) => {
+    if (filePath && fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+    }
+};
 const addBlog = async (req,res)=> {
     try {
         uploadFiles(req, res, async (err) => {
@@ -40,6 +48,7 @@ const deleteBlog= async (req,res)=>{
         if (!blog) {
             return res.status(404).json("Blog not found");
         }
+            deleteFile(blog.image);
 
         await blog.destroy();
         return res.status(200).send(blog);
@@ -50,17 +59,39 @@ const deleteBlog= async (req,res)=>{
 };
 const updateBlog= async (req,res)=>{
     try {
-        const { id, title, body, categoryId } = req.body;
-        let updatedBlog = await blogs.update(
-            {title:title, body:body, categoryId:categoryId },
-            { where: { id:id } }
-        );
+        uploadFiles(req, res, async (err) => {
+            if (err) {
+                return res.status(400).send('Error uploading files: ' + err.message);
+            }
 
-        if (!updatedBlog[0]) {
-            return res.status(404).send('Blog not found or no updates were made');
-        } else {
-            return res.status(200).send('Blog updated successfully');
-        }
+            const { id, title, body, categoryId } = req.body;
+            const image = req.files?.image;
+
+
+                const blog = await blogs.findByPk(id);
+                if (!blog) {
+                    return res.status(404).send('Blog not found');
+                }
+
+                if (image) {
+                    deleteFile(blog.image);
+                    console.log("exe")
+                }
+
+                const imagePath = image ? image[0].path : blog.image;
+
+
+                const updatedBlog = await blogs.update(
+                    { title, body, categoryId, image: imagePath },
+                    { where: { id } }
+                );
+
+                if (!updatedBlog[0]) {
+                    return res.status(404).send('Error updating blog');
+                } else {
+                    return res.status(200).send('Blog updated successfully');
+                }
+        });
     }
     catch (e) {
         console.error('Error updating blog', e);
