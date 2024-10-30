@@ -1,4 +1,6 @@
-const adminController = require('../controllers/AdminController.js')
+const categoriesController = require('../controllers/Admin/Categories.js')
+const contactformController = require('../controllers/Admin/ContactForm.js')
+const blogsController = require('../controllers/Admin/Blogs.js')
 
 
 const authMiddleware = require("../middlewares/AuthMiddleware.js")
@@ -8,11 +10,16 @@ const adminRouter = require('express').Router()
 
 
 
-adminRouter.post('/contactus' ,adminController.contactForm);
-adminRouter.post('/categories/add',authMiddleware,checkAdminMiddleware,adminController.addCategory);
-adminRouter.get('/categories/all',authMiddleware,checkAdminMiddleware,adminController.getAllCategories);
-adminRouter.get('/categories/name',authMiddleware,checkAdminMiddleware,adminController.getCategoryByName);
-adminRouter.delete('/categories/delete',authMiddleware,checkAdminMiddleware,adminController.deleteCategory);
+adminRouter.post('/contactus' ,contactformController.contactForm);
+
+adminRouter.post('/categories/add',authMiddleware,checkAdminMiddleware,categoriesController.addCategory);
+adminRouter.delete('/categories/delete',authMiddleware,checkAdminMiddleware,categoriesController.deleteCategory);
+
+adminRouter.post('/blogs/add',authMiddleware,checkAdminMiddleware,blogsController.addBlog)
+adminRouter.put('/blogs/update',authMiddleware,checkAdminMiddleware,blogsController.updateBlog)
+adminRouter.delete('/blogs/delete',authMiddleware,checkAdminMiddleware,blogsController.deleteBlog)
+
+
 
 
 
