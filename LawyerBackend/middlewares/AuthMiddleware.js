@@ -3,7 +3,7 @@ require("dotenv").config();
 
 module.exports = (req, res, next) => {
     const authHeader = req.headers.authorization
-    console.log(authHeader)
+    console.log("auth:"+req.body)
     try {
 
             if (!authHeader) {
@@ -13,9 +13,11 @@ module.exports = (req, res, next) => {
             const data = jwt.verify(token, process.env.SECRET);
             if (!data.user) {
                 return res.status(401).json({ error: 'Unauthorized - Invalid Token' });
+            }else{
+                req.user = data.user
+                next();
             }
-            req.user = data.user
-            next();
+
 
     } catch (error) {
         if (error.name === 'TokenExpiredError') {

@@ -2,7 +2,7 @@ module.exports = (sequelize, DataTypes) => {
 
     return sequelize.define("files", {
         path: {
-            type: DataTypes.STRING(20),
+            type: DataTypes.STRING(50),
             allowNull: false
         },
         userId: {

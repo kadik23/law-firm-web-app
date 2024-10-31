@@ -35,8 +35,10 @@ db.sequelize = sequelize
 
 db.users = require('./Users.js')(sequelize, DataTypes)
 db.files = require('./FIles.js')(sequelize, DataTypes)
+db.categories = require('./Categories.js')(sequelize, DataTypes)
+db.blogs = require('./Blogs.js')(sequelize, DataTypes)
 
-db.sequelize.sync({ force: true })
+db.sequelize.sync({ force: false })
 .then(() => {
     console.log('yes re-sync done!')
 })
@@ -48,4 +50,17 @@ db.files.belongsTo(db.users,{
     onUpdate:"CASCADE",
 })
 
+db.blogs.belongsTo(db.users,{
+    foreignKey:'userId',
+    allowNull:false,
+    onDelete:"CASCADE",
+    onUpdate:"CASCADE",
+})
+
+db.blogs.belongsTo(db.categories,{
+    foreignKey:'categoryId',
+    allowNull:false,
+    onDelete:"CASCADE",
+    onUpdate:"CASCADE",
+})
 module.exports = db

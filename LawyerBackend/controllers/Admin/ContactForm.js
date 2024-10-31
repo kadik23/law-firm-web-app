@@ -1,6 +1,7 @@
 const nodemailer = require("nodemailer");
 require('dotenv').config();
-
+const db = require('../../models')
+const categories=db.categories
 const contactForm = async (req, res) =>  {
     try {
         const {name, surname, email, message} = req.body;
@@ -30,7 +31,6 @@ const contactForm = async (req, res) =>  {
         res.status(500).send('Internal Server Error');
     }
 }
-
 module.exports = {
-    contactForm
+    contactForm,
 };
