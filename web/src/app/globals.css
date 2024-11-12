@@ -30,7 +30,16 @@ body {
   }
 }
 
+.error{
+  color: red;
+  text-align: left;
+  font-size: 12px;
+}
 
 .btn {
   @apply  hover:opacity-95 cursor-pointer active:scale-105 transition-all duration-150
+}
+
+.btn_desabled{
+  @apply bg-gray-300 cursor-not-allowed text-black/30
 }
