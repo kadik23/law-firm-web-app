@@ -17,3 +17,8 @@ type SignupformType ={
         files: unknown[]
     }
 }
+
+type SigninformType = {
+    email:string
+    password: string
+}

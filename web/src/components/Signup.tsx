@@ -80,6 +80,8 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
       });
       if(response.status == 200){
         alert("Success sign in")
+        const token = response.data.token;
+        localStorage.setItem("authToken", token);
         setModalOpen(false);
       }else {
         alert(response.data)
