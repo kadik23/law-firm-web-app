@@ -4,13 +4,10 @@ import Modal from "./Modal";
 import useRegisterForm from "@/hooks/useRegisterForm";
 import { DevTool } from "@hookform/devtools";
 import {
-  // Control,
   FieldErrors,
   useFieldArray,
-  // UseFormHandleSubmit,
-  // UseFormRegister,
-  // UseFormWatch,
 } from "react-hook-form";
+import axiosClient from "@/lib/utils/axiosClient";
 
 interface SignupProps {
   isModalOpen: boolean;
@@ -35,7 +32,7 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
   const [isDisabled2, setIsDisabled2] = useState(true);
   const [isDisabled3, setIsDisabled3] = useState(true);
 
-  const validateStep = (stepName: 'stepOne' |'stepTwo' | 'stepThree', currentStep: number,toNextStep = false) => {
+  const validateSteps = (stepName: 'stepOne' |'stepTwo' | 'stepThree', currentStep: number,toNextStep = false) => {
     const stepData = watch()[stepName];
     const stepErrors = errors[stepName] || {};
   
@@ -66,9 +63,30 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
     console.log(errors);
   };
 
-  const onsubmit = (data: SignupformType) => {
-    console.log("first submit ", data);
-    setModalOpen(false);
+  const onsubmit = async (data: SignupformType) => {
+    try{
+      console.log("first submit ", data);
+      const response = await axiosClient.post("/user/signup",{
+        name: data.stepOne.name,
+        surname: data.stepOne.surname,
+        email: data.stepOne.email,
+        password: data.stepOne.password,
+        phone_number: data.stepTwo.nbr_tel,
+        pays: data.stepTwo.pays,
+        ville: data.stepTwo.ville,
+        age: data.stepTwo.age,
+        sex: data.stepTwo.gender == 'Femal' ? 'Femme' : 'Homme',
+        terms_accepted: true,
+      });
+      if(response.status == 200){
+        alert("Success sign in")
+        setModalOpen(false);
+      }else {
+        alert(response.data)
+      }
+    }catch(err){
+      console.log(err)
+    }
   };
 
   function moveNewStep(currentStep: number, nextStep: number) {
@@ -77,11 +95,11 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
 
   useEffect(() => {
     if(formStep == 0){
-      validateStep('stepOne',formStep,false);
+      validateSteps('stepOne',formStep,false);
     }else if(formStep == 1){
-      validateStep('stepTwo',formStep,false);
+      validateSteps('stepTwo',formStep,false);
     }else{
-      validateStep('stepThree',formStep,false);
+      validateSteps('stepThree',formStep,false);
     }
   }, [watch]);
 
@@ -240,7 +258,7 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
             </button>
             <button
               onClick={async () => {
-                const isValid = await validateStep('stepOne',0,true);
+                const isValid = await validateSteps('stepOne',0,true);
                 if (isValid) {
                   moveNewStep(0, 1);
                 } else {
@@ -401,7 +419,7 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
               </button>
               {isUploadFiles ? (
                 <button
-                  onClick={() => validateStep('stepTwo',1,true)}
+                  onClick={() => validateSteps('stepTwo',1,true)}
                   className={`${
                     isDisabled2
                       ? "btn_desabled active:scale-100"
@@ -413,7 +431,7 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
                 </button>
               ) : (
                 <button
-                  onClick={() => handleSubmit(onsubmit)}
+                  type="submit"
                   disabled={isDisabled2}
                   className={`${
                     isDisabled2
@@ -462,14 +480,14 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
           <div className="hidden md:flex flex-col items-center justify-between gap-4 w-full">
             <div className="hidden md:flex items-center justify-between w-full gap-8">
               <button
-                onClick={() => validateStep('stepThree',2,true)}
+                onClick={() => validateSteps('stepThree',2,true)}
                 className="bg-textColor text-sm rounded-md p-2 btn font-semibold shadow-lg w-full"
               >
                 Retour
               </button>
             </div>
             <button
-              onClick={() => handleSubmit(onsubmit)}
+              type="submit"
               className={`${
                 isDisabled3
                   ? "btn_desabled active:scale-100"
