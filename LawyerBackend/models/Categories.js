@@ -7,3 +7,17 @@ module.exports = (sequelize, DataTypes) => {
         }
     })
 }
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Category:
+ *       type: object
+ *       required:
+ *         - name
+ *       properties:
+ *         name:
+ *           type: string
+ *           maxLength: 20
+ *           example: "Technology"
+ */

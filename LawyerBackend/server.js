@@ -1,11 +1,34 @@
 require('dotenv').config();
 const express = require('express')
 const cors = require('cors')
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
 
 
 const app = express()
 
+const swaggerOptions = {
+    definition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'Law Firm Web App Backend',
+            version: '1.0.0',
+            description: 'API documentation',
+        },
+    },
+    apis: ['./models/*.js', './controllers/*.js','./controllers/Admin/*.js','./controllers/User/*.js'],
+    servers: [
+        {
+            url: 'http://localhost:8080'
+        }
+    ],
+};
 
+// Initialize swagger-jsdoc
+const swaggerSpec = swaggerJsDoc(swaggerOptions);
+
+// Serve Swagger documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 
 app.use(express.json())
