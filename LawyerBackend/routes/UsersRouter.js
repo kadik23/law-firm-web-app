@@ -1,5 +1,5 @@
 
-const userController = require('../controllers/UserController.js')
+const userController = require('../controllers/AuthController.js')
 
 const authMiddleware = require("../middlewares/AuthMiddleware.js")
 const categoriesController = require("../controllers/User/Categories.js");

@@ -52,3 +52,65 @@ module.exports = (sequelize, DataTypes) => {
         },
     })
 }
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       required:
+ *         - name
+ *         - surname
+ *         - email
+ *         - password
+ *         - phone_number
+ *         - pays
+ *         - ville
+ *         - age
+ *         - sex
+ *         - terms_accepted
+ *         - type
+ *       properties:
+ *         name:
+ *           type: string
+ *           maxLength: 20
+ *           example: "John"
+ *         surname:
+ *           type: string
+ *           maxLength: 20
+ *           example: "Doe"
+ *         email:
+ *           type: string
+ *           format: email
+ *           maxLength: 50
+ *           example: "john.doe@example.com"
+ *         password:
+ *           type: string
+ *           example: "password123"
+ *         phone_number:
+ *           type: string
+ *           maxLength: 20
+ *           example: "+1234567890"
+ *         pays:
+ *           type: string
+ *           example: "France"
+ *         ville:
+ *           type: string
+ *           example: "Paris"
+ *         age:
+ *           type: integer
+ *           example: 30
+ *         sex:
+ *           type: string
+ *           enum:
+ *             - Homme
+ *             - Femme
+ *           example: "Homme"
+ *         terms_accepted:
+ *           type: boolean
+ *           example: true
+ *         type:
+ *           type: string
+ *           example: "admin"
+ */

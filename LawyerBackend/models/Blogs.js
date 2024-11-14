@@ -27,3 +27,40 @@ module.exports = (sequelize, DataTypes) => {
         },
     })
 }
+/**
+* @swagger
+* components:
+*  schemas:
+*    Blog:
+*      type: object
+*      required:
+*        - title
+*        - body
+*        - image
+*        - categoryId
+*        - userId
+*        - accepted
+*      properties:
+*        title:
+*          type: string
+*          maxLength: 20
+*          example: "My First Blog"
+*        body:
+*          type: string
+*          maxLength: 500
+*          example: "This is the content of the blog post."
+*        image:
+*          type: string
+*          maxLength: 50
+*          example: "image.jpg"
+*        categoryId:
+*          type: integer
+*          example: 1
+*        userId:
+*          type: integer
+*          example: 42
+*        accepted:
+*          type: boolean
+*          example: true
+*
+* */
