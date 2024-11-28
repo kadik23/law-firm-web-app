@@ -19,7 +19,7 @@ userRouter.get('/categories/all',categoriesController.getAllCategories);
 userRouter.get('/categories/name',categoriesController.getCategoryByName);
 
 userRouter.get('/blogs/all',blogsController.getAllBlogs)
-userRouter.get('/blogs/id',blogsController.getBlogById)
+userRouter.get('/blogs/:id',blogsController.getBlogById)
 
 
 

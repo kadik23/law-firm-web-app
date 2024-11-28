@@ -33,7 +33,7 @@ const getAllBlogs= async (req,res)=>{
 };
 /**
  * @swagger
- * /user/blogs/id:
+ * /user/blogs/:id:
  *   get:
  *     summary: Retrieve a single blog by ID
  *     description: This endpoint retrieves a single blog entry from the database based on the provided blog ID in the body.
@@ -65,7 +65,7 @@ const getAllBlogs= async (req,res)=>{
 
 const getBlogById= async (req,res)=>{
     try {
-        const {id} = req.body;
+        const {id} = req.params;
         let blog = await blogs.findOne({ where: { id } });
 
         if (!blog) {
