@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react";
 
-const BlogCategory = ({blogCategory}:{blogCategory:string}) => {
+const BlogCategory = ({blogCategory}:{blogCategory?:string}) => {
     const [activeCategory, setActiveCategory] = useState<number | null>(null);
 
     const categories: string[] = [

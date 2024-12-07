@@ -1,28 +1,10 @@
+import useDateFormatter from "@/hooks/useDateFormatter";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
-
-type Blog = {
-    id: number;
-    title: string;
-    author: string;
-    content: string;
-    likes: number;
-    date: Date;
-    readingDuration: number;
-    image: string;
-    category: string;
-}
 
 const BLogInfromation = ({ blog }:{blog:Blog}) => {
 
-    const months:String[] = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov","Dec"];
-
-    const formatDate = () => {
-        const date = new Date(blog.date);
-        console.log("month number",date.getMonth())
-        return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
-    }
     return (
-        <div className="w-full flex md:flex-col flex-col-reverse">
+        <div className="w-full flex md:flex-col flex-col-reverse mb-8">
 
             {/* Blog Header (date and share button) */}
             <div className="pb-4 my-4 w-full flex md:flex-row flex-col gap-3 justify-between items-center
@@ -30,14 +12,14 @@ const BLogInfromation = ({ blog }:{blog:Blog}) => {
 
                 {/* date and reading duration */}
                 <div className="text-sm font-medium text-gray-600">
-                    {formatDate()} - {Math.floor(blog.readingDuration / 60000)} minutes de lecture
+                    {useDateFormatter(blog.date)} minutes de lecture
                 </div>
 
                 {/* comment and Share Button */}
                 <div className="flex gap-3">
                     <button className="text-primary border-[1px] border-black font-semibold px-4 py-2 rounded-md
                         flex items-center gap-1 md:hidden">
-                            {/* plus icon */}
+                            {/* comment icon */}
                             <Icon
                                 icon="mdi:comment"
                                 width={20}
@@ -47,7 +29,7 @@ const BLogInfromation = ({ blog }:{blog:Blog}) => {
                     </button>
                     <button className="text-primary border-[1px] border-black font-semibold px-4 py-2 rounded-md
                         flex items-center gap-1">
-                            {/* plus icon */}
+                            {/* share icon */}
                             <Icon
                                 icon="mdi:share"
                                 width={20}

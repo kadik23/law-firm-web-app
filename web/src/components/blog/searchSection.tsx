@@ -45,7 +45,7 @@ const SearchSection = () => {
                     </button>
 
                 </div>
-            </div>
+        </div>
     )
 }
 

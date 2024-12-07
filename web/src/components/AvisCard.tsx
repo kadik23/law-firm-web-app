@@ -1,5 +1,7 @@
 import React from 'react'
 import Image from "next/image";
+import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
+import useDateFormatter from '@/hooks/useDateFormatter';
 
 function AvisCard({name, image, avis, likes, creationDate}: avisEntity) {
   return (
@@ -16,6 +18,31 @@ function AvisCard({name, image, avis, likes, creationDate}: avisEntity) {
             <div className='font-semibold'>{name}</div>
         </div>
         <div className='mt-4'>{avis}</div>
+        {(likes && creationDate) &&
+            <div className='pt-3 pb-5 flex items-center justify-between'>
+                <div className='flex flex-col items-start gap-2'>
+                    <div className="flex items-center gap-1">
+                                {/* like icon */}
+                                <button>
+                                    <Icon
+                                            icon="mdi:like"
+                                            width={20}
+                                    />
+                                </button>
+                                {likes}
+                    </div>
+                    <div className='text-sm font-medium text-gray-300'>
+                        {useDateFormatter(creationDate)}
+                    </div>
+                </div>
+                <div>
+                    <Icon
+                        icon="mdi:reply"
+                        width={20}
+                    />
+                </div>
+            </div>
+        }
     </div>
     )
 }
