@@ -17,7 +17,7 @@ const BlogCard = ({blog}:{blog:Blog}) => {
                     <div className="text-sm flex gap-1 items-center">
                         Read post
                         <Icon
-                            icon="mdi:like"
+                            icon="mdi:arrow"
                             width={15}
                         />
                     </div>
