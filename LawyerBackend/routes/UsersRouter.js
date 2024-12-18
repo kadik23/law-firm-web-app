@@ -4,6 +4,7 @@ const userController = require('../controllers/AuthController.js')
 const authMiddleware = require("../middlewares/AuthMiddleware.js")
 const categoriesController = require("../controllers/User/Categories.js");
 const blogsController = require("../controllers/User/Blogs");
+const attorneysController = require('../controllers/User/attorneys.js');
 
 
 
@@ -18,8 +19,11 @@ userRouter.post('/signin' ,userController.signIn);
 userRouter.get('/categories/all',categoriesController.getAllCategories);
 userRouter.get('/categories/name',categoriesController.getCategoryByName);
 
-userRouter.get('/blogs/all',blogsController.getAllBlogs)
-userRouter.get('/blogs/:id',blogsController.getBlogById)
+userRouter.get('/blogs/all',blogsController.getAllBlogs);
+userRouter.get('/blogs/:id',blogsController.getBlogById);
+
+userRouter.get('/attorneys',attorneysController.getAllAttorneys);
+
 
 
 

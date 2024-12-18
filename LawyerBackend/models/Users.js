@@ -1,57 +1,61 @@
-module.exports = (sequelize, DataTypes) => {
 
-    return sequelize.define("users", {
-        name: {
-            type: DataTypes.STRING(20),
-            allowNull: false
-        },
-        surname: {
-            type: DataTypes.STRING(20),
-            allowNull: false
-        },
-        email: {
-            type: DataTypes.STRING(50),
-            allowNull: false,
-            unique: true,
-            validate: {
-                isEmail: true,
-            }
-        },
-        password: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
-        phone_number: {
-            type: DataTypes.STRING(20),
-            allowNull: false,
-            unique: true
-        },
-        pays: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
-        ville: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
-        age: {
-            type: DataTypes.INTEGER,
-            allowNull: false
-        },
-        sex: {
-            type: DataTypes.ENUM('Homme', 'Femme'),
-            allowNull: false,
-        },
-        terms_accepted: {
-            type: DataTypes.BOOLEAN,
-            allowNull: false,
-        },
-        type: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-    })
-}
+module.exports = (sequelize, DataTypes) => {
+    const User = sequelize.define('User', {
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  surname: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true
+  },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  phone_number: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  pays: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  ville: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  age: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
+  sex: {
+      type: DataTypes.ENUM('Homme', 'Femme'),
+      allowNull: true
+  },
+  
+  terms_accepted: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false
+  },
+  type: {
+    type: DataTypes.STRING,
+    allowNull: false
+  }
+});
+
+    return User;
+  };
 
 /**
  * @swagger
@@ -60,6 +64,7 @@ module.exports = (sequelize, DataTypes) => {
  *     User:
  *       type: object
  *       required:
+           - id
  *         - name
  *         - surname
  *         - email
@@ -72,6 +77,9 @@ module.exports = (sequelize, DataTypes) => {
  *         - terms_accepted
  *         - type
  *       properties:
+           id:
+             type: number
+             example: "2"
  *         name:
  *           type: string
  *           maxLength: 20
