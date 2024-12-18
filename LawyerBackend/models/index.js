@@ -34,6 +34,8 @@ db.Sequelize = Sequelize
 db.sequelize = sequelize
 
 db.users = require('./Users.js')(sequelize, DataTypes)
+const Attorney = require('./attorneys')(sequelize, Sequelize.DataTypes);
+db.Attorney = Attorney;
 db.files = require('./FIles.js')(sequelize, DataTypes)
 db.categories = require('./Categories.js')(sequelize, DataTypes)
 db.blogs = require('./Blogs.js')(sequelize, DataTypes)
