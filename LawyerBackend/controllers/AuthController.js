@@ -235,6 +235,40 @@ const signIn = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 };
+/**
+ * @swagger
+ * /user/current:
+ *     get:
+ *         summary: Get Current User
+ * description: Fetch the details of the currently authenticated client.
+ *     tags:
+ * - Client Profile
+ *     responses:
+ *         '200':
+ *           description: Successfully fetched the current user.
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 $ref: '#/components/schemas/User'
+ * '401':
+ * description: Unauthorized - Missing or Invalid Token.
+ *     content:
+ * application/json:
+ * schema:
+ *     type: object
+ * properties:
+ *     error:
+ *         type: string
+ * example: Unauthorized - Missing Token
+ * '500':
+ * description: Internal Server Error.
+ *     content:
+ * application/json:
+ * schema:
+ *     type: string
+ * example: Internal Server Error
+ */
+
 
 const getCurrentClient = async (req, res) => {
     try {
