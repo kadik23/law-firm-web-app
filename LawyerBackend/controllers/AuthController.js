@@ -235,8 +235,20 @@ const signIn = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 };
+
+const getCurrentClient = async (req, res) => {
+    try {
+        console.log("Success fetching user");
+        res.status(200).send(req.user);
+    } catch (error) {
+        console.error('Error fetching client:', error);
+        res.status(500).send('Internal Server Error');
+    }
+};
+
 module.exports = {
     signUp,
     addFiles,
-    signIn
+    signIn,
+    getCurrentClient
 };
