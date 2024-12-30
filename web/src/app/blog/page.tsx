@@ -1,4 +1,3 @@
-
 import BlogCategory from "@/components/blog/blogCategory";
 import OtherBlogs from "@/components/blog/otherBlogs";
 import blogPosts from "@/components/blog/blogs";
