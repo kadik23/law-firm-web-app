@@ -5,6 +5,7 @@ import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import Signup from "./Signup";
 import Signin from "./Signin";
 import Link from "next/link";
+import { div } from "framer-motion/client";
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -48,104 +49,149 @@ function Header() {
   }, []);
 
   return (
-    <div className="flex justify-between items-center fixed top-0 left-0 w-full z-50 bg-third py-2 shadow-lg px-4 md:px-8 text-white">
-      <Link href={"/"}>
-        <Image
-          src="/images/Logo.png"
-          alt="logo"
-          width={125}
-          height={125}
-          priority
+    <div className="flex flex-col w-full fixed top-0 left-0 w-full z-50">
+      <div className="flex justify-between items-center w-full bg-[#4A84AA] py-2 px-4 md:px-8">
+        <div className="flex items-center text-white font-semibold text-sm">
+          <Icon icon="ic:outline-phone" width="20" height="20" className="mr-2" />
+          0 26 45 23 45
+        </div>
+        <div className="flex gap-3 items-center text-white">
+          <span className="text-sm">Social Media</span>
+            {/* Facebook */}
+            <Icon 
+              icon="ic:outline-facebook" 
+              width={20} 
+              className="hover:text-blue-700"
+            />
+            {/* WhatsApp */}
+              <Icon
+                icon="mdi:whatsapp"
+                width={20}
+                className="hover:text-green-700"
+              />
+            {/* Linkedin */}
+            <Icon
+              icon="mdi:linkedin"
+              width={20}
+              className="hover:text-blue-900"
+            />
+        </div>
+      </div>
+      <div className="flex justify-between items-center w-full bg-third py-2 shadow-lg px-4 md:px-8 text-white">
+        <Link href={"/"}>
+          <Image
+            src="/images/Logo.png"
+            alt="logo"
+            width={125}
+            height={125}
+            priority
+          />
+        </Link>
+        <Signup
+          isModalOpen={isSignupModalOpen}
+          setModalOpen={setSignupModalOpen}
+          isUploadFiles={false}
         />
-      </Link>
-      <Signup
-        isModalOpen={isSignupModalOpen}
-        setModalOpen={setSignupModalOpen}
-        isUploadFiles={false}
-      />
-      <Signin
-        isModalOpen={isSigninModalOpen}
-        setModalOpen={setSigninModalOpen}
-      />
-      <div className="hidden lg:flex items-center justify-between gap-4 cursor-pointer">
-        {links.map((link, index) => (
-          <a
-            key={index}
-            href={link.href}
-            className={`uppercase text-sm text-primary hover:underline underline-offset-2 font-semibold transition duration-300 ${
-              activeSection === link.href.substring(1) ? "underline" : ""
-            }`}
-          >
-            {link.name}
-          </a>
-        ))}
-      </div>
-
-      <div className="flex items-center text-primary font-semibold text-sm">
-        <Icon icon="ic:outline-phone" width="20" height="20" className="mr-2" />
-        0 26 45 23 45
-      </div>
-
-      <div className="hidden md:flex items-center justify-between gap-4">
-        <button
-          className="bg-primary rounded-md p-2 btn font-semibold shadow-lg"
-          onClick={() => setSigninModalOpen(true)}
-        >
-          connexion
-        </button>
-        <button
-          className="bg-secondary rounded-md p-2 btn font-semibold shadow-lg"
-          onClick={() => setSignupModalOpen(true)}
-        >
-          inscription
-        </button>
-      </div>
-
-      <Icon
-        icon="mingcute:menu-line"
-        width="32"
-        height="32"
-        className="lg:hidden text-primary cursor-pointer"
-        onClick={toggleMenu}
-      />
-
-      {/* Dropdown menu for small screens */}
-      {menuOpen && (
-        <div className="absolute top-14 right-4 bg-white text-primary rounded-md shadow-lg p-4 flex flex-col gap-2 lg:hidden">
+        <Signin
+          isModalOpen={isSigninModalOpen}
+          setModalOpen={setSigninModalOpen}
+        />
+        <div className="hidden lg:flex items-center justify-between gap-4 cursor-pointer">
           {links.map((link, index) => (
             <a
               key={index}
               href={link.href}
-              className={`uppercase text-sm hover:underline text-primary font-semibold transition duration-300 ${
+              className={`uppercase text-sm text-primary hover:underline underline-offset-2 font-semibold transition duration-300 ${
                 activeSection === link.href.substring(1) ? "underline" : ""
               }`}
-              onClick={() => setMenuOpen(false)}
             >
               {link.name}
             </a>
           ))}
-          <div className="flex flex-col gap-2 mt-4">
+        </div>
+
+        
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-1 hidden md:flex text-primary">
+              {/* Heart / Favorite */}
+              <Icon
+                icon="mdi:heart"
+                width={20}
+              />
+              <div className="uppercase font-semibold text-sm">My blogs</div>
+          </div>
+          <div className="hidden md:flex items-center justify-between gap-4">
             <button
-              onClick={() => {
-                setSigninModalOpen(true);
-                setMenuOpen(false);
-              }}
-              className="bg-primary text-white rounded-md p-2 font-semibold shadow-lg"
+              className="bg-primary rounded-md p-2 btn font-semibold shadow-lg"
+              onClick={() => setSigninModalOpen(true)}
             >
               connexion
             </button>
             <button
-              className="bg-secondary rounded-md p-2 font-semibold shadow-lg"
-              onClick={() => {
-                setSignupModalOpen(true);
-                setMenuOpen(false);
-              }}
+              className="bg-secondary rounded-md p-2 btn font-semibold shadow-lg"
+              onClick={() => setSignupModalOpen(true)}
             >
               inscription
             </button>
           </div>
         </div>
-      )}
+
+        <Icon
+          icon="mingcute:menu-line"
+          width="32"
+          height="32"
+          className="lg:hidden text-primary cursor-pointer"
+          onClick={toggleMenu}
+        />
+
+        {/* Dropdown menu for small screens */}
+        {menuOpen && (
+          <div className="absolute top-14 right-4 bg-white text-primary rounded-md shadow-lg p-4 flex flex-col gap-2 lg:hidden">
+            {links.map((link, index) => (
+              <a
+                key={index}
+                href={link.href}
+                className={`uppercase text-sm hover:underline text-primary font-semibold transition duration-300 ${
+                  activeSection === link.href.substring(1) ? "underline" : ""
+                }`}
+                onClick={() => setMenuOpen(false)}
+              >
+                {link.name}
+              </a>
+            ))}
+            <div className="flex flex-col items-center mt-3 border-t pt-2">
+              <div className="flex items-center gap-2 text-primary">
+                  {/* Heart / Favorite */}
+                  <Icon
+                    icon="mdi:heart"
+                    width={20}
+                  />
+                  <span className="uppercase font-semibold text-sm">My blogs</span>
+              </div>
+              <div className="flex flex-col gap-2 mt-4">
+                <button
+                  onClick={() => {
+                    setSigninModalOpen(true);
+                    setMenuOpen(false);
+                  }}
+                  className="bg-primary text-white rounded-md p-2 font-semibold shadow-lg"
+                >
+                  connexion
+                </button>
+                <button
+                  className="bg-secondary rounded-md p-2 font-semibold shadow-lg"
+                  onClick={() => {
+                    setSignupModalOpen(true);
+                    setMenuOpen(false);
+                  }}
+                >
+                  inscription
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

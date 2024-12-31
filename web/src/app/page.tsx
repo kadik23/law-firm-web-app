@@ -7,6 +7,7 @@ import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import { motion } from "framer-motion";
 import useCarousel from "@/hooks/useCarousel";
 import Link from "next/link";
+import useContactForm from "@/hooks/useContact";
 
 export default function Home() {
   const directions = [
@@ -25,7 +26,8 @@ export default function Home() {
     offset: serviceOffset,
     visibleItems: serviceVisibleItems,
   } = useCarousel(serviceItems.length, 3.5);
-
+  const { register, onsubmit, handleSubmit, errors, isDisabled, validateForm } =
+    useContactForm();
   const {
     currentIndex: currentAvisIndex,
     handlePrev: handlePrevAvis,
@@ -182,14 +184,21 @@ export default function Home() {
           </div>
           <div className="p-4 md:p-8 flex flex-col md:flex-row items-center gap-4 lg:gap-0 lg:justify-between">
             <Map />
-            <div className="md:w-5/12 w-full flex flex-col gap-4 border border-white rounded-lg p-4">
+            <form
+              onSubmit={handleSubmit(onsubmit)}
+              className="md:w-5/12 w-full flex flex-col gap-4 border border-white rounded-lg p-4"
+            >
               <div className="flex flex-col justify-start gap-2">
                 <div className="text-textColor text-sm font-semibold">Name</div>
                 <input
                   type="text"
                   placeholder="Enter votre name"
                   className="py-1 px-4 outline-none text-white rounded-lg border border-white bg-transparent"
+                  {...register("name", {
+                    required: "nom est requis",
+                  })}
                 />
+                {errors.name && <p className="error">{errors.name.message}</p>}
               </div>
               <div className="flex flex-col justify-start gap-2">
                 <div className="text-textColor text-sm font-semibold">
@@ -199,7 +208,15 @@ export default function Home() {
                   type="text"
                   placeholder="Enter votre surname"
                   className="py-1 px-4 outline-none text-white rounded-lg border border-white bg-transparent"
+                  {...register("surname", {
+                    required: "prénom est requis",
+                  })}
                 />
+                {errors?.surname?.message && (
+                  <p className="error" style={{ color: "red" }}>
+                    {errors?.surname.message}
+                  </p>
+                )}
               </div>
               <div className="flex flex-col justify-start gap-2">
                 <div className="text-textColor text-sm font-semibold">
@@ -207,9 +224,32 @@ export default function Home() {
                 </div>
                 <input
                   type="email"
+                  {...register("email", {
+                    pattern: {
+                      value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                      message: "Format d'email invalide",
+                    },
+                    validate: {
+                      notAdmin: (fieldValue) => {
+                        return (
+                          fieldValue !== "admin@example.com" ||
+                          "Enter a different email address"
+                        );
+                      },
+                      notBlackListed: (fieldValue) => {
+                        return (
+                          !fieldValue.endsWith("baddomain.com") ||
+                          "this Domain is not supported"
+                        );
+                      },
+                    },
+                  })}
                   placeholder="Enter votre email"
                   className="py-1 px-4 outline-none text-white rounded-lg border border-white bg-transparent"
                 />
+                {errors?.email?.message && (
+                  <p className="error">{errors?.email.message}</p>
+                )}
               </div>
               <div className="flex flex-col justify-start gap-2">
                 <div className="text-textColor text-sm font-semibold">
@@ -218,12 +258,27 @@ export default function Home() {
                 <textarea
                   placeholder="Enter votre message"
                   className="py-1 px-4 outline-none w-full text-white rounded-lg border border-white bg-transparent"
+                  {...register("message", {
+                    required: "message est requis",
+                  })}
                 />
+                {errors?.message?.message && (
+                  <p className="error" style={{ color: "red" }}>
+                    {errors?.message.message}
+                  </p>
+                )}
               </div>
-              <button className="btn bg-textColor py-1 px-4 text-center rounded-md text-white">
+              <button
+                onClick={() => validateForm()}
+                className={`${
+                  isDisabled
+                    ? "btn_desabled active:scale-100"
+                    : "btn bg-textColor"
+                } py-1 px-4 text-center rounded-md text-white`}
+              >
                 Submit
               </button>
-            </div>
+            </form>
           </div>
         </div>
       </section>

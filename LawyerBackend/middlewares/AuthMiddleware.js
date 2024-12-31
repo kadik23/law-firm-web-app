@@ -3,14 +3,14 @@ require("dotenv").config();
 
 module.exports = (req, res, next) => {
     const authHeader = req.headers.authorization
-    console.log("auth:"+req.body)
+    console.log("auth:"+authHeader)
     try {
 
             if (!authHeader) {
                 return res.status(401).json({ error: 'Unauthorized - Missing Token' });
             }
-            const token = authHeader.split(' ')[1];
-            const data = jwt.verify(token, process.env.SECRET);
+            // const token = authHeader.split(' ')[1];
+            const data = jwt.verify(authHeader, process.env.SECRET);
             if (!data.user) {
                 return res.status(401).json({ error: 'Unauthorized - Invalid Token' });
             }else{

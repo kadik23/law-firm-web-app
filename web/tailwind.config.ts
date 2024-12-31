@@ -13,11 +13,14 @@ const config: Config = {
         foreground: "var(--foreground)",
         primary: "#1E3B58",
         secondary: "#4A84AA",
+        btnSecondary: "#3281B8",
         third: "#E4F1FE",
         textColor: "#3498DB"
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require('tailwind-scrollbar'),
+  ],
 };
 export default config;
