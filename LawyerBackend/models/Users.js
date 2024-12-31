@@ -64,7 +64,6 @@ module.exports = (sequelize, DataTypes) => {
  *     User:
  *       type: object
  *       required:
-           - id
  *         - name
  *         - surname
  *         - email
@@ -77,9 +76,6 @@ module.exports = (sequelize, DataTypes) => {
  *         - terms_accepted
  *         - type
  *       properties:
-           id:
-             type: number
-             example: "2"
  *         name:
  *           type: string
  *           maxLength: 20
