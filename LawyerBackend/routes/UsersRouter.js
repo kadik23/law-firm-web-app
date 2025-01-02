@@ -16,6 +16,7 @@ const userRouter = require('express').Router()
 userRouter.post('/signup' ,userController.signUp);
 userRouter.post('/uploadFiles', authMiddleware,userController.addFiles);
 userRouter.post('/signin' ,userController.signIn);
+userRouter.get('/current' ,authMiddleware,userController.getCurrentClient);
 
 userRouter.get('/categories/all',categoriesController.getAllCategories);
 userRouter.get('/categories/name',categoriesController.getCategoryByName);

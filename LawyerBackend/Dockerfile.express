@@ -1,0 +1,31 @@
+# Use the official Node.js image
+FROM node:16
+
+# Set working directory
+WORKDIR /app
+
+# Install wait-for-it
+RUN apt-get update && apt-get install -y wget
+RUN wget -O wait-for-it.sh https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh
+RUN chmod +x wait-for-it.sh
+
+# Copy package files
+COPY package*.json ./
+
+# Install backend dependencies
+RUN npm install
+RUN npm rebuild bcrypt --build-from-source
+
+# Copy the application code
+COPY . .
+
+# Copy and make the script executable
+COPY scripts/scripts.sh ./scripts.sh
+RUN chmod +x ./scripts.sh
+RUN ./scripts.sh
+
+# Expose backend port (e.g., 5000)
+EXPOSE 5000
+
+# Use wait-for-it script before starting the app
+CMD ["./wait-for-it.sh", "mysql:3306", "--", "npm", "start"]

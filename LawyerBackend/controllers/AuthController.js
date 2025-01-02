@@ -235,8 +235,59 @@ const signIn = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 };
+/**
+ * @swagger
+ * /user/current:
+ *   get:
+ *     summary: Get Current User
+ *     description: Fetch the details of the currently authenticated client.
+ *     tags:
+ *       - Client Profile
+ *     responses:
+ *       '200':
+ *         description: Successfully fetched the current user.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       '401':
+ *         description: Unauthorized - Missing or Invalid Token.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *               example:
+ *                 error: Unauthorized - Missing Token
+ *       '500':
+ *         description: Internal Server Error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *               example: Internal Server Error
+ */
+
+const getCurrentClient = async (req, res) => {
+    try {
+        console.log("Success fetching user");
+        const email = req.user.email;
+        const user = await users.findOne({ 
+            where: { email },
+            attributes: { exclude: ['password'] },
+         });
+        res.status(200).send(user);
+    } catch (error) {
+        console.error('Error fetching client:', error);
+        res.status(500).send('Internal Server Error');
+    }
+};
+
 module.exports = {
     signUp,
     addFiles,
-    signIn
+    signIn,
+    getCurrentClient
 };
