@@ -30,3 +30,36 @@ module.exports = (sequelize, DataTypes) => {
 
   return Attorney;
 };
+/**
+* @swagger
+* components:
+*  schemas:
+*    Attorney:
+*      type: object
+*      required:
+*        - user_id
+*        - status
+*        - date_membership
+*      properties:
+*        id:
+*          type: integer
+*          example: 1
+*        user_id:
+*          type: integer
+*          example: 42
+*        status:
+*          type: string
+*          default: "pending"
+*          example: "approved"
+*        linkedin_url:
+*          type: string
+*          example: "https://linkedin.com/in/attorney"
+*        certificats:
+*          type: string
+*          example: "Certificate of Law"
+*        date_membership:
+*          type: string
+*          format: date-time
+*          example: "2025-01-01T12:00:00Z"
+*
+* */

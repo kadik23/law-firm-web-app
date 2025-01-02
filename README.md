@@ -1,9 +1,10 @@
 # law-firm-web-app
 use http://localhost:8080/api-docs/
 
-# Acces Blog Page
-via http://localhost:3000/blog
 
-# Acces Blog Details Page 
-via http://localhost:3000/blog/blogId
-Note: blogId from 1 to 10
+# To run backend in docker: 
+1- delete node_modules folder </br>
+2- docker build: ```docker build -t express-app -f Dockerfile.express .```</br>
+3- run both express server and mysql server: ```docker run -p 5000:5000 express-app```</br>
+
+### NOTE: this is just if you want to test it in docker so no need to use it always in develepment mode (it's just for production mode), use npm and your localhost mysql
