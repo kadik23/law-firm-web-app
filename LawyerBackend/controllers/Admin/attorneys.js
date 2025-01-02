@@ -5,6 +5,88 @@ const jwt = require('jsonwebtoken');
 const User = db.users;
 const Attorney = db.Attorney;
 
+/**
+ * @swagger
+ * paths:
+ *   /admin/attorneys/create:
+ *     post:
+ *       summary: "Create a new attorney"
+ *       description: "Create a new attorney account with associated user details."
+ *       tags:
+ *         - Attorneys
+ *       security:
+ *         - BearerAuth: []
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               required:
+ *                 - first_name
+ *                 - last_name
+ *                 - email
+ *                 - password
+ *                 - linkedin_url
+ *                 - pays
+ *                 - terms_accepted
+ *                 - status
+ *               properties:
+ *                 first_name:
+ *                   type: string
+ *                   example: "John"
+ *                 last_name:
+ *                   type: string
+ *                   example: "Doe"
+ *                 email:
+ *                   type: string
+ *                   format: email
+ *                   example: "john.doe@example.com"
+ *                 password:
+ *                   type: string
+ *                   format: password
+ *                   example: "securepassword123"
+ *                 phone_number:
+ *                   type: string
+ *                   example: "+1234567890"
+ *                 city:
+ *                   type: string
+ *                   example: "New York"
+ *                 age:
+ *                   type: integer
+ *                   example: 35
+ *                 sex:
+ *                   type: string
+ *                   example: "Male"
+ *                 linkedin_url:
+ *                   type: string
+ *                   example: "https://www.linkedin.com/in/johndoe"
+ *                 certificats:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Certificate A", "Certificate B"]
+ *                 date_membership:
+ *                   type: string
+ *                   format: date
+ *                   example: "2022-01-01"
+ *                 pays:
+ *                   type: string
+ *                   example: "USA"
+ *                 terms_accepted:
+ *                   type: boolean
+ *                   example: true
+ *                 status:
+ *                   type: string
+ *                   example: "Active"
+ *       responses:
+ *         '201':
+ *           description: "Attorney created successfully"
+ *         '400':
+ *           description: "Bad Request - Missing required fields"
+ *         '500':
+ *           description: "Internal Server Error"
+ */
 const createAttorney = async (req, res) => {
   const {
     first_name,

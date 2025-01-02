@@ -1,61 +1,59 @@
-
 module.exports = (sequelize, DataTypes) => {
-    const User = sequelize.define('User', {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true
-  },
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  surname: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  email: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true
-  },
-  password: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  phone_number: {
-    type: DataTypes.STRING,
-    allowNull: true
-  },
-  pays: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  ville: {
-    type: DataTypes.STRING,
-    allowNull: true
-  },
-  age: {
-    type: DataTypes.INTEGER,
-    allowNull: true
-  },
-  sex: {
+  const User = sequelize.define('users', {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    surname: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    phone_number: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    pays: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    ville: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    age: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    sex: {
       type: DataTypes.ENUM('Homme', 'Femme'),
-      allowNull: true
-  },
-  
-  terms_accepted: {
-    type: DataTypes.BOOLEAN,
-    allowNull: false
-  },
-  type: {
-    type: DataTypes.STRING,
-    allowNull: false
-  }
-});
+      allowNull: true,
+    },
+    terms_accepted: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+    },
+    type: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+  });
+  return User;
+};
 
-    return User;
-  };
 
 /**
  * @swagger
@@ -64,6 +62,7 @@ module.exports = (sequelize, DataTypes) => {
  *     User:
  *       type: object
  *       required:
+ *         - id
  *         - name
  *         - surname
  *         - email
@@ -76,6 +75,9 @@ module.exports = (sequelize, DataTypes) => {
  *         - terms_accepted
  *         - type
  *       properties:
+ *         id:
+ *           type: number
+ *           example: 2
  *         name:
  *           type: string
  *           maxLength: 20
