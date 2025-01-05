@@ -2,7 +2,7 @@ import useDateFormatter from "@/hooks/useDateFormatter";
 import useTruncateText from "@/hooks/useTruncateText";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 
-const BlogCard = ({blog}:{blog:Blog}) => {
+const BlogCard = ({blog, signIn}:{blog:Blog,signIn?:boolean}) => {
     return (
         <div className="w-full p-2 flex flex-col shadow-md rounded-md">
             <img 
@@ -10,7 +10,7 @@ const BlogCard = ({blog}:{blog:Blog}) => {
                 alt={blog.title} 
                 className="rounded-md w-full h-full object-cover mb-2" 
             />
-            <div>
+            <div className="mb-3">
                 <h3 className="text-sm font-semibold text-gray-900">{blog.title}</h3>
                 <p className="text-sm text-gray-500 text-justify mb-4">{useTruncateText(blog.content, 200)}</p>
                 <div className="flex justify-between items-center gap-2">
@@ -22,8 +22,19 @@ const BlogCard = ({blog}:{blog:Blog}) => {
                         />
                     </div>
                     <span className="text-sm text-gray-500">{useDateFormatter(blog.date)}</span>
-                </div>
+                </div>  
             </div>
+            {signIn && (
+            
+                <button className="bg-secondary text-white flex gap-1 items-center 
+                justify-center w-full py-2 rounded-lg">
+                    <Icon
+                        icon="mdi:delete"
+                        width={15}
+                    />
+                    retirer le
+                </button>
+            )}
         </div>
     )
 }
