@@ -1,0 +1,10 @@
+NODE_ENV=development
+SECRET="itsasecret"
+EMAIL_USER=user@gmail.com
+EMAIL_PASS='userpassword'
+PORT=3306
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=password
+DB_NAME=lawyer
+DB_PORT=3306

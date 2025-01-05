@@ -6,6 +6,7 @@ const categoriesController = require("../controllers/User/Categories.js");
 const blogsController = require("../controllers/User/Blogs");
 const attorneysController = require('../controllers/User/attorneys.js');
 const favoritesController = require('../controllers/User/Favorites.js');
+const blogCommentsController = require('../controllers/User/BlogComments');
 
 
 
@@ -23,6 +24,7 @@ userRouter.get('/categories/name',categoriesController.getCategoryByName);
 
 userRouter.get('/blogs/all',blogsController.getAllBlogs);
 userRouter.get('/blogs/:id',blogsController.getBlogById);
+userRouter.post('/blogs/addcomment',authMiddleware,blogCommentsController.addBlogComment);
 
 userRouter.get('/attorneys',attorneysController.getAllAttorneys);
 
