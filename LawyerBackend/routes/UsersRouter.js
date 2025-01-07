@@ -25,6 +25,9 @@ userRouter.get('/categories/name',categoriesController.getCategoryByName);
 userRouter.get('/blogs/all',blogsController.getAllBlogs);
 userRouter.get('/blogs/:id',blogsController.getBlogById);
 userRouter.post('/blogs/addcomment',authMiddleware,blogCommentsController.addBlogComment);
+userRouter.delete('/blogs/deletecomment',authMiddleware,blogCommentsController.deleteBlogComment());
+userRouter.put('/blogs/updatecomment',authMiddleware,blogCommentsController.updateBlogComment());
+userRouter.post('/blogs/replycomment',authMiddleware,blogCommentsController.replyComment());
 
 userRouter.get('/attorneys',attorneysController.getAllAttorneys);
 
