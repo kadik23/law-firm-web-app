@@ -1,6 +1,7 @@
 require('dotenv').config();
 const db = require('../../models')
 const blogs=db.blogs
+const categories=db.categories
 /**
  * @swagger
  * /user/blogs/all:
@@ -77,7 +78,95 @@ const getBlogById= async (req,res)=>{
         res.status(500).send('Internal Server Error');
     }
 };
+/**
+ * @swagger
+ * paths:
+ *   /admin/blogs/like:
+ *     put:
+ *       summary: "Like a blog"
+ *       tags:
+ *         - Blogs
+ *       security:
+ *         - BearerAuth: []
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               required:
+ *                 - id
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   example: 1
+ *       responses:
+ *         '200':
+ *           description: "Blog updated successfully"
+ *         '401':
+ *           description: "Unauthorized - Missing or Invalid Token"
+ *         '404':
+ *           description: "Blog not found"
+ *         '500':
+ *           description: "Internal Server Error"
+ */
+
+const likeBlog= async (req,res)=> {
+    try {
+        const {id} = req.body;
+
+        const blog = await blogs.findByPk(id);
+        if (!blog) {
+            return res.status(404).send('Blog not found');
+        }
+
+        const updatedBlog = await blogs.update(
+            {likes: blog.likes + 1},
+            {where: {id}}
+        );
+
+        if (!updatedBlog[0]) {
+            return res.status(404).send('Error updating blog');
+        } else {
+            return res.status(200).send('Blog updated successfully');
+        }
+
+    } catch (e) {
+        console.error('Error updating blog', e);
+        res.status(500).send('Internal Server Error');
+    }
+}
+
+
+const sortBlogs= async (req,res)=>{
+    try {
+        const {categoryId,sort,title} = req.params;
+        let blogsList = await blogs.findAll();
+        if(categoryId){
+            blogsList = blogsList.filter(blog => blog.categoryId === categoryId);
+        }
+        if (title) {
+            const searchTitle = title.toLowerCase();
+            blogsList = blogsList.filter(blog => blog.title.toLowerCase().startsWith(searchTitle));
+        }
+        if (sort) {
+            if (sort === "new") {
+                blogsList = blogsList.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            }
+            if (sort === "best") {
+                blogsList = blogsList.sort((a, b) => b.likes - a.likes);
+            }
+        }
+
+        return res.status(200).send(blogsList);
+    } catch (e) {
+        console.error('Error fetching blogs', e);
+        res.status(500).send('Internal Server Error');
+    }
+};
 module.exports = {
     getAllBlogs,
-    getBlogById
+    getBlogById,
+    likeBlog,
+    sortBlogs
 };
