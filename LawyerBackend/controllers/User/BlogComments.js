@@ -91,7 +91,7 @@ const addBlogComment = async (req,res)=> {
 
 const deleteBlogComment= async (req,res)=>{
     try {
-        const {id} = req.params;
+        const {id} = req.body;
         let comment = await comments.findByPk(id);
 
         if (!comment) {
@@ -238,9 +238,67 @@ const replyComment = async (req,res)=> {
         res.status(500).send('Internal Server Error');
     }
 };
+/**
+ * @swagger
+ * paths:
+ *   /user/blogs/likecomment:
+ *     post:
+ *       summary: "like a comment"
+ *       tags:
+ *         - like comment
+ *       security:
+ *         - BearerAuth: []
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               id:
+ *                   type: integer
+ *       responses:
+ *         '200':
+ *           description: "Comment added successfully"
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 $ref: '#/components/schemas/BlogComments'
+ *         '401':
+ *           description: "Unauthorized - Missing or Invalid Token"
+ *         '500':
+ *           description: "Internal Server Error"
+ */
+
+const likeComment = async (req,res)=> {
+    try {
+        const {id} = req.body;
+        let comment = await comments.findByPk(id);
+
+        if (!comment) {
+            return res.status(404).json("comment not found");
+        }
+
+
+        const updatedComments = await comment.update(
+            { likes: comment.likes+1 },
+            { where: { id } }
+        );
+
+        if (!updatedComments[0]) {
+            return res.status(404).send('Error updating comment');
+        } else {
+            return res.status(200).send('Comment updated successfully');
+        }
+
+    }
+    catch (e) {
+        console.error('Error updating comment', e);
+        res.status(500).send('Internal Server Error');
+    }
+};
 module.exports = {
     addBlogComment,
     updateBlogComment,
     deleteBlogComment,
-    replyComment
+    replyComment,
+    likeComment
 };
