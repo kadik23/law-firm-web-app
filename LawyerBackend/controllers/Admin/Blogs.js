@@ -74,7 +74,7 @@ const addBlog = async (req,res)=> {
 
             const imagePath = image ? image[0].path : null;
             let newBlog = await blogs.create({
-                title, body, image: imagePath, categoryId, userId: 3, accepted: true
+                title,likes:0, body, image: imagePath, categoryId, userId: 3, accepted: true
             });
 
             if (!newBlog) {
