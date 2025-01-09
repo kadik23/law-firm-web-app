@@ -50,7 +50,7 @@ function Header() {
 
   return (
     <div className="flex flex-col w-full fixed top-0 left-0 w-full z-50">
-      <div className="flex justify-between items-center w-full bg-[#4A84AA] py-2 px-4 md:px-8">
+      <div className="hidden md:flex justify-between items-center w-full bg-[#4A84AA] py-2 px-4 md:px-8">
         <div className="flex items-center text-white font-semibold text-sm">
           <Icon icon="ic:outline-phone" width="20" height="20" className="mr-2" />
           0 26 45 23 45
@@ -77,7 +77,9 @@ function Header() {
             />
         </div>
       </div>
+      
       <div className="flex justify-between items-center w-full bg-third py-2 shadow-lg px-4 md:px-8 text-white">
+        
         <Link href={"/"}>
           <Image
             src="/images/Logo.png"
@@ -136,14 +138,20 @@ function Header() {
           </div>
         </div>
 
-        <Icon
-          icon="mingcute:menu-line"
-          width="32"
-          height="32"
-          className="lg:hidden text-primary cursor-pointer"
-          onClick={toggleMenu}
-        />
+        <div className="flex lg:hidden items-center gap-2">
+          <div className="flex md:hidden items-center text-primary font-semibold text-sm">
+            <Icon icon="ic:outline-phone" width="20" height="20" className="mr-2" />
+            0 26 45 23 45
+          </div>
 
+          <Icon
+            icon="mingcute:menu-line"
+            width="32"
+            height="32"
+            className="lg:hidden text-primary cursor-pointer"
+            onClick={toggleMenu}
+          />
+        </div>
         {/* Dropdown menu for small screens */}
         {menuOpen && (
           <div className="absolute top-14 right-4 bg-white text-primary rounded-md shadow-lg p-4 flex flex-col gap-2 lg:hidden">
