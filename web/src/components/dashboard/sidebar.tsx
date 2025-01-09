@@ -23,7 +23,7 @@ const Sidebar = () => {
     ];
 
     return (
-        <div className="bg-secondary flex flex-col justify-center max-w-[320px] pt-20 pb-10 sticky left-0">
+        <div className="bg-secondary hidden md:flex flex-col max-w-[320px] pt-20 pb-10 sticky left-0">
             <ul className="mb-20 ml-6">
                 {routes.map(({ Icon, alt, path }) => {
                     const isActive = pathname === path;
