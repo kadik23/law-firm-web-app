@@ -62,20 +62,24 @@ const addBlogComment = async (req,res)=> {
 /**
  * @swagger
  * paths:
- *   /user/blogs/deletecomment/{id}:
+ *   /user/blogs/deletecomment:
  *     delete:
  *       summary: "Delete a blog comment"
  *       tags:
  *         - Blogs comments
  *       security:
  *         - BearerAuth: []
- *       parameters:
- *         - in: path
- *           name: id
- *           required: true
- *           schema:
- *             type: integer
- *           description: The ID of the blog comment to delete.
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               required:
+ *                 - id
+ *               properties:
+ *                 id:
+ *                   type: integer
  *       responses:
  *         '200':
  *           description: "Blog comment deleted successfully"
@@ -199,9 +203,14 @@ const updateBlogComment= async (req,res)=>{
  *         content:
  *           application/json:
  *             schema:
- *               body:
+ *               type: object
+ *               required:
+ *                 - body
+ *                 - originalCommentId
+ *               properties:
+ *                 body:
  *                   type: string
- *               originalCommentId:
+ *                 originalCommentId:
  *                   type: integer
  *       responses:
  *         '200':
@@ -252,13 +261,17 @@ const replyComment = async (req,res)=> {
  *         - Blogs comments
  *       security:
  *         - BearerAuth: []
- *       parameters:
- *         - in: path
- *           name: id
- *           required: true
- *           schema:
- *             type: integer
- *           description: The ID of the blog comment to like.
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               required:
+ *                 - id
+ *               properties:
+ *                 id:
+ *                   type: integer
  *       responses:
  *         '200':
  *           description: "Comment added successfully"
@@ -302,6 +315,17 @@ const likeComment = async (req,res)=> {
  *     summary: Retrieve a list of all comments of a blog
  *     tags:
  *       - Blogs comments
+ *     requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               required:
+ *                 - id
+ *               properties:
+ *                 id:
+ *                   type: integer
  *     responses:
  *       200:
  *         description: A list of comments
