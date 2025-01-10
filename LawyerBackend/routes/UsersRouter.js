@@ -6,6 +6,7 @@ const categoriesController = require("../controllers/User/Categories.js");
 const blogsController = require("../controllers/User/Blogs");
 const attorneysController = require('../controllers/User/attorneys.js');
 const favoritesController = require('../controllers/User/Favorites.js');
+const blogCommentsController = require('../controllers/User/BlogComments');
 
 
 
@@ -23,6 +24,16 @@ userRouter.get('/categories/name',categoriesController.getCategoryByName);
 
 userRouter.get('/blogs/all',blogsController.getAllBlogs);
 userRouter.get('/blogs/:id',blogsController.getBlogById);
+userRouter.post('/blogs/likeblog',authMiddleware,blogsController.likeBlog);
+userRouter.get('/blogs/sort',blogsController.sortBlogs);
+
+
+userRouter.post('/blogs/addcomment',authMiddleware, blogCommentsController.addBlogComment);
+userRouter.delete('/blogs/deletecomment',authMiddleware, blogCommentsController.deleteBlogComment);
+userRouter.put('/blogs/updatecomment',authMiddleware, blogCommentsController.updateBlogComment);
+userRouter.post('/blogs/replycomment',authMiddleware, blogCommentsController.replyComment);
+userRouter.post('/blogs/likecomment',authMiddleware, blogCommentsController.likeComment);
+userRouter.get('/blogs/commentsByBlog/:id',blogCommentsController.getCommentsByBlog);
 
 userRouter.get('/attorneys',attorneysController.getAllAttorneys);
 
