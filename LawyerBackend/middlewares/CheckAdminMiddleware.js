@@ -8,7 +8,7 @@ module.exports = (req, res, next) => {
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-        console.log(user.type);
+        console.log("user is an:"+user.type);
         if (user.type === 'admin') {
             console.log("user is admin");
             next();
