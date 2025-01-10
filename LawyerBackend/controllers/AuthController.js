@@ -226,7 +226,7 @@ const signIn = async (req, res) => {
         if (!isMatch) {
             return res.status(401).send('Invalid email or password.');
         }
-        const token = jwt.sign({ user: { id: user.id, email: user.email } }, process.env.SECRET, { expiresIn: '7d' });
+        const token = jwt.sign({ user }, process.env.SECRET, { expiresIn: '7d' });
 
         console.log("Successful sign in");
         res.status(200).send({ token });

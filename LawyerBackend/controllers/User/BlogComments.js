@@ -32,7 +32,7 @@ const comments=db.blogcomments
  *           content:
  *             application/json:
  *               schema:
- *                 $ref: '#/components/schemas/BlogComments'
+ *                 $ref: '#/components/schemas/BlogComment'
  *         '401':
  *           description: "Unauthorized - Missing or Invalid Token"
  *         '500':
@@ -44,7 +44,7 @@ const addBlogComment = async (req,res)=> {
             const {body, blogId} = req.body;
             const userId=req.user.id
             let newBlogComment = await comments.create({
-                body,userId,blogId,isAReply:false
+               body: body,userId:userId,blogId:blogId,isAReply:false
             });
 
             if (!newBlogComment) {
@@ -69,24 +69,34 @@ const addBlogComment = async (req,res)=> {
  *         - Blogs comments
  *       security:
  *         - BearerAuth: []
- *       requestParams:
+ *       requestBody:
  *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               required:
+ *                 - id
+ *               properties:
+ *                 id:
+ *                   type: integer
  *       responses:
  *         '200':
  *           description: "Blog comment deleted successfully"
  *           content:
  *             application/json:
  *               schema:
- *                 $ref: '#/components/schemas/BlogComments'
+ *                 $ref: '#/components/schemas/BlogComment'
  *         '401':
  *           description: "Unauthorized - Missing or Invalid Token"
  *         '403':
  *           description: "Forbidden - This comment does not belong to this user"
  *         '404':
- *           description: "comment not found"
+ *           description: "Comment not found"
  *         '500':
  *           description: "Internal Server Error"
  */
+
 
 
 const deleteBlogComment= async (req,res)=>{
@@ -117,7 +127,7 @@ const deleteBlogComment= async (req,res)=>{
  *     put:
  *       summary: "Update a blog comment"
  *       tags:
- *         - Blogs comment
+ *         - Blogs comments
  *       security:
  *         - BearerAuth: []
  *       requestBody:
@@ -125,7 +135,6 @@ const deleteBlogComment= async (req,res)=>{
  *         content:
  *           application/json:
  *             schema:
- *               schema:
  *               type: object
  *               required:
  *                 - id
@@ -164,10 +173,9 @@ const updateBlogComment= async (req,res)=>{
 
         const updatedComments = await comment.update(
             { body:body },
-            { where: { id } }
+            { where: { id:id } }
         );
-
-        if (!updatedComments[0]) {
+        if (!updatedComments) {
             return res.status(404).send('Error updating comment');
         } else {
             return res.status(200).send('Comment updated successfully');
@@ -185,7 +193,7 @@ const updateBlogComment= async (req,res)=>{
  * paths:
  *   /user/blogs/replycomment:
  *     post:
- *       summary: "Comment a blog"
+ *       summary: "Reply a comment"
  *       tags:
  *         - Blogs comments
  *       security:
@@ -195,9 +203,14 @@ const updateBlogComment= async (req,res)=>{
  *         content:
  *           application/json:
  *             schema:
- *               body:
+ *               type: object
+ *               required:
+ *                 - body
+ *                 - originalCommentId
+ *               properties:
+ *                 body:
  *                   type: string
- *               originalCommentId:
+ *                 originalCommentId:
  *                   type: integer
  *       responses:
  *         '200':
@@ -205,7 +218,7 @@ const updateBlogComment= async (req,res)=>{
  *           content:
  *             application/json:
  *               schema:
- *                 $ref: '#/components/schemas/BlogComments'
+ *                 $ref: '#/components/schemas/BlogComment'
  *         '401':
  *           description: "Unauthorized - Missing or Invalid Token"
  *         '404':
@@ -245,7 +258,7 @@ const replyComment = async (req,res)=> {
  *     post:
  *       summary: "like a comment"
  *       tags:
- *         - like comment
+ *         - Blogs comments
  *       security:
  *         - BearerAuth: []
  *       requestBody:
@@ -253,15 +266,15 @@ const replyComment = async (req,res)=> {
  *         content:
  *           application/json:
  *             schema:
- *               id:
+ *               type: object
+ *               required:
+ *                 - id
+ *               properties:
+ *                 id:
  *                   type: integer
  *       responses:
  *         '200':
  *           description: "Comment added successfully"
- *           content:
- *             application/json:
- *               schema:
- *                 $ref: '#/components/schemas/BlogComments'
  *         '401':
  *           description: "Unauthorized - Missing or Invalid Token"
  *         '500':
@@ -283,7 +296,7 @@ const likeComment = async (req,res)=> {
             { where: { id } }
         );
 
-        if (!updatedComments[0]) {
+        if (!updatedComments) {
             return res.status(404).send('Error updating comment');
         } else {
             return res.status(200).send('Comment updated successfully');
@@ -295,10 +308,54 @@ const likeComment = async (req,res)=> {
         res.status(500).send('Internal Server Error');
     }
 };
+/**
+ * @swagger
+ * /user/blogs/allcomments:
+ *   get:
+ *     summary: Retrieve a list of all comments of a blog
+ *     tags:
+ *       - Blogs comments
+ *     requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               required:
+ *                 - id
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *     responses:
+ *       200:
+ *         description: A list of comments
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/BlogComment'
+ *       500:
+ *         description: Internal Server Error
+ */
+
+const getCommentsByBlog= async (req,res)=>{
+    try {
+        const {id} = req.params;
+
+        let commentsList = await comments.findAll({ where: { blogId:id } });
+
+        return res.status(200).send(commentsList);
+    } catch (e) {
+        console.error('Error fetching comments', e);
+        res.status(500).send('Internal Server Error');
+    }
+};
 module.exports = {
     addBlogComment,
     updateBlogComment,
     deleteBlogComment,
     replyComment,
-    likeComment
+    likeComment,
+    getCommentsByBlog
 };

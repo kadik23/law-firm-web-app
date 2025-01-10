@@ -1,7 +1,6 @@
 require('dotenv').config();
 const db = require('../../models')
 const blogs=db.blogs
-const categories=db.categories
 /**
  * @swagger
  * /user/blogs/all:
@@ -81,8 +80,8 @@ const getBlogById= async (req,res)=>{
 /**
  * @swagger
  * paths:
- *   /admin/blogs/like:
- *     put:
+ *   /user/blogs/like:
+ *     post:
  *       summary: "Like a blog"
  *       tags:
  *         - Blogs
@@ -137,19 +136,85 @@ const likeBlog= async (req,res)=> {
     }
 }
 
-
+/**
+ * @swagger
+ * paths:
+ *   /user/blogs/sort:
+ *     get:
+ *       summary: Get filtered and sorted list of blogs
+ *
+ *       description: Retrieve blogs based on optional filtering and sorting criteria such as category, title, or sort order.
+ *       tags:
+ *         - Blogs
+ *       parameters:
+ *         - in: query
+ *           name: categoryId
+ *           schema:
+ *             type: integer
+ *           description: Filter blogs by the ID of the category.
+ *           required: false
+ *         - in: query
+ *           name: sort
+ *           schema:
+ *             type: string
+ *             enum: [new, best]
+ *           description: Sort blogs by "new" (latest blogs) or "best" (blogs with the most likes).
+ *           required: false
+ *         - in: query
+ *           name: title
+ *           schema:
+ *             type: string
+ *           description: Search blogs by title starting with the provided letters (case insensitive).
+ *           required: false
+ *       responses:
+ *         200:
+ *           description: A list of blogs matching the filtering and sorting criteria.
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: array
+ *                 items:
+ *                   $ref: '#/components/schemas/Blog'
+ *         500:
+ *           description: Internal Server Error
+ * components:
+ *   schemas:
+ *     Blog:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           description: Unique identifier for the blog.
+ *         title:
+ *           type: string
+ *           description: Title of the blog.
+ *         categoryId:
+ *           type: integer
+ *           description: The ID of the category this blog belongs to.
+ *         likes:
+ *           type: integer
+ *           description: Number of likes the blog has received.
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           description: The date and time the blog was created.
+ */
 const sortBlogs= async (req,res)=>{
     try {
-        const {categoryId,sort,title} = req.params;
+        const {categoryId,sort,title} = req.query;
+
         let blogsList = await blogs.findAll();
+
         if(categoryId){
-            blogsList = blogsList.filter(blog => blog.categoryId === categoryId);
+            blogsList = blogsList.filter(blog => blog.categoryId === Number(categoryId));
+
         }
         if (title) {
             const searchTitle = title.toLowerCase();
             blogsList = blogsList.filter(blog => blog.title.toLowerCase().startsWith(searchTitle));
         }
         if (sort) {
+
             if (sort === "new") {
                 blogsList = blogsList.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
             }
