@@ -29,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
     }, { tableName: 'blogs' });
-
+    
     return Blog;
   };
 /**

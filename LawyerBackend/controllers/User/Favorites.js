@@ -1,7 +1,7 @@
 require('dotenv').config();
 const db = require('../../models');
 const { users, blogs, favorites } = db;
-
+const { Op } = require('sequelize');
 /**
  * @swagger
  * /user/favorites:
@@ -205,8 +205,254 @@ const DeleteFavoriteBlog = async (req, res) => {
   }
 };
 
+/**
+ * @swagger
+ * /user/favorites:
+ *   delete:
+ *     summary: Delete all favorites for the user
+ *     description: This endpoint removes all blogs from the authenticated user's favorites list.
+ *     tags:
+ *       - Favorites
+ *     responses:
+ *       200:
+ *         description: All favorites successfully deleted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "All favorites deleted successfully"
+ *                 deletedCount:
+ *                   type: integer
+ *                   example: 10
+ *       500:
+ *         description: Internal Server Error
+ */
+const DeleteAllFavorites = async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    const deletedCount = await favorites.destroy({
+      where: { userId }
+    });
+
+    res.status(200).json({
+      message: "All favorites deleted successfully",
+      deletedCount
+    });
+  } catch (error) {
+    console.error("Error deleting all favorites:", error);
+    res.status(500).json({ message: "An error occurred while deleting all favorites." });
+  }
+};
+
+/**
+ * @swagger
+ * /user/favorites/search:
+ *   get:
+ *     summary: Search favorite blogs with filters and pagination
+ *     description: Search through user's favorite blogs by title, description, and update date
+ *     tags:
+ *       - Favorites
+ *     parameters:
+ *       - name: page
+ *         in: query
+ *         description: Page number
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           example: 1
+ *       - name: limit
+ *         in: query
+ *         description: Items per page
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           example: 10
+ *       - name: title
+ *         in: query
+ *         description: Search by blog title
+ *         required: false
+ *         schema:
+ *           type: string
+ *       - name: description
+ *         in: query
+ *         description: Search by blog description
+ *         required: false
+ *         schema:
+ *           type: string
+ *       - name: updatedAt
+ *         in: query
+ *         description: Search by update date (YYYY-MM-DD)
+ *         required: false
+ *         schema:
+ *           type: string
+ *           format: date
+ *     responses:
+ *       200:
+ *         description: A list of favorite blogs with pagination
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   description: List of favorite blogs
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         example: 1
+ *                       title:
+ *                         type: string
+ *                         example: "My First Blog"
+ *                       body:
+ *                         type: string
+ *                         example: "This is the content of the blog post."
+ *                       updatedAt:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2025-01-01T12:00:00Z"
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     currentPage:
+ *                       type: integer
+ *                       example: 1
+ *                     totalPages:
+ *                       type: integer
+ *                       example: 3
+ *                     totalItems:
+ *                       type: integer
+ *                       example: 30
+ *                     itemsPerPage:
+ *                       type: integer
+ *                       example: 10
+ *       400:
+ *         description: User ID is required
+ *       500:
+ *         description: An error occurred
+ *     security:
+ *       - bearerAuth: []
+ */
+
+
+const SearchFavoriteBlogs = async (req, res) => {
+  const userId = req.user?.id;
+  const { page = 1, limit = 10, title, description, updatedAt } = req.query;
+
+  if (!userId) {
+    return res.status(400).json({ message: 'User ID is required.' });
+  }
+
+  const offset = (page - 1) * limit;
+
+  try {
+    const whereClause = {};
+
+    if (title && typeof title === 'string') {
+      whereClause.title = { [Op.like]: `%${title}%` };  // Use LIKE for MySQL
+    }
+
+    if (description && typeof description === 'string') {
+      whereClause.body = { [Op.like]: `%${description}%` }; // Use LIKE for MySQL
+    }
+
+    if (updatedAt) {
+      const startDate = new Date(updatedAt);
+      const endDate = new Date(startDate);
+      endDate.setDate(endDate.getDate() + 1);
+      whereClause.updatedAt = {
+        [Op.between]: [startDate, endDate]
+      };
+    }
+
+    const { count, rows } = await favorites.findAndCountAll({
+      where: { userId },
+      include: [
+        {
+          model: blogs,
+          as: 'blog',  // Using 'blog' alias as defined in the associations
+          where: whereClause,  // Corrected to use the correct 'whereClause' variable
+          attributes: ['id', 'title', 'body', 'updatedAt'],
+        },
+      ],
+      limit: parseInt(limit, 10),
+      offset: parseInt(offset, 10),
+    });
+
+    res.status(200).json({
+      data: rows.map((favorite) => favorite.blog),
+      pagination: {
+        currentPage: parseInt(page, 10),
+        totalPages: Math.ceil(count / limit),
+        totalItems: count,
+        itemsPerPage: parseInt(limit, 10),
+      },
+    });
+  } catch (error) {
+    console.error('Error searching favorite blogs:', error);
+
+    if (error.name === 'SequelizeEagerLoadingError') {
+      return res.status(500).json({ message: 'Database association error. Check your model associations.' });
+    }
+
+    res.status(500).json({ message: 'An error occurred while searching favorite blogs.' });
+  }
+};
+
+
+/**
+ * @swagger
+ * /user/favorites/count:
+ *   get:
+ *     summary: Get total count of favorite blogs
+ *     description: Returns the total number of blogs in the user's favorites
+ *     tags:
+ *       - Favorites
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved favorites count
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 totalFavorites:
+ *                   type: integer
+ *                   example: 50
+ *       500:
+ *         description: Internal Server Error
+ */
+const GetFavoritesCount = async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    const count = await favorites.count({
+      where: { userId }
+    });
+
+    res.status(200).json({
+      totalFavorites: count
+    });
+  } catch (error) {
+    console.error("Error counting favorites:", error);
+    res.status(500).json({ message: "An error occurred while counting favorites." });
+  }
+};
+
+
 module.exports = {
   CreateFavoriteBlog,
   GetAllFavoriteBlogs,
   DeleteFavoriteBlog,
+  DeleteAllFavorites,
+  SearchFavoriteBlogs,
+  GetFavoritesCount,
 };
