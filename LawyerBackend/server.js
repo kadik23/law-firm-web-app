@@ -3,9 +3,10 @@ const express = require('express')
 const cors = require('cors')
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
-
+const cookieParser = require("cookie-parser");
 
 const app = express()
+app.use(cookieParser());
 
 const swaggerOptions = {
     definition: {

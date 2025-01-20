@@ -5,7 +5,7 @@ import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import Signup from "./Signup";
 import Signin from "./Signin";
 import Link from "next/link";
-import { div } from "framer-motion/client";
+import { useAuth } from "@/hooks/useAuth";
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -23,6 +23,9 @@ function Header() {
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
+
+
+  const {user} = useAuth();
 
   useEffect(() => {
     const sections = document.querySelectorAll("section");
@@ -49,7 +52,7 @@ function Header() {
   }, []);
 
   return (
-    <div className="flex flex-col w-full fixed top-0 left-0 w-full z-50">
+    <div className="flex flex-col w-full fixed top-0 left-0 z-50">
       <div className="hidden md:flex justify-between items-center w-full bg-[#4A84AA] py-2 px-4 md:px-8">
         <div className="flex items-center text-white font-semibold text-sm">
           <Icon icon="ic:outline-phone" width="20" height="20" className="mr-2" />
@@ -114,7 +117,7 @@ function Header() {
 
         
         <div className="flex items-center gap-6">
-          <div className="flex items-center gap-1 hidden md:flex text-primary">
+          <div className="items-center gap-1 hidden md:flex text-primary">
               {/* Heart / Favorite */}
               <Icon
                 icon="mdi:heart"
@@ -122,7 +125,7 @@ function Header() {
               />
               <div className="uppercase font-semibold text-sm">My blogs</div>
           </div>
-          <div className="hidden md:flex items-center justify-between gap-4">
+          <div className={` items-center justify-between gap-4 ${user ? "hidden" : "hidden md:flex"}`}>
             <button
               className="bg-primary rounded-md p-2 btn font-semibold shadow-lg"
               onClick={() => setSigninModalOpen(true)}
@@ -134,6 +137,18 @@ function Header() {
               onClick={() => setSignupModalOpen(true)}
             >
               inscription
+            </button>
+          </div>
+          <div className={` items-center justify-between gap-4 ${user ? "hidden md:flex" : "hidden"}`}>
+            <button
+              className="bg-primary rounded-md p-2 capitalize text-white btn font-semibold shadow-lg"
+            >
+              Bienvenu {user?.name}
+            </button>
+            <button
+              className="bg-secondary w-11 h-11 rounded-full text-center text-lg p-2 btn font-semibold shadow-lg"
+            >
+              {user?.name[0]}
             </button>
           </div>
         </div>
@@ -176,7 +191,7 @@ function Header() {
                   />
                   <span className="uppercase font-semibold text-sm">My blogs</span>
               </div>
-              <div className="flex flex-col gap-2 mt-4">
+              <div className={`${user ? "hidden" : "flex"} flex-col gap-2 mt-4 `}>
                 <button
                   onClick={() => {
                     setSigninModalOpen(true);
@@ -194,6 +209,18 @@ function Header() {
                   }}
                 >
                   inscription
+                </button>
+              </div>
+              <div className={`${user ? "flex" : "hidden"} flex-col my-4 items-center justify-between gap-4 `}>
+                <button
+                  className="bg-primary rounded-md p-2 capitalize text-white btn font-semibold shadow-lg"
+                >
+                  Bienvenu {user?.name}
+                </button>
+                <button
+                  className="bg-secondary w-11 h-11 rounded-full text-center text-lg p-2 btn font-semibold shadow-lg"
+                >
+                  {user?.name[0]}
                 </button>
               </div>
             </div>
