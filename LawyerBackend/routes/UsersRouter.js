@@ -40,6 +40,9 @@ userRouter.get('/attorneys',attorneysController.getAllAttorneys);
 userRouter.post('/favorites',authMiddleware(["client"]),favoritesController.CreateFavoriteBlog);
 userRouter.get('/favorites',authMiddleware(["client"]),favoritesController.GetAllFavoriteBlogs);
 userRouter.delete('/favorites/:id',authMiddleware(["client"]),favoritesController.DeleteFavoriteBlog);
+userRouter.delete('/favorites',authMiddleware(["client"]),favoritesController.DeleteAllFavorites);
+userRouter.get('/favorites/search',authMiddleware(["client"]),favoritesController.SearchFavoriteBlogs);
+userRouter.get('/favorites/count',authMiddleware(["client"]),favoritesController.GetFavoritesCount);
 
 
 
