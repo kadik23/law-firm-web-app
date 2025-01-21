@@ -7,6 +7,7 @@ const blogsController = require("../controllers/User/Blogs");
 const attorneysController = require('../controllers/User/attorneys.js');
 const favoritesController = require('../controllers/User/Favorites.js');
 const blogCommentsController = require('../controllers/User/BlogComments');
+const servicesController = require('../controllers/User/Services.js');
 
 
 
@@ -41,6 +42,7 @@ userRouter.post('/favorites',authMiddleware,favoritesController.CreateFavoriteBl
 userRouter.get('/favorites',authMiddleware,favoritesController.GetAllFavoriteBlogs);
 userRouter.delete('/favorites/:id',authMiddleware,favoritesController.DeleteFavoriteBlog);
 
+userRouter.get('/services',authMiddleware,servicesController.getAllServices);
 
 
 module.exports = userRouter
