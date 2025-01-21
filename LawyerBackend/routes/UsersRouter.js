@@ -43,6 +43,7 @@ userRouter.get('/favorites',authMiddleware,favoritesController.GetAllFavoriteBlo
 userRouter.delete('/favorites/:id',authMiddleware,favoritesController.DeleteFavoriteBlog);
 
 userRouter.get('/services',authMiddleware,servicesController.getAllServices);
+userRouter.get('/services/:id',authMiddleware,servicesController.getOneService);
 
 
 module.exports = userRouter
