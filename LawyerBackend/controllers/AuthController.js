@@ -80,9 +80,15 @@ const signUp = async (req, res) => {
             }
             console.log(process.env.SECRET)
             const token = jwt.sign({user : newUser}, process.env.SECRET, {expiresIn: "7d"})
+            res.cookie('authToken', token, {
+                httpOnly: true,
+                secure: true, 
+                sameSite: 'strict',
+                maxAge: 60 * 60 * 1000,
+              });
+      
+            res.status(200).json({ message: 'Signed in successfully', type: newUser.type});
             console.log("Success sign in")
-            res.status(200).send({token:token})
-
     } catch (error) {
         console.error('Error creating user:', error);
         res.status(500).send('Internal Server Error');
@@ -226,10 +232,17 @@ const signIn = async (req, res) => {
         if (!isMatch) {
             return res.status(401).send('Invalid email or password.');
         }
-        const token = jwt.sign({ user: { id: user.id, email: user.email } }, process.env.SECRET, { expiresIn: '7d' });
+        const token = jwt.sign({ user }, process.env.SECRET, { expiresIn: '7d' });
 
+        res.cookie('authToken', token, {
+          httpOnly: true,
+          secure: true, 
+          sameSite: 'strict',
+          maxAge: 60 * 60 * 1000,
+        });
+
+        res.status(200).json({ message: 'Signed in successfully', type: user.type });
         console.log("Successful sign in");
-        res.status(200).send({ token });
     } catch (error) {
         console.error('Error during sign in:', error);
         res.status(500).send('Internal Server Error');
@@ -285,9 +298,14 @@ const getCurrentClient = async (req, res) => {
     }
 };
 
+const checkUserAuthentication = async (req, res) => {
+    res.status(200).send(req.user);
+};
+
 module.exports = {
     signUp,
     addFiles,
     signIn,
-    getCurrentClient
+    getCurrentClient,
+    checkUserAuthentication
 };

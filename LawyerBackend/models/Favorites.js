@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  const Favorite = sequelize.define('favorites', {
+  const Favorite = sequelize.define('favorites', { // Use singular 'Favorite' here
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -18,8 +18,25 @@ module.exports = (sequelize, DataTypes) => {
       onUpdate: DataTypes.NOW,
     },
   });
+
+  // Corrected: use the singular 'Favorite' in the associations
+  Favorite.associate = (models) => {
+    // Many-to-many relationship between favorites and blogs
+    Favorite.belongsTo(models.blogs, {
+      foreignKey: 'blogId',
+      as: 'blog'
+    });
+
+    // Many-to-many relationship between favorites and users
+    Favorite.belongsTo(models.users, {
+      foreignKey: 'userId',
+      as: 'user'
+    });
+  };
+
   return Favorite;
 };
+
 /**
 * @swagger
 * components:

@@ -40,6 +40,7 @@ db.files = require('./Files.js')(sequelize, DataTypes);
 db.categories = require('./Categories.js')(sequelize, DataTypes);
 db.blogs = require('./Blogs.js')(sequelize, DataTypes);
 db.favorites = require('./Favorites.js')(sequelize, DataTypes);
+db.blogcomments = require('./BlogComments.js')(sequelize, DataTypes);
 
 
 db.files.belongsTo(db.users, {
@@ -79,7 +80,26 @@ db.users.belongsToMany(db.blogs, {
   otherKey: 'blogId',
 });
 
+db.blogcomments.belongsTo(db.users, {
+    foreignKey: 'userId',
+    allowNull: false,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+});
 
+db.blogcomments.belongsTo(db.blogs, {
+    foreignKey: 'blogId',
+    allowNull: false,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+});
+
+db.blogcomments.belongsTo(db.blogcomments, {
+    foreignKey: 'originalCommentId',
+    allowNull: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+});
 Object.keys(db).forEach((modelName) => {
   if (db[modelName].associate) {
     db[modelName].associate(db);

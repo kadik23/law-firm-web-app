@@ -3,7 +3,11 @@ import usePagination from "@/hooks/usePagination ";
 import BlogCard from "./blogCard";
 import { useState, useEffect } from "react";
 
-const OtherBlogs = ({ blogCategory, blogs }: { blogCategory?: string; blogs: Blog[] }) => {
+const OtherBlogs = ({ blogCategory, blogs, signIn }: { 
+  blogCategory?: string; 
+  blogs: Blog[];
+  signIn?:boolean 
+}) => {
   const blogsPerPage = 6; // Max blogs per page
   const [filteredBlogs, setFilteredBlogs] = useState<Blog[]>([]);
 
@@ -46,7 +50,7 @@ const OtherBlogs = ({ blogCategory, blogs }: { blogCategory?: string; blogs: Blo
             )}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {blogsToDisplay.map((blog) => (
-                <BlogCard blog={blog} key={blog.id} />
+                <BlogCard blog={blog} key={blog.id} signIn={signIn} />
               ))}
             </div>
           </div>

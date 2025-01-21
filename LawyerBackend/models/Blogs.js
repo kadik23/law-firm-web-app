@@ -4,6 +4,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING(20),
         allowNull: false,
       },
+      likes: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
       body: {
         type: DataTypes.STRING(500),
         allowNull: false,
@@ -25,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
     }, { tableName: 'blogs' });
-
+    
     return Blog;
   };
 /**

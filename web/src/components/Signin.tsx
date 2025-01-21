@@ -4,6 +4,7 @@ import Modal from "./Modal";
 import useLoginForm from "@/hooks/useLoginForm";
 import { DevTool } from "@hookform/devtools";
 import axiosClient from "@/lib/utils/axiosClient";
+import { useRouter } from "next/navigation";
 
 interface SigninProps {
   isModalOpen: boolean;
@@ -12,45 +13,41 @@ interface SigninProps {
 
 function Signin({ isModalOpen, setModalOpen }: SigninProps) {
   const [isDisabled, setIsDisabled] = useState(true);
-  const { register, control, handleSubmit, errors, watch } = useLoginForm();
-  const validate = () => {
-    if (
-      errors.email ||
-      errors.password ||
-      !watch().email ||
-      !watch().password
-    ) {
-      console.log(errors);
-      setIsDisabled(true);
-      return false;
-    }
-    setIsDisabled(false);
-    return true;
-  };
+  const {
+    register,
+    control,
+    handleSubmit,
+    errors,
+    isValid,
+  } = useLoginForm(); 
+  const router = useRouter();
 
-  const onsubmit = async (data: SigninformType) => {
+  useEffect(() => {
+    setIsDisabled(!isValid); 
+  }, [isValid]); 
+
+  const onSubmit = async (data: SigninformType) => {
     try {
-      console.log("first submit ", data);
+      console.log("Submitting:", data);
       const response = await axiosClient.post("/user/signin", {
-        email: data.email,
-        password: data.password,
-      });
-      if (response.status == 200) {
-        alert("Success sign in");
-        const token = response.data.token;
-        console.log("Token:", token);
-        localStorage.setItem("authToken", token);
-        setModalOpen(false);
+          email: data.email,
+          password: data.password,
+        },
+        { withCredentials: true }
+      );
+      if (response.status === 200) {
+        alert("Success sign in"); 
+        setModalOpen(false)   
+        router.push(`/${response.data.type}/dashboard`)
       } else {
-        alert(response);
+        alert("Failed to sign in");
       }
     } catch (err) {
-      console.log(err);
+      alert("Failed to sign in");
+      console.error("Error signing in:", err);
     }
   };
-  useEffect(() => {
-      validate();
-  }, [watch]);
+
   return (
     <Modal
       isOpen={isModalOpen}
@@ -58,12 +55,10 @@ function Signin({ isModalOpen, setModalOpen }: SigninProps) {
       isNotStepOne={isModalOpen}
     >
       <form
-        onSubmit={handleSubmit(onsubmit)}
+        onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col items-start gap-4"
       >
-        {process.env.NODE_ENV === "development" && (
-          <DevTool control={control} />
-        )}
+        {process.env.NODE_ENV === "development" && <DevTool control={control} />}
         <div className="text-xl">Re-bienvenue</div>
         <div>Entrer vos informations svp !</div>
         <div className="flex gap-16"></div>
@@ -73,28 +68,16 @@ function Signin({ isModalOpen, setModalOpen }: SigninProps) {
             type="email"
             id="email"
             {...register("email", {
+              required: "Email is required",
               pattern: {
                 value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                message: "Format d'email invalide",
-              },
-              validate: {
-                notAdmin: (fieldValue) => {
-                  return (
-                    fieldValue !== "admin@example.com" ||
-                    "Enter a different email address"
-                  );
-                },
-                notBlackListed: (fieldValue) => {
-                  return (
-                    !fieldValue.endsWith("baddomain.com") ||
-                    "this Domain is not supported"
-                  );
-                },
+                message: "Invalid email format",
               },
             })}
             placeholder="Enter votre email"
             className="py-1 px-4 outline-none text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
           />
+          {errors.email && <p className="error">{errors.email.message}</p>}
         </div>
         <div className="flex flex-col justify-start gap-2 w-full">
           <div className="text-textColor text-sm font-semibold">
@@ -102,14 +85,14 @@ function Signin({ isModalOpen, setModalOpen }: SigninProps) {
           </div>
           <input
             type="password"
-            placeholder="Enter votre mot de passe"
             {...register("password", {
-              required: "password est requis",
+              required: "Password is required",
               minLength: {
                 value: 8,
-                message: "This input must exceed 8 characters",
+                message: "Password must be at least 8 characters",
               },
             })}
+            placeholder="Enter votre mot de passe"
             className="py-1 px-4 outline-none text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
           />
           {errors.password && (
@@ -117,17 +100,18 @@ function Signin({ isModalOpen, setModalOpen }: SigninProps) {
           )}
         </div>
         <button
+          type="submit"
+          disabled={isDisabled} // Use `isDisabled` state
           className={`${
             isDisabled ? "btn_desabled active:scale-100" : "btn bg-textColor"
-          }
-          text-sm rounded-md p-2 btn font-semibold shadow-lg w-full`}
+          } text-sm rounded-md p-2 btn font-semibold shadow-lg w-full`}
         >
           Se connectez
         </button>
       </form>
       <div className="flex gap-2 items-center justify-center mt-4 text-sm font-semibold w-full">
         Vous n{"'"}avez pas encore de compte ?
-        <div className="text-textColor underline ">Inscrivez-vous</div>{" "}
+        <div className="text-textColor underline">Inscrivez-vous</div>
       </div>
     </Modal>
   );
