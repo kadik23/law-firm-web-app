@@ -29,7 +29,8 @@ export const Header = ({ totalBolgs }: { totalBolgs: number }) => {
                     placeholder="Rechercher un blog" 
                     name="blog-search-bar" 
                     id="blog-search"
-                    className="bg-white" />
+                    className="bg-white w-full h-full outline-none"
+                    />
                     {/* Search icon */}
                     <Icon
                         icon="mdi:search"

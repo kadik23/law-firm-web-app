@@ -8,7 +8,7 @@ export default function RootLayout({
     return (
         <div className="flex">
             <Sidebar />
-            <div className="py-20 px-10 flex-1">
+            <div className="md:py-20 md:px-10 flex-1 py-6">
                 {children}
             </div>
         </div>
