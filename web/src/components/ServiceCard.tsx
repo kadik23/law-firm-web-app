@@ -21,7 +21,7 @@ function ServiceCard({ title, body, image, isDescription, style }: ServiceCardPr
         <div className="font-semibold text-lg">{title}</div>
         {isDescription && <div>{body}</div>}
         <div className="text-xs font-semibold btn mt-2">
-          <a href="#service">Learn More &gt;</a>
+          <a href="#service">En savoir plus &gt;</a>
         </div>
       </div>
     </div>
