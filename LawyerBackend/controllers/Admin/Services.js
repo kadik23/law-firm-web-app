@@ -61,15 +61,14 @@ const Service = db.services;
  */
 const createService = async (req, res) => {
   try {
-    const { id, name, description, requestedFiles, coverImage, price } = req.body;
+    const { name, description, requestedFiles, coverImage, price } = req.body;
     const createdBy = req.user.id;
 
-    if (!id || !name || !description || !requestedFiles || !coverImage || !price) {
+    if (!name || !description || !requestedFiles || !coverImage || !price) {
       return res.status(400).json({ error: 'All fields are required.' });
     }
 
     const service = await Service.create({
-      id,
       name,
       description,
       requestedFiles,
