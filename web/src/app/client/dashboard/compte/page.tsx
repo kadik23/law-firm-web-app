@@ -1,3 +1,4 @@
+"use client"
 import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -8,16 +9,6 @@ const Account = () => {
     return (
       <div className="flex items-center justify-center h-screen">
         <span className="text-lg font-semibold">Chargement...</span>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <span className="text-lg font-semibold text-red-500">
-          Utilisateur non authentifié
-        </span>
       </div>
     );
   }
