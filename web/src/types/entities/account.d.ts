@@ -1,13 +1,14 @@
-interface Account{
-    id: string;
+interface User {
+    id: number;
     name: string;
     surname: string;
     email: string;
     password: string;
+    phone_number: string;
+    pays: string; 
+    ville: string; 
     age: number;
-    gender: string;
-    created_at: string;
-    account_type: 'Admin' | 'Attorney' | 'Client';
-    telephone: number;
-    city: string;
-}
+    sex: string;
+    type: string;
+  }
+  
