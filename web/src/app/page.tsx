@@ -1,4 +1,3 @@
-"use client";
 import AvisCard from "@/components/AvisCard";
 import AvocatCard from "@/components/AvocatCard";
 import Map from "@/components/Map";
