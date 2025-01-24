@@ -1,3 +1,4 @@
+"use client";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import Link from "next/link";
 import dynamic from "next/dynamic";
