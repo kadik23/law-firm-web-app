@@ -28,7 +28,6 @@ const useCarousel = (itemsLength: number, initialVisibleItems: number) => {
     };
 
     useEffect(() => {
-        if (!isClient) return;
         const updateVisibleItems = () => {
             if (typeof window !== "undefined") {
                 if (window.innerWidth >= 1024) {
@@ -43,13 +42,18 @@ const useCarousel = (itemsLength: number, initialVisibleItems: number) => {
                 }
             }
         };
-
-        updateVisibleItems();
-        window.addEventListener("resize", updateVisibleItems);
+    
+        if (isClient) {
+            updateVisibleItems();
+            window.addEventListener("resize", updateVisibleItems);
+        }
+    
         return () => {
-            window.removeEventListener("resize", updateVisibleItems);
+            if (isClient) {
+                window.removeEventListener("resize", updateVisibleItems);
+            }
         };
-    }, [isClient]); 
+    }, [isClient]);    
 
     return {
         currentIndex,
