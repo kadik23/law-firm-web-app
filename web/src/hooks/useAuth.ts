@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "@/lib/utils/axiosClient";
 
 export const useAuth = () => {
-  const [user, setUser] = useState<Account | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

@@ -53,7 +53,7 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
     const stepErrors = errors[stepName] || {};
   
     const hasErrors = Object.values(stepErrors).some((error) => error);
-    const hasEmptyFields = Object.values(stepData).some((value) => !value);
+    const hasEmptyFields = Object.values(stepData || {}).some((value) => !value);
 
     const isValidStep = !hasErrors && !hasEmptyFields;
     console.log(currentStep)
@@ -314,9 +314,9 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
               {...register("stepTwo.nbr_tel", {
                 required: "Numéro de téléphone est requis",
                 valueAsNumber: true,
-                pattern: {
-                  value: /^[0-9]{10}$/,
-                  message: "Format de téléphone invalide",
+                validate: {
+                  pattern: (value) =>
+                    /^[0-9]{10}$/.test(value.toString()) || "Format de téléphone invalide",
                 },
               })}
               className="py-1 px-4 outline-none w-full text-sm md:text-base text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
