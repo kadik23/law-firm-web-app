@@ -14,13 +14,13 @@ const Account = () => {
   }
 
   const infoToShow = [
-    { label: "Nom", value: user.surname },
-    { label: "Prénom", value: user.name },
-    { label: "Sexe", value: user.sex },
-    { label: "Pays", value: user.pays },
-    { label: "Âge", value: user.age },
-    { label: "Ville", value: user.ville },
-    { label: "Numéro de téléphone", value: user.phone_number },
+    { label: "Nom", value: user?.surname },
+    { label: "Prénom", value: user?.name },
+    { label: "Sexe", value: user?.sex },
+    { label: "Pays", value: user?.pays },
+    { label: "Âge", value: user?.age },
+    { label: "Ville", value: user?.ville },
+    { label: "Numéro de téléphone", value: user?.phone_number },
   ];
 
   return (
@@ -36,9 +36,9 @@ const Account = () => {
         />
         <div className="flex flex-col gap-1">
           <span className="font-semibold">
-            {`${user.name} ${user.surname}`}
+            {`${user?.name} ${user?.surname}`}
           </span>
-          <span className="text-xs text-gray-500">{user.email}</span>
+          <span className="text-xs text-gray-500">{user?.email}</span>
         </div>
       </div>
 
