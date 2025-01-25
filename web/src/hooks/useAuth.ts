@@ -1,30 +1,10 @@
-import { useEffect, useState } from "react";
-import axios from "@/lib/utils/axiosClient";
-import { isAxiosError } from "axios";
+import { AuthContext } from "@/contexts/AuthContext";
+import { useContext } from "react";
 
-export const useAuth = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await axios.get("/user/current", { withCredentials: true });
-        setUser(response.data);
-      } catch (err: unknown) {
-        if (isAxiosError(err) && err.response?.status === 401) {
-          console.warn("User not authenticated");
-        } else {
-          console.error("An unexpected error occurred:", err);
-        }
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUser();
-  }, []);
-
-  return { user, loading };
-};
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+};  
