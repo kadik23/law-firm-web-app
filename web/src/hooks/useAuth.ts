@@ -10,8 +10,12 @@ export const useAuth = () => {
       try {
         const response = await axios.get("/user/current", { withCredentials: true });
         setUser(response.data);
-      } catch (err) {
-        console.error("User not authenticated:", err);
+      } catch (err: any) {
+        if (err.response?.status === 401) {
+          console.warn("User not authenticated");
+        } else {
+          console.error("An unexpected error occurred:", err);
+        }
         setUser(null);
       } finally {
         setLoading(false);
