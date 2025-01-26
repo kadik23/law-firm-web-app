@@ -7,7 +7,7 @@ import ServiceCard from "@/components/ServiceCard";
 import { motion } from "framer-motion";
 import AvisCard from "@/components/AvisCard";
 
-function page() {
+function Page() {
   const serviceItems = Array(6).fill(null);
   const avisItems = Array(12).fill(null);
 
@@ -202,4 +202,4 @@ function page() {
   );
 }
 
-export default page;
+export default Page;

@@ -1,3 +1,4 @@
+"use client"
 import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -12,6 +13,7 @@ const Account = () => {
     );
   }
 
+<<<<<<< HEAD
   if (!user) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -30,6 +32,16 @@ const Account = () => {
     { label: "Âge", value: user.age },
     { label: "Ville", value: user.ville },
     { label: "Numéro de téléphone", value: user.phone_number },
+=======
+  const infoToShow = [
+    { label: "Nom", value: user?.surname },
+    { label: "Prénom", value: user?.name },
+    { label: "Sexe", value: user?.sex },
+    { label: "Pays", value: user?.pays },
+    { label: "Âge", value: user?.age },
+    { label: "Ville", value: user?.ville },
+    { label: "Numéro de téléphone", value: user?.phone_number },
+>>>>>>> 212971bc2af78f5f840805b7e059bbeeccddc50e
   ];
 
   return (
@@ -45,9 +57,15 @@ const Account = () => {
         />
         <div className="flex flex-col gap-1">
           <span className="font-semibold">
+<<<<<<< HEAD
             {`${user.name} ${user.surname}`}
           </span>
           <span className="text-xs text-gray-500">{user.email}</span>
+=======
+            {`${user?.name} ${user?.surname}`}
+          </span>
+          <span className="text-xs text-gray-500">{user?.email}</span>
+>>>>>>> 212971bc2af78f5f840805b7e059bbeeccddc50e
         </div>
       </div>
 
