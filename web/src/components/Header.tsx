@@ -117,14 +117,14 @@ function Header() {
 
         
         <div className="flex items-center gap-6">
-          <div className="items-center gap-1 hidden md:flex text-primary">
+          <Link href={'/blog'} className="items-center gap-1 hidden md:flex text-primary hover:text-secondary cursor-pointer">
               {/* Heart / Favorite */}
               <Icon
                 icon="mdi:heart"
                 width={20}
               />
               <div className="uppercase font-semibold text-sm">My blogs</div>
-          </div>
+          </Link>
           <div className={` items-center justify-between gap-4 ${user ? "hidden" : "hidden md:flex"}`}>
             <button
               className="bg-primary rounded-md p-2 btn font-semibold shadow-lg"
@@ -183,14 +183,14 @@ function Header() {
               </a>
             ))}
             <div className="flex flex-col items-center mt-3 border-t pt-2">
-              <div className="flex items-center gap-2 text-primary">
+              <Link  href={'/blog'} className="flex items-center gap-2 text-primary hover:text-secondary cursor-pointer">
                   {/* Heart / Favorite */}
                   <Icon
                     icon="mdi:heart"
                     width={20}
                   />
                   <span className="uppercase font-semibold text-sm">My blogs</span>
-              </div>
+              </Link>
               <div className={`${user ? "hidden" : "flex"} flex-col gap-2 mt-4 `}>
                 <button
                   onClick={() => {
