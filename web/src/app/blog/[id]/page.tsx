@@ -1,22 +1,28 @@
 "use client";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import BlogCategory from "@/components/blog/blogCategory";
 import BLogInfromation from "@/components/blog/blogInfromation";
 import ReaderFeedback from "@/components/blog/readerFeedback";
-import blogPosts from "@/components/blog/blogs";
 import OtherBlogs from "@/components/blog/otherBlogs";
+import useBlog from "@/hooks/useBlog";
+import { useBlogs } from "@/hooks/useBlogs";
+import useCategories from "@/hooks/useCategories";
 
 const Page = () => {
   const { id } = useParams() as { id: string };
-  const [blog, setBlog] = useState<Blog | null>(null);
-  const [loading, setLoading] = useState<boolean>(true); // State to track loading status
-
+  const { fetchBlog, blog, loading } = useBlog();
+  const {
+    blogs,
+    blogsLoading,
+    getFilteredBlogs,
+    selectedCategory,
+    setSelectedCategory,
+  } = useBlogs();
+  const { categories } = useCategories();
   useEffect(() => {
     if (id) {
-      const foundBlog = blogPosts.find((post) => post.id === parseInt(id));
-      setBlog(foundBlog || null);
-      setLoading(false); // Set loading to false once the data is fetched
+      fetchBlog(parseInt(id));
     }
   }, [id]);
 
@@ -37,10 +43,36 @@ const Page = () => {
 
   return (
     <div className="">
-      <BlogCategory blogCategory={blog.category} />
+      <BlogCategory
+        categories={categories}
+        setSelectedCategory={setSelectedCategory}
+        selectedCategory={selectedCategory}
+      />
       <BLogInfromation blog={blog} />
       <ReaderFeedback />
-      <OtherBlogs blogs={blogPosts} blogCategory={blog.category} />
+      <div className="font-bold text-3xl md:text-4xl text-primary mb-3">
+        D{"'"} autres blogs
+      </div>
+      {blogs?.length > 0 ? (
+        <OtherBlogs
+          blogs={blogs}
+          selectedCategory={selectedCategory}
+          getFilteredBlogs={getFilteredBlogs}
+        />
+      ) : (
+        <>
+          <OtherBlogs
+            blogs={[]}
+            selectedCategory={selectedCategory}
+            getFilteredBlogs={getFilteredBlogs}
+          />
+          <p>
+            {blogsLoading
+              ? "Loading..."
+              : "Aucun blog disponible pour le moment."}
+          </p>
+        </>
+      )}
     </div>
   );
 };

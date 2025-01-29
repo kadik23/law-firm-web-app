@@ -22,9 +22,3 @@ type SigninformType = {
     email:string
     password: string
 }
-
-
-interface AuthContextType {
-  user: User | null;
-  loading: boolean;
-}
