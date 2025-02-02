@@ -1,9 +1,11 @@
 const db = require('../../models');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const {upload} = require("../../middlewares/FilesMiddleware");
+const {path} = require("express/lib/view");
 
 const User = db.users;
-const Attorney = db.Attorney;
+const Attorney = db.attorneys;
 
 /**
  * @swagger
@@ -87,7 +89,22 @@ const Attorney = db.Attorney;
  *         '500':
  *           description: "Internal Server Error"
  */
+const uploadFile = upload.single('picture');
+
 const createAttorney = async (req, res) => {
+  try {
+  uploadFile(req, res, async (err) => {
+    if (err) {
+      return res.status(400).send('Error uploading files: ' + err.message);
+    }
+
+    const uploadedFile = req.file;
+    if (!uploadedFile || uploadedFile.length === 0) {
+      return res.status(400).send('No files were uploaded.');
+    }
+
+
+
   const {
     first_name,
     last_name,
@@ -109,7 +126,7 @@ const createAttorney = async (req, res) => {
     return res.status(400).send({ error: 'Missing required fields' });
   }
 
-  try {
+
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
       return res.status(400).send({ error: 'Email already in use' });
@@ -139,11 +156,12 @@ const createAttorney = async (req, res) => {
       linkedin_url,
       certificats: certificats || null,
       date_membership: date_membership ? new Date(date_membership) : new Date(),
+      picture_path: uploadedFile.path
     });
 
     console.log('Attorney created successfully:', newAttorney);
     return res.status(201).send({ message: 'Attorney created successfully', user: newUser, attorney: newAttorney });
-
+  });
   } catch (error) {
     console.error('Error creating attorney:', error);
     return res.status(500).send('Failed to create attorney');
