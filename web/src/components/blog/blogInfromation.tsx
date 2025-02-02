@@ -1,72 +1,86 @@
 import useDateFormatter from "@/hooks/useDateFormatter";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { useFavorites } from "@/hooks/useFavourites";
 
-const BLogInfromation = ({ blog }: { blog: Blog }) => {
+const BlogInformation = ({ blog }: { blog: Blog }) => {
+  const { user } = useAuth();
+  const { addToFavorites, removeFromFavorites } = useFavorites();
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  const handleFavoriteToggle = async () => {
+    if (!user) {
+      alert("Please sign in to add favorites");
+      return;
+    }
+
+    const success = isFavorite 
+      ? await removeFromFavorites(blog.id)
+      : await addToFavorites(blog.id);
+
+    if (success) {
+      setIsFavorite(!isFavorite);
+    }
+  };
+
   return (
     <div className="w-full flex md:flex-col flex-col-reverse mb-8">
-      {/* Blog Header (date and share button) */}
-      <div
-        className="pb-4 my-4 w-full flex md:flex-row flex-col gap-3 justify-between items-center
-            md:border-0 border-b-[1px] border-black"
-      >
-        {/* date and reading duration */}
+      <div className="pb-4 my-4 w-full flex md:flex-row flex-col gap-3 justify-between items-center
+          md:border-0 border-b-[1px] border-black">
         <div className="text-sm font-medium text-gray-600">
           {useDateFormatter(blog.createdAt)}. {blog.readingDuration} minutes de lecture
         </div>
 
-        {/* comment and Share Button */}
         <div className="flex gap-3">
-          <button
-            className="text-primary border-[1px] border-black font-semibold px-4 py-2 rounded-md
-                        flex items-center gap-1 md:hidden"
-          >
-            {/* comment icon */}
+          <button className="text-primary border-[1px] border-black font-semibold px-4 py-2 rounded-md
+                      flex items-center gap-1 md:hidden">
             <Icon icon="mdi:comment" width={20} className="text-black" />
             <span className="">Commenter</span>
           </button>
-          <button
-            className="text-primary border-[1px] border-black font-semibold px-4 py-2 rounded-md
-                        flex items-center gap-1 hover:bg-primary hover:text-white"
-          >
-            {/* share icon */}
+          <button className="text-primary border-[1px] border-black font-semibold px-4 py-2 rounded-md
+                      flex items-center gap-1 hover:bg-primary hover:text-white">
             <Icon icon="mdi:share" width={20} />
             <span className="md:flex hidden">Partager</span>
           </button>
         </div>
       </div>
 
-      {/* Blog Image and content */}
       <div className="w-full">
-        {/* Blog image */}
-        <div
-          className="relative lg:w-[500px] lg:h-[250px] float-left mr-4"
-          style={{ backgroundImage: `url('/images/${blog.image}')` }}
-        >
+        <div className="relative lg:w-[500px] lg:h-[250px] float-left mr-4">
           <img
-            src="/images/blog.png"
+            src={`/images/${blog.image}`}
             alt={blog.title}
             className="rounded-md w-full h-full object-cover"
           />
           <div className="w-full text-white absolute bottom-0 p-4 flex items-center justify-between">
             <div className="flex items-center gap-1">
-              {/* like icon */}
               <button className="relative group overflow-visible">
                 <Icon icon="mdi:like" width={20} className="group-hover:text-secondary"/>
-                <span className="absolute -top-4 right-2 hidden group-hover:block text-xs font-semibold text-nowrap">Like</span>
+                <span className="absolute -top-4 right-2 hidden group-hover:block text-xs font-semibold text-nowrap">
+                  Like
+                </span>
               </button>
               {blog.likes}
             </div>
             <div>
-              {/* heart icon */}
-              <button className="relative group overflow-visible">
-                <Icon icon="mdi:heart" width={20} className="group-hover:text-secondary"/>
-                <span className="absolute -top-4 right-2 hidden group-hover:block text-xs font-semibold text-nowrap">Favorite blog</span>
+              <button 
+                onClick={handleFavoriteToggle}
+                className="relative group overflow-visible"
+              >
+                <Icon 
+                  icon="mdi:heart" 
+                  width={20} 
+                  className={`group-hover:text-secondary ${isFavorite ? 'text-red-500' : ''}`}
+                />
+                <span className="absolute -top-4 right-2 hidden group-hover:block text-xs font-semibold text-nowrap">
+                  {isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                </span>
               </button>
             </div>
           </div>
         </div>
 
-        {/* Blog content */}
         <div className="">
           <h1 className="md:text-5xl text-4xl font-bold text-gray-800">
             {blog.title}
@@ -83,4 +97,4 @@ const BLogInfromation = ({ blog }: { blog: Blog }) => {
   );
 };
 
-export default BLogInfromation;
+export default BlogInformation;

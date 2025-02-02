@@ -1,15 +1,59 @@
+"use client";
 import { Header } from "./header";
-import blogPosts from "@/consts/blogs";
+import { useEffect, useState, useCallback } from "react";
 import FavBlogs from "@/components/blog/favBlogs";
+import { useAuth } from "@/hooks/useAuth";
+import { useFavorites } from "@/hooks/useFavourites";
 
-const VosBlogs= () => {
-    const totalBlogs = blogPosts.length;
+const VosBlogs = () => {
+    const [blogs, setBlogs] = useState<Blog[]>([]);
+    const [totalBlogs, setTotalBlogs] = useState(0);
+    const { getFavorites, getFavoritesCount, searchFavorites } = useFavorites();
+    const { user, loading: authLoading } = useAuth();
+
+    const loadInitialData = useCallback(async () => {
+        if (user) {
+            const favBlogs = await getFavorites();
+            console.log("\n Favourite Blogs (VosBlogs.tsx)\n",favBlogs);
+            const count = await getFavoritesCount();
+            console.log(count);
+            setBlogs(favBlogs);
+            setTotalBlogs(count);
+        }
+    }, [user, getFavorites, getFavoritesCount]);
+
+    useEffect(() => {
+        loadInitialData();
+    }, [loadInitialData]);
+
+    const handleSearch = useCallback(async (query: string) => {
+        if (!user) return;
+        
+        if (query.trim() === '') {
+            // If search is empty, load all favorites
+            loadInitialData();
+        } else {
+            // Search in favorites
+            const searchResults = await searchFavorites(query);
+            setBlogs(searchResults);
+            setTotalBlogs(searchResults.length);
+        }
+    }, [user, searchFavorites, loadInitialData]);
+
+    if (authLoading) {
+        return <div>Loading...</div>;
+    }
+
+    if (!user) {
+        return <div>Please sign in to view your favorite blogs</div>;
+    }
+
     return (
         <div>
-            <Header totalBolgs={totalBlogs}/>
-            <FavBlogs blogs={blogPosts} signIn={true} />
+            <Header totalBlogs={totalBlogs} onSearch={handleSearch} />
+            <FavBlogs blogs={blogs} signIn={true} />
         </div>
-    )
-}
+    );
+};
 
 export default VosBlogs;
