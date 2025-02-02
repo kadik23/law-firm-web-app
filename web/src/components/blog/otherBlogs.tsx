@@ -1,24 +1,28 @@
-"use client"
+"use client";
 import usePagination from "@/hooks/usePagination ";
 import BlogCard from "./blogCard";
 import { useState, useEffect } from "react";
 
-const OtherBlogs = ({ blogCategory, blogs, signIn }: { 
-  blogCategory?: string; 
+const OtherBlogs = ({
+  selectedCategory,
+  blogs,
+  signIn,
+  getFilteredBlogs,
+}: {
+  selectedCategory: Category | null;
   blogs: Blog[];
-  signIn?:boolean 
+  signIn?: boolean;
+  getFilteredBlogs: () => void;
 }) => {
   const blogsPerPage = 6; // Max blogs per page
   const [filteredBlogs, setFilteredBlogs] = useState<Blog[]>([]);
+  useEffect(() => {
+    getFilteredBlogs();
+  }, [selectedCategory]);
 
   useEffect(() => {
-    if (blogCategory) {
-      const categoryBlogs = blogs.filter((blog) => blog.category === blogCategory);
-      setFilteredBlogs(categoryBlogs);
-    } else {
-      setFilteredBlogs(blogs);
-    }
-  }, [blogCategory, blogs]);
+    setFilteredBlogs(blogs);
+  }, [blogs]);
 
   // Using the custom usePagination hook
   const {
@@ -41,25 +45,18 @@ const OtherBlogs = ({ blogCategory, blogs, signIn }: {
     <div className="">
       <div className="">
         {/* display Blogs */}
-        {filteredBlogs.length > 0 ? (
-          <div>
-            {blogCategory && (
+        <div>
+          {/* {selectedCategory && (
               <div className="font-bold text-3xl md:text-4xl text-primary mb-3">
-                D'autres blogs
+                D{"'"} autres blogs
               </div>
-            )}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {blogsToDisplay.map((blog) => (
-                <BlogCard blog={blog} key={blog.id} signIn={signIn} />
-              ))}
-            </div>
+            )} */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {blogsToDisplay.map((blog) => (
+              <BlogCard blog={blog} key={blog.id} signIn={signIn} />
+            ))}
           </div>
-        ) : (
-          <div className="font-semibold text-gray-500 w-full p-4 flex justify-center items-center">
-            <h3>No blogs available at the moment.</h3>
-          </div>
-        )}
-
+        </div>
         {/* Pagination Controls */}
         {totalPages > 1 && (
           <div className="flex gap-3 justify-center items-center mt-4">
@@ -88,7 +85,6 @@ const OtherBlogs = ({ blogCategory, blogs, signIn }: {
                   {pageNumber}
                 </button>
               ))}
-
             </div>
 
             {/* Next Button */}
@@ -106,6 +102,5 @@ const OtherBlogs = ({ blogCategory, blogs, signIn }: {
     </div>
   );
 };
-
 
 export default OtherBlogs;

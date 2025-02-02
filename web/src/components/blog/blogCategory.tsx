@@ -1,38 +1,57 @@
-"use client"
-import { useState } from "react";
+"use client";
 
-const BlogCategory = ({blogCategory}:{blogCategory?:string}) => {
-    const [activeCategory, setActiveCategory] = useState<number | null>(null);
-
-    const categories: string[] = [
-        "Droit administratif",
-        "Droit des affaires",
-        "Droit du travail",
-        "Droit pénal",
-        "Droit des assurances",
-        "Droit immobilier"
-    ];
-
-    return (
-        <div className="mb-4 overflow-x-auto py-3 flex items-center gap-6 md:justify-between w-full scrollbar-hidden">
-            {categories.map((category, index) => (
-                <div
-                    key={index}
-                    className="text-start min-w-fit cursor-pointer"
-                >
-                    <div className={`${category === blogCategory ? "text-primary font-bold" : ""}`}>
-                        {category}
-                    </div>
-                    {/* Show the border if the category is active */}
-                    <div
-                        className={`w-4 h-[3px] rounded-lg bg-primary transition-all ${
-                            category === blogCategory ? "opacity-100" : "opacity-0"
-                        }`}
-                    ></div>
-                </div>
-            ))}
+const BlogCategory = ({
+  categories,
+  selectedCategory,
+  setSelectedCategory,
+}: {
+  categories: Category[];
+  selectedCategory: Category | null;
+  setSelectedCategory: (category: Category | null) => void;
+}) => {
+  return (
+    <div className="mb-4 overflow-x-auto py-3 flex items-center gap-6 md:justify-between w-full scrollbar-hidden">
+      <button
+        className="text-start min-w-fit cursor-pointer"
+        onClick={() => setSelectedCategory(null)}
+      >
+        <div
+          className={`${
+            selectedCategory === null ? "text-primary font-bold" : ""
+          }`}
+        >
+          All
         </div>
-    );
+        <div
+          className={`w-4 h-[3px] rounded-lg bg-primary transition-all ${
+            selectedCategory === null ? "opacity-100" : "opacity-0"
+          }`}
+        ></div>
+      </button>
+      {categories.map((category, index) => (
+        <button
+          key={index}
+          className="text-start min-w-fit cursor-pointer"
+          onClick={() => setSelectedCategory(category)}
+        >
+          <div
+            className={`${
+              category.id === selectedCategory?.id
+                ? "text-primary font-bold"
+                : ""
+            }`}
+          >
+            {category.name}
+          </div>
+          <div
+            className={`w-4 h-[3px] rounded-lg bg-primary transition-all ${
+              category.id == selectedCategory?.id ? "opacity-100" : "opacity-0"
+            }`}
+          ></div>
+        </button>
+      ))}
+    </div>
+  );
 };
 
 export default BlogCategory;

@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import AuthClientWrapper from "@/components/AuthClientWrapper";
 
 const geistSans = localFont({
   src: "../assets/fonts/GeistVF.woff",
@@ -26,20 +27,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+      <head/>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased `}
+        className={`antialiased `}
       >
-        <Header />
-        <div className="mt-12 md:mt-14">{children}</div>
-        <Footer />
+        <AuthClientWrapper>
+          <div>
+            <Header />
+            <div className="mt-12 md:mt-14">{children}</div>
+            <Footer />
+          </div>
+        </AuthClientWrapper>
       </body>
     </html>
   );

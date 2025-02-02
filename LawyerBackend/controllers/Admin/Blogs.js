@@ -69,12 +69,12 @@ const addBlog = async (req,res)=> {
                 return res.status(400).send('Error uploading files: ' + err.message);
             }
 
-            const {title, body, categoryId} = req.body;
+            const {title, body, readingDuration, categoryId} = req.body;
             const {image} = req.files;
 
             const imagePath = image ? image[0].path : null;
             let newBlog = await blogs.create({
-                title,likes:0, body, image: imagePath, categoryId, userId: 3, accepted: true
+                title,likes:0, body, readingDuration, image: imagePath, categoryId, userId: 3, accepted: true, 
             });
 
             if (!newBlog) {

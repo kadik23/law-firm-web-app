@@ -1,13 +1,13 @@
-import OtherBlogs from "@/components/blog/otherBlogs";
 import { Header } from "./header";
-import blogPosts from "@/components/blog/blogs";
+import blogPosts from "@/consts/blogs";
+import FavBlogs from "@/components/blog/favBlogs";
 
 const VosBlogs= () => {
     const totalBlogs = blogPosts.length;
     return (
         <div>
             <Header totalBolgs={totalBlogs}/>
-            <OtherBlogs blogs={blogPosts} signIn={true} />
+            <FavBlogs blogs={blogPosts} signIn={true} />
         </div>
     )
 }

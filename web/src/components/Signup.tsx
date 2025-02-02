@@ -8,6 +8,7 @@ import {
   useFieldArray,
 } from "react-hook-form";
 import axiosClient from "@/lib/utils/axiosClient";
+import { useRouter } from "next/navigation";
 
 interface SignupProps {
   isModalOpen: boolean;
@@ -24,35 +25,54 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
   useEffect(() => {
     const subscription = watch((value) => {
       console.log("Watched values:", value);
+      if(formStep === 0) {
+        console.log("STEP 01");
+        validateSteps('stepOne', formStep, false);
+      } else if (formStep === 1) {
+        console.log("STEP 02");
+        validateSteps('stepTwo', formStep, false);
+      } else {
+        console.log("STEP 03");
+        validateSteps('stepThree', formStep, false);
+      }
     });
+  
     return () => subscription.unsubscribe();
-  }, [watch]);
+  }, [formStep]);
 
   const [isDisabled1, setIsDisabled1] = useState(true);
   const [isDisabled2, setIsDisabled2] = useState(true);
   const [isDisabled3, setIsDisabled3] = useState(true);
 
-  const validateSteps = (stepName: 'stepOne' |'stepTwo' | 'stepThree', currentStep: number,toNextStep = false) => {
+  const validateSteps = async (
+    stepName: 'stepOne' | 'stepTwo' | 'stepThree',
+    currentStep: number,
+    toNextStep = false
+  ) => {
     const stepData = watch()[stepName];
     const stepErrors = errors[stepName] || {};
   
-    const hasErrors = Object.values(stepErrors).some(error => error);
-    const hasEmptyFields = Object.values(stepData).some(value => !value);
-  
+    const hasErrors = Object.values(stepErrors).some((error) => error);
+    const hasEmptyFields = Object.values(stepData || {}).some((value) => !value);
+
+    const isValidStep = !hasErrors && !hasEmptyFields;
+    console.log(currentStep)
+    console.log(isValidStep)
     if (stepName === "stepOne") {
-      setIsDisabled1(hasErrors || hasEmptyFields);
+      setIsDisabled1(!isValidStep);
     } else if (stepName === "stepTwo") {
-      setIsDisabled2(hasErrors || hasEmptyFields);
+      setIsDisabled2(!isValidStep);
     } else if (stepName === "stepThree") {
-      setIsDisabled3(hasErrors || hasEmptyFields);
+      setIsDisabled3(!isValidStep);
     }
   
-    if (!hasErrors && !hasEmptyFields && toNextStep) {
+    if (isValidStep && toNextStep) {
       moveNewStep(currentStep, currentStep + 1);
     }
   
-    return !hasErrors && !hasEmptyFields;
-  };  
+    return isValidStep;
+  };
+  const router = useRouter();
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -80,9 +100,8 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
       });
       if(response.status == 200){
         alert("Success sign in")
-        const token = response.data.token;
-        localStorage.setItem("authToken", token);
         setModalOpen(false);
+        router.push(`/${response.data.type}/dashboard`)
       }else {
         alert(response.data)
       }
@@ -94,16 +113,6 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
   function moveNewStep(currentStep: number, nextStep: number) {
     setFormStep(nextStep);
   }
-
-  useEffect(() => {
-    if(formStep == 0){
-      validateSteps('stepOne',formStep,false);
-    }else if(formStep == 1){
-      validateSteps('stepTwo',formStep,false);
-    }else{
-      validateSteps('stepThree',formStep,false);
-    }
-  }, [watch]);
 
   return (
     <Modal
@@ -305,9 +314,9 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
               {...register("stepTwo.nbr_tel", {
                 required: "Numéro de téléphone est requis",
                 valueAsNumber: true,
-                pattern: {
-                  value: /^[0-9]{10}$/,
-                  message: "Format de téléphone invalide",
+                validate: {
+                  pattern: (value) =>
+                    /^[0-9]{10}$/.test(value.toString()) || "Format de téléphone invalide",
                 },
               })}
               className="py-1 px-4 outline-none w-full text-sm md:text-base text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
