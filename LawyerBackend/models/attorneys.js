@@ -25,6 +25,10 @@ module.exports = (sequelize, DataTypes) => {
     date_membership: {
       type: DataTypes.DATE,
       allowNull: false
+    },
+    picture_path: {
+      type: DataTypes.STRING(50),
+      allowNull: false
     }
   });
 
