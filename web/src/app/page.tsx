@@ -17,7 +17,7 @@ export default function Home() {
     <div className="min-h-screen mt-8">
       <section
         id="accueil"
-        className="bg-[url('/images/slide.png')] bg-cover bg-center h-screen p-4 md:p-8"
+        className="bg-[url('/images/slide.png')] bg-cover bg-center md:h-screen p-4 md:p-8"
       >
         <div className="flex flex-col items-start my-8 text-white">
           <div className="font-semibold text-2xl mb-4 text-center md:text-start">
@@ -40,7 +40,7 @@ export default function Home() {
                   <Link
                     href={direction.link}
                     key={index}
-                    className="flex items-center hover:bg-primary cursor-pointer active:scale-105 transition-all duration-150 hover:text-white hover:border-white justify-between p-2 m-2 gap-4 text-sm font-semibold rounded-sm border border-primary"
+                    className="flex items-center hover:bg-primary cursor-pointer active:scale-105 transition-all duration-150 hover:text-white hover:border-white justify-between p-2 m-2 gap-4 text-xs font-semibold rounded-sm border border-primary"
                   >
                     <div>{direction.text}</div>
                     <div className="p-1 peer-hover:text-white hover:border-white flex justify-center items-center border border-primary rounded-sm">

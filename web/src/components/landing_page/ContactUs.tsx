@@ -10,9 +10,9 @@ function ContactUs() {
   return (
     <section
       id="contact"
-      className="md:bg-[url('/images/contactBg.png')] bg-primary lg:h-screen"
+      className="md:bg-[url('/images/contactBg.png')] bg-primary"
     >
-      <div className="p-4 md:p-8">
+      <div className="py-4 md:p-8">
         <div className=" font-bold text-3xl md:text-4xl text-center text-white py-4">
           Contactez Nous !
         </div>
