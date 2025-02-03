@@ -1,6 +1,7 @@
 require('dotenv').config();
 const db = require('../../models');
-const attorneys = db.Attorney;
+const path = require('path');
+const attorneys = db.attorneys;
 
 /**
  * @swagger
@@ -27,8 +28,15 @@ const attorneys = db.Attorney;
 const getAllAttorneys = async (req, res) => {
   try {
     let attorneyList = await attorneys.findAll();
+
     if (attorneyList) {
-      return res.status(200).send(attorneyList);
+
+      attorneyList = attorneyList.map(attorney => ({
+        ...attorney.toJSON(),
+        picture_url: `http://localhost:${process.env.PORT}/${attorney.picture_path.replace(/\\/g, '/')}`
+      }));
+
+      return res.status(200).json(attorneyList);
     } else {
       return res.status(401).send('Error fetching attorneys');
     }
@@ -37,6 +45,9 @@ const getAllAttorneys = async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 };
+
+
+
 
 module.exports = {
   getAllAttorneys
