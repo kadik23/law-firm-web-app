@@ -1,5 +1,7 @@
 module.exports = (sequelize, DataTypes) => {
-    const Blog = sequelize.define('blogs', {
+  const Blog = sequelize.define(
+    "blogs",
+    {
       title: {
         type: DataTypes.STRING(20),
         allowNull: false,
@@ -9,7 +11,11 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       body: {
-        type: DataTypes.STRING(500),
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
+      readingDuration: {
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
       image: {
@@ -28,10 +34,12 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         allowNull: false,
       },
-    }, { tableName: 'blogs' });
+    },
+    { tableName: "blogs" }
+  );
 
-    return Blog;
-  };
+  return Blog;
+};
 /**
 * @swagger
 * components:
@@ -40,11 +48,13 @@ module.exports = (sequelize, DataTypes) => {
 *      type: object
 *      required:
 *        - title
+         - readingDuration
 *        - body
 *        - image
 *        - categoryId
 *        - userId
 *        - accepted
+*        - likes
 *      properties:
 *        title:
 *          type: string
@@ -54,6 +64,9 @@ module.exports = (sequelize, DataTypes) => {
 *          type: string
 *          maxLength: 500
 *          example: "This is the content of the blog post."
+*        likes:
+*          type: integer
+*          example: 0
 *        image:
 *          type: string
 *          maxLength: 50

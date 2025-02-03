@@ -3,6 +3,5 @@ interface avisEntity{
     name: string;
     image: string;
     avis: string;
-    likes?: number;
     creationDate?: Date;
 }

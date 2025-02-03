@@ -4,8 +4,11 @@ const cors = require('cors')
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const path = require('path');
+const cookieParser = require("cookie-parser");
+
 
 const app = express()
+app.use(cookieParser());
 
 const swaggerOptions = {
     definition: {

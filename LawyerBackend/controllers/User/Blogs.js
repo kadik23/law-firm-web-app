@@ -216,7 +216,12 @@ const sortBlogs= async (req,res)=>{
         if (sort) {
 
             if (sort === "new") {
-                blogsList = blogsList.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                blogsList = blogsList.sort((a, b) => {
+                    const dateA = new Date(a.createdAt);
+                    const dateB = new Date(b.createdAt);
+                    console.log('Date A:', dateA, 'Date B:', dateB);
+                    return dateB - dateA;
+                });
             }
             if (sort === "best") {
                 blogsList = blogsList.sort((a, b) => b.likes - a.likes);

@@ -15,11 +15,11 @@ const Sidebar = () => {
     const pathname = usePathname() || "";
 
     const routes = [
-        { Icon: DashboardIcon, alt: "Dashboard", path: "/dashboard" },
-        { Icon: AccountIcon, alt: "Compte", path: "/dashboard/compte" },
-        { Icon: PaymentsIcon, alt: "Payments", path: "/dashboard/payments" },
-        { Icon: ServiceIcon, alt: "Services", path: "/dashboard/services" },
-        { Icon: BlogsIcon, alt: "Vos blogs", path: "/dashboard/vos-blogs" },
+        { Icon: DashboardIcon, alt: "Dashboard", path: "/client/dashboard" },
+        { Icon: AccountIcon, alt: "Compte", path: "/client/dashboard/compte" },
+        { Icon: PaymentsIcon, alt: "Payments", path: "/client/dashboard/payments" },
+        { Icon: ServiceIcon, alt: "Services", path: "/client/dashboard/services" },
+        { Icon: BlogsIcon, alt: "Vos blogs", path: "/client/dashboard/vos-blogs" },
     ];
 
     return (

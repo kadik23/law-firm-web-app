@@ -2,10 +2,11 @@ interface Blog {
     id: number;
     title: string;
     author: string;
-    content: string;
+    body: string;
     likes: number;
-    date: Date;
-    readingDuration: number; // milliseconds
+    createdAt: Date;
+    updatedAt: Date;
+    readingDuration: number; 
     image: string;
-    category: string;
+    categoryId: number;
 }
