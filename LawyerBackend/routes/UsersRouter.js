@@ -15,7 +15,7 @@ const userRouter = require('express').Router()
 
 
 userRouter.post('/signup' ,userController.signUp);
-userRouter.post('/uploadFiles', authMiddleware(["client"]),userController.addFiles);
+userRouter.post('/uploadFiles', authMiddleware(["client","admin","attorney"]),userController.addFiles);
 userRouter.post('/signin' ,userController.signIn);
 userRouter.get('/current' ,authMiddleware(["client","admin","attorney"]),userController.getCurrentClient);
 userRouter.get('/validate' ,authMiddleware(["client","admin","attorney"]),userController.checkUserAuthentication);
