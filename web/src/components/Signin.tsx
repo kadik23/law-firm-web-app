@@ -38,7 +38,7 @@ function Signin({ isModalOpen, setModalOpen }: SigninProps) {
       if (response.status === 200) {
         alert("Success sign in"); 
         setModalOpen(false)   
-        router.push(`/${response.data.type}/dashboard`)
+        window.location.href = `/${response.data.type}/dashboard`;
       } else {
         alert("Failed to sign in");
       }

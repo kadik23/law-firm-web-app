@@ -8,7 +8,7 @@ import { useFavorites } from "@/hooks/useFavourites";
 const VosBlogs = () => {
     const [blogs, setBlogs] = useState<Blog[]>([]);
     const [totalBlogs, setTotalBlogs] = useState(0);
-    const { getFavorites, getFavoritesCount, searchFavorites } = useFavorites();
+    const { getFavorites, getFavoritesCount, searchFavorites, loading } = useFavorites();
     const { loading: authLoading } = useAuth();
 
     const loadInitialData = useCallback(async () => {
@@ -23,6 +23,11 @@ const VosBlogs = () => {
         loadInitialData();
     }, []);
 
+    useEffect(() => {
+        console.log(blogs) ;
+    }, [blogs]);
+
+
     const handleSearch = useCallback(async (query: string) => {
         
         if (query.trim() === '') {
@@ -31,20 +36,21 @@ const VosBlogs = () => {
         } else {
             // Search in favorites
             const searchResults = await searchFavorites(query);
-            setBlogs(searchResults);
-            setTotalBlogs(searchResults.length);
+            setBlogs(searchResults.data);
+            setTotalBlogs(searchResults.data.length);
         }
     }, [searchFavorites, loadInitialData]);
 
     if (authLoading) {
-        return <div>Loading...</div>;
+        return <div>Chargement...</div>;
     }
 
 
     return (
         <div>
             <Header totalBlogs={totalBlogs} onSearch={handleSearch} />
-            <FavBlogs blogs={blogs} signIn={true} />
+            {blogs.length == 0 && !loading ? "Il n'y a pas des articles": (<FavBlogs blogs={blogs} signIn={true} />)}
+            {loading && 'Chargement...'}
         </div>
     );
 };
