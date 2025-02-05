@@ -8,7 +8,6 @@ import {
   useFieldArray,
 } from "react-hook-form";
 import axiosClient from "@/lib/utils/axiosClient";
-import { useRouter } from "next/navigation";
 
 interface SignupProps {
   isModalOpen: boolean;
@@ -67,7 +66,6 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
   
     return isValidStep;
   };
-  const router = useRouter();
 
   const { fields, append, remove } = useFieldArray({
     control,

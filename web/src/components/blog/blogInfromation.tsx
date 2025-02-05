@@ -1,6 +1,6 @@
 import useDateFormatter from "@/hooks/useDateFormatter";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 import { useFavorites } from "@/hooks/useFavourites";
 
 const BlogInformation = ({

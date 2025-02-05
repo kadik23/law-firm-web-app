@@ -12,6 +12,7 @@ export const useFavorites = () => {
       console.log("api response: ",response.data);
       return response.data;
     } catch (err) {
+      console.error(err);
       setError("Failed to fetch favorites");
       return [];
     } finally {
@@ -25,6 +26,7 @@ export const useFavorites = () => {
       const response = await axios.get(`/user/favorites/search?q=${query}`);
       return response.data;
     } catch (err) {
+      console.error(err);
       setError("Failed to search favorites");
       return [];
     } finally {
@@ -38,6 +40,7 @@ export const useFavorites = () => {
       await axios.post("/user/favorites", { blogId });
       return true;
     } catch (err) {
+      console.error(err);
       setError("Failed to add to favorites");
       return false;
     } finally {
@@ -51,6 +54,7 @@ export const useFavorites = () => {
       await axios.delete(`/user/favorites/${blogId}`);
       return true;
     } catch (err) {
+      console.error(err);
       setError("Failed to remove from favorites");
       return false;
     } finally {
@@ -64,6 +68,7 @@ export const useFavorites = () => {
       await axios.delete("/user/favorites");
       return true;
     } catch (err) {
+      console.error(err);
       setError("Failed to remove all favorites");
       return false;
     } finally {
@@ -76,6 +81,7 @@ export const useFavorites = () => {
       const response = await axios.get("/user/favorites/count");
       return response.data.totalFavorites;
     } catch (err) {
+      console.error(err);
       setError("Failed to get favorites count");
       return 0;
     }

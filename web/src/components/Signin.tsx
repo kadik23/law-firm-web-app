@@ -4,7 +4,6 @@ import Modal from "./Modal";
 import useLoginForm from "@/hooks/useLoginForm";
 import { DevTool } from "@hookform/devtools";
 import axiosClient from "@/lib/utils/axiosClient";
-import { useRouter } from "next/navigation";
 
 interface SigninProps {
   isModalOpen: boolean;
@@ -20,7 +19,6 @@ function Signin({ isModalOpen, setModalOpen }: SigninProps) {
     errors,
     isValid,
   } = useLoginForm(); 
-  const router = useRouter();
 
   useEffect(() => {
     setIsDisabled(!isValid); 
