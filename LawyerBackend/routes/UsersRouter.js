@@ -6,6 +6,7 @@ const blogsController = require("../controllers/User/Blogs");
 const attorneysController = require('../controllers/User/attorneys.js');
 const favoritesController = require('../controllers/User/Favorites.js');
 const blogCommentsController = require('../controllers/User/BlogComments');
+const servicesController = require('../controllers/User/Services.js');
 
 
 
@@ -14,7 +15,7 @@ const userRouter = require('express').Router()
 
 
 userRouter.post('/signup' ,userController.signUp);
-userRouter.post('/uploadFiles', authMiddleware(["client"]),userController.addFiles);
+userRouter.post('/uploadFiles', authMiddleware(["client","admin","attorney"]),userController.addFiles);
 userRouter.post('/signin' ,userController.signIn);
 userRouter.get('/current' ,authMiddleware(["client","admin","attorney"]),userController.getCurrentClient);
 userRouter.get('/validate' ,authMiddleware(["client","admin","attorney"]),userController.checkUserAuthentication);
@@ -45,6 +46,7 @@ userRouter.get('/favorites/count',authMiddleware(["client"]),favoritesController
 userRouter.get('/favorites/IsBlogFavorited/:blogId',authMiddleware(["client","admin","attorney"]),favoritesController.IsBlogFavorited);
 userRouter.delete('/favorites',authMiddleware(["client"]),favoritesController.DeleteAllFavorites);
 
+userRouter.get('/services',authMiddleware,servicesController.getAllServices);
 
 
 module.exports = userRouter

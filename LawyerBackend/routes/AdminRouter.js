@@ -2,6 +2,7 @@ const categoriesController = require('../controllers/Admin/Categories.js')
 const contactformController = require('../controllers/Admin/ContactForm.js')
 const blogsController = require('../controllers/Admin/Blogs.js')
 const attorneysController = require('../controllers/Admin/attorneys.js')
+const servicesController = require('../controllers/Admin/Services.js')
 
 const authMiddleware = require("../middlewares/AuthMiddleware.js")
 const checkAdminMiddleware = require("../middlewares/CheckAdminMiddleware.js")
@@ -20,7 +21,7 @@ adminRouter.post('/blogs/add',authMiddleware(["admin"]),checkAdminMiddleware,blo
 adminRouter.put('/blogs/update',authMiddleware(["admin"]),checkAdminMiddleware,blogsController.updateBlog)
 adminRouter.delete('/blogs/delete',authMiddleware(["admin"]),checkAdminMiddleware,blogsController.deleteBlog)
 
-
+adminRouter.post('/services/create',authMiddleware,checkAdminMiddleware,servicesController.createService)
 
 
 

@@ -48,7 +48,7 @@ module.exports = (sequelize, DataTypes) => {
 *      type: object
 *      required:
 *        - title
-         - readingDuration
+*        - readingDuration
 *        - body
 *        - image
 *        - categoryId

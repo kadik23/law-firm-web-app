@@ -41,6 +41,7 @@ db.categories = require('./Categories.js')(sequelize, DataTypes);
 db.blogs = require('./Blogs.js')(sequelize, DataTypes);
 db.favorites = require('./Favorites.js')(sequelize, DataTypes);
 db.blogcomments = require('./BlogComments.js')(sequelize, DataTypes);
+db.services = require('./Services.js')(sequelize, DataTypes);
 
 
 db.files.belongsTo(db.users, {
@@ -100,6 +101,19 @@ db.blogcomments.belongsTo(db.blogcomments, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
 });
+
+db.services.belongsTo(db.users, {
+  foreignKey: 'createdBy',
+  as: 'creator',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
+
+db.users.hasMany(db.services, {
+  foreignKey: 'createdBy',
+  as: 'userServices',
+});
+
 Object.keys(db).forEach((modelName) => {
   if (db[modelName].associate) {
     db[modelName].associate(db);
@@ -116,6 +130,7 @@ db.sequelize
     console.error('Error during database synchronization:', err);
   });
 
+console.log(db.services);  // Ensure it's not undefined
 
 console.log(db.blogs.associations);
 console.log(db.users.associations);
