@@ -9,25 +9,21 @@ const VosBlogs = () => {
     const [blogs, setBlogs] = useState<Blog[]>([]);
     const [totalBlogs, setTotalBlogs] = useState(0);
     const { getFavorites, getFavoritesCount, searchFavorites } = useFavorites();
-    const { user, loading: authLoading } = useAuth();
+    const { loading: authLoading } = useAuth();
 
     const loadInitialData = useCallback(async () => {
-        if (user) {
-            const favBlogs = await getFavorites();
-            console.log("\n Favourite Blogs (VosBlogs.tsx)\n",favBlogs);
-            const count = await getFavoritesCount();
-            console.log(count);
-            setBlogs(favBlogs);
-            setTotalBlogs(count);
-        }
-    }, [user, getFavorites, getFavoritesCount]);
+        const favBlogs = await getFavorites();
+        const count = await getFavoritesCount();
+        console.log("\n Favourite Blogs (VosBlogs.tsx)\n", favBlogs);
+        setBlogs(favBlogs.favorites);
+        setTotalBlogs(count);
+    }, [getFavorites, getFavoritesCount]);
 
     useEffect(() => {
         loadInitialData();
-    }, [loadInitialData]);
+    }, []);
 
     const handleSearch = useCallback(async (query: string) => {
-        if (!user) return;
         
         if (query.trim() === '') {
             // If search is empty, load all favorites
@@ -38,15 +34,12 @@ const VosBlogs = () => {
             setBlogs(searchResults);
             setTotalBlogs(searchResults.length);
         }
-    }, [user, searchFavorites, loadInitialData]);
+    }, [searchFavorites, loadInitialData]);
 
     if (authLoading) {
         return <div>Loading...</div>;
     }
 
-    if (!user) {
-        return <div>Please sign in to view your favorite blogs</div>;
-    }
 
     return (
         <div>

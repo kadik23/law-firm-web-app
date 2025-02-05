@@ -28,6 +28,8 @@ const FavBlogs: React.FC<FavBlogsProps> = ({ blogs, signIn }) => {
   const startIndex = (currentPage - 1) * blogsPerPage;
   const endIndex = startIndex + blogsPerPage;
   const blogsToDisplay = filteredBlogs.slice(startIndex, endIndex);
+  
+  console.log("BlogInfo: ", blogsToDisplay);  
 
   return (
     <div className="w-full">

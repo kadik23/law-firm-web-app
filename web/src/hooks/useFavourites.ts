@@ -1,14 +1,11 @@
 import axios from "@/lib/utils/axiosClient";
-import { useState, useCallback } from "react";
-import { useAuth } from "./useAuth";
+import { useState } from "react";
 
 export const useFavorites = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { user } = useAuth();
 
-  const getFavorites = useCallback(async () => {
-    if (!user) return [];
+  const getFavorites = async () => {
     setLoading(true);
     try {
       const response = await axios.get("/user/favorites");
@@ -20,10 +17,9 @@ export const useFavorites = () => {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  };
 
-  const searchFavorites = useCallback(async (query: string) => {
-    if (!user) return [];
+  const searchFavorites =async (query: string) => {
     setLoading(true);
     try {
       const response = await axios.get(`/user/favorites/search?q=${query}`);
@@ -34,10 +30,9 @@ export const useFavorites = () => {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  };
 
-  const addToFavorites = useCallback(async (blogId: number) => {
-    if (!user) return false;
+  const addToFavorites = async (blogId: number) => {
     setLoading(true);
     try {
       await axios.post("/user/favorites", { blogId });
@@ -48,10 +43,9 @@ export const useFavorites = () => {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  };
 
-  const removeFromFavorites = useCallback(async (blogId: number) => {
-    if (!user) return false;
+  const removeFromFavorites = async (blogId: number) => {
     setLoading(true);
     try {
       await axios.delete(`/user/favorites/${blogId}`);
@@ -62,10 +56,9 @@ export const useFavorites = () => {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  };
 
-  const removeAllFavorites = useCallback(async () => {
-    if (!user) return false;
+  const removeAllFavorites = async () => {
     setLoading(true);
     try {
       await axios.delete("/user/favorites");
@@ -76,18 +69,17 @@ export const useFavorites = () => {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  };
 
-  const getFavoritesCount = useCallback(async () => {
-    if (!user) return 0;
+  const getFavoritesCount = async () => {
     try {
       const response = await axios.get("/user/favorites/count");
-      return response.data.count;
+      return response.data.totalFavorites;
     } catch (err) {
       setError("Failed to get favorites count");
       return 0;
     }
-  }, [user]);
+  };
 
   return {
     loading,

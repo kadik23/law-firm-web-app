@@ -1,19 +1,13 @@
 import useDateFormatter from "@/hooks/useDateFormatter";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
-import { useState, useEffect } from "react";
-import { useAuth } from "@/hooks/useAuth";
+import { useState } from "react";
 import { useFavorites } from "@/hooks/useFavourites";
 
 const BlogInformation = ({ blog }: { blog: Blog }) => {
-  const { user } = useAuth();
   const { addToFavorites, removeFromFavorites } = useFavorites();
   const [isFavorite, setIsFavorite] = useState(false);
 
   const handleFavoriteToggle = async () => {
-    if (!user) {
-      alert("Please sign in to add favorites");
-      return;
-    }
 
     const success = isFavorite 
       ? await removeFromFavorites(blog.id)
