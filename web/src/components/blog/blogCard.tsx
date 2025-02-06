@@ -1,9 +1,20 @@
 import useDateFormatter from "@/hooks/useDateFormatter";
+import { useFavorites } from "@/hooks/useFavourites";
 import useTruncateText from "@/hooks/useTruncateText";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import Link from "next/link";
 
 const BlogCard = ({blog, signIn}:{blog:Blog,signIn?:boolean}) => {
+    const {removeFromFavorites} = useFavorites();
+    const removeBlog = async () => {
+        if (window.confirm("Are you sure you want to remove blog titled \"" + blog.title + "\" ?")) {
+            const response = await removeFromFavorites(blog.id);
+            if (response) {
+                window.location.reload();
+            }
+        }
+    }        
+
     return (
         <div className="w-full p-2 flex flex-col shadow-md rounded-md">
             <img 
@@ -28,7 +39,7 @@ const BlogCard = ({blog, signIn}:{blog:Blog,signIn?:boolean}) => {
             {signIn && (
             
                 <button className="bg-secondary text-white flex gap-1 items-center 
-                justify-center w-full py-2 rounded-lg">
+                justify-center w-full py-2 rounded-lg" onClick={removeBlog}>
                     <Icon
                         icon="mdi:delete"
                         width={15}

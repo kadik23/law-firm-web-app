@@ -8,7 +8,6 @@ import {
   useFieldArray,
 } from "react-hook-form";
 import axiosClient from "@/lib/utils/axiosClient";
-import { useRouter } from "next/navigation";
 
 interface SignupProps {
   isModalOpen: boolean;
@@ -26,13 +25,10 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
     const subscription = watch((value) => {
       console.log("Watched values:", value);
       if(formStep === 0) {
-        console.log("STEP 01");
         validateSteps('stepOne', formStep, false);
       } else if (formStep === 1) {
-        console.log("STEP 02");
         validateSteps('stepTwo', formStep, false);
       } else {
-        console.log("STEP 03");
         validateSteps('stepThree', formStep, false);
       }
     });
@@ -56,8 +52,6 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
     const hasEmptyFields = Object.values(stepData || {}).some((value) => !value);
 
     const isValidStep = !hasErrors && !hasEmptyFields;
-    console.log(currentStep)
-    console.log(isValidStep)
     if (stepName === "stepOne") {
       setIsDisabled1(!isValidStep);
     } else if (stepName === "stepTwo") {
@@ -72,7 +66,6 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
   
     return isValidStep;
   };
-  const router = useRouter();
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -85,7 +78,6 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
 
   const onsubmit = async (data: SignupformType) => {
     try{
-      console.log("first submit ", data);
       const response = await axiosClient.post("/user/signup",{
         name: data.stepOne.name,
         surname: data.stepOne.surname,
@@ -101,7 +93,7 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
       if(response.status == 200){
         alert("Success sign in")
         setModalOpen(false);
-        router.push(`/${response.data.type}/dashboard`)
+        window.location.href = `/${response.data.type}/dashboard`;
       }else {
         alert(response.data)
       }
