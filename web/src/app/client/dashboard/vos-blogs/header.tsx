@@ -1,6 +1,32 @@
-import { Icon } from "@iconify-icon/react/dist/iconify.mjs"
+import { useFavorites } from "@/hooks/useFavourites";
+import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
+import { useState } from "react";
 
-export const Header = ({ totalBolgs }: { totalBolgs: number }) => {
+export const Header = ({ 
+    totalBlogs, 
+    onSearch 
+}: { 
+    totalBlogs: number;
+    onSearch: (query: string) => void;
+}) => {
+    const { removeAllFavorites } = useFavorites();
+    const [searchQuery, setSearchQuery] = useState("");
+
+    const handleDeleteAll = async () => {
+        if (window.confirm("Are you sure you want to remove all favorites?")) {
+            const success = await removeAllFavorites();
+            if (success) {
+                window.location.reload();
+            }
+        }
+    };
+
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const query = e.target.value;
+        setSearchQuery(query);
+        onSearch(query);
+    };
+
     return (
         <div>
             <div className="flex items-center justify-between">
@@ -14,35 +40,36 @@ export const Header = ({ totalBolgs }: { totalBolgs: number }) => {
                         <span className="hidden md:flex">
                             Total de blogs : 
                         </span>
-                        {totalBolgs >= 10 ? totalBolgs : "0"+totalBolgs} 
+                        {totalBlogs >= 10 ? totalBlogs : "0"+ totalBlogs} 
                         <span className="flex md:hidden">
-                            blog{totalBolgs > 1 ? "s" : ""} 
+                            blog{totalBlogs > 1 ? "s" : ""} 
                         </span>
                     </div>
                 </div>
             </div>
             <div className="pt-4 flex items-center justify-between gap-8 mb-4">
-                {/* search bar  */}
                 <div className="bg-white lg:w-fit w-full px-4 py-2 rounded-lg border-[1px] border-black
                     flex items-center justify-between flex-1 shadow-md max-w-[400px]">
-                    <input type="text"  
-                    placeholder="Rechercher un blog" 
-                    name="blog-search-bar" 
-                    id="blog-search"
-                    className="bg-white w-full h-full outline-none"
+                    <input 
+                        type="text"  
+                        placeholder="Rechercher un blog" 
+                        name="blog-search-bar" 
+                        id="blog-search"
+                        value={searchQuery}
+                        onChange={handleSearch}
+                        className="bg-white w-full h-full outline-none"
                     />
-                    {/* Search icon */}
                     <Icon
                         icon="mdi:search"
                         width={20}
                     />
                 </div>
 
-                {/* buttons for handling blogs */}
-                    {/* Nouveaux Blogs Btn */}
-                <button className="bg-btnSecondary text-white font-semibold px-4 py-3 rounded-md
-                flex items-center gap-1">
-                    {/* plus icon */}
+                <button 
+                    onClick={handleDeleteAll}
+                    className="bg-btnSecondary text-white font-semibold px-4 py-3 rounded-md
+                    flex items-center gap-1"
+                >
                     <Icon
                         icon="mdi:delete"
                         width={20}
@@ -51,8 +78,7 @@ export const Header = ({ totalBolgs }: { totalBolgs: number }) => {
                         Supprimer tous
                     </span>
                 </button>
-
             </div>
         </div>
-    )
-}
+    );
+};

@@ -6,6 +6,7 @@ const blogsController = require("../controllers/User/Blogs");
 const attorneysController = require('../controllers/User/attorneys.js');
 const favoritesController = require('../controllers/User/Favorites.js');
 const blogCommentsController = require('../controllers/User/BlogComments');
+const servicesController = require('../controllers/User/Services.js');
 
 
 
@@ -14,7 +15,7 @@ const userRouter = require('express').Router()
 
 
 userRouter.post('/signup' ,userController.signUp);
-userRouter.post('/uploadFiles', authMiddleware(["client"]),userController.addFiles);
+userRouter.post('/uploadFiles', authMiddleware(["client","admin","attorney"]),userController.addFiles);
 userRouter.post('/signin' ,userController.signIn);
 userRouter.get('/current' ,authMiddleware(["client","admin","attorney"]),userController.getCurrentClient);
 userRouter.get('/validate' ,authMiddleware(["client","admin","attorney"]),userController.checkUserAuthentication);
@@ -40,10 +41,13 @@ userRouter.get('/attorneys',attorneysController.getAllAttorneys);
 userRouter.post('/favorites',authMiddleware(["client"]),favoritesController.CreateFavoriteBlog);
 userRouter.get('/favorites',authMiddleware(["client"]),favoritesController.GetAllFavoriteBlogs);
 userRouter.delete('/favorites/:id',authMiddleware(["client"]),favoritesController.DeleteFavoriteBlog);
-userRouter.delete('/favorites',authMiddleware(["client"]),favoritesController.DeleteAllFavorites);
 userRouter.get('/favorites/search',authMiddleware(["client"]),favoritesController.SearchFavoriteBlogs);
 userRouter.get('/favorites/count',authMiddleware(["client"]),favoritesController.GetFavoritesCount);
+userRouter.get('/favorites/IsBlogFavorited/:blogId',authMiddleware(["client","admin","attorney"]),favoritesController.IsBlogFavorited);
+userRouter.delete('/favorites',authMiddleware(["client"]),favoritesController.DeleteAllFavorites);
 
+userRouter.get('/services',authMiddleware(["client","admin","attorney"]),servicesController.getAllServices);
+userRouter.get('/services/:id',authMiddleware(["client","admin","attorney"]),servicesController.getOneService);
 
 
 module.exports = userRouter
