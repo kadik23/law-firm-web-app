@@ -1,4 +1,6 @@
 const db = require('../../models');
+const path = require('path');
+const fs = require('fs');
 const Service = db.services;
 
 /**
@@ -21,8 +23,7 @@ const Service = db.services;
  *                 properties:
  *                   id:
  *                     type: string
- *                     format: uuid
- *                     example: "123e4567-e89b-12d3-a456-426614174000"
+ *                     example: "1"
  *                   name:
  *                     type: string
  *                     example: "Premium Service"
@@ -36,7 +37,7 @@ const Service = db.services;
  *                     example: ["file1.png", "file2.pdf"]
  *                   coverImage:
  *                     type: string
- *                     example: "https://example.com/image.jpg"
+ *                     example: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
  *                   price:
  *                     type: string
  *                     example: "199.99"
@@ -56,16 +57,32 @@ const Service = db.services;
  */
 const getAllServices = async (req, res) => {
   try {
-    const services = await Service.findAll();
+    let services = await Service.findAll({
+      attributes: ['id', 'name', 'description', 'requestedFiles', 'coverImage', 'price', 'createdBy', 'createdAt', 'updatedAt'],
+      order: [['createdAt', 'DESC']], // Trier du plus récent au plus ancien
+    });
 
-    if (services.length === 0) {
-      return res.status(404).json({ message: 'No services found.' });
-    }
+    // Convertir coverImage en Base64
+    services = await Promise.all(
+      services.map(async (service) => {
+        const filePath = path.resolve(__dirname, '..', '..', service.coverImage);
+        let base64Image = null;
+
+        if (fs.existsSync(filePath)) {
+          const fileData = fs.readFileSync(filePath);
+          base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
+        }
+
+        return {
+          ...service.toJSON(),
+          coverImage: base64Image,
+        };
+      })
+    );
 
     return res.status(200).json(services);
   } catch (error) {
     console.error('Error fetching services:', error);
-
     return res.status(500).json({ error: 'Server error: ' + error.message });
   }
 };

@@ -46,7 +46,7 @@ userRouter.get('/favorites/count',authMiddleware(["client"]),favoritesController
 userRouter.get('/favorites/IsBlogFavorited/:blogId',authMiddleware(["client","admin","attorney"]),favoritesController.IsBlogFavorited);
 userRouter.delete('/favorites',authMiddleware(["client"]),favoritesController.DeleteAllFavorites);
 
-userRouter.get('/services',authMiddleware,servicesController.getAllServices);
+userRouter.get('/services',authMiddleware(["client"]),servicesController.getAllServices);
 
 
 module.exports = userRouter

@@ -21,7 +21,7 @@ adminRouter.post('/blogs/add',authMiddleware(["admin"]),checkAdminMiddleware,blo
 adminRouter.put('/blogs/update',authMiddleware(["admin"]),checkAdminMiddleware,blogsController.updateBlog)
 adminRouter.delete('/blogs/delete',authMiddleware(["admin"]),checkAdminMiddleware,blogsController.deleteBlog)
 
-adminRouter.post('/services/create',authMiddleware,checkAdminMiddleware,servicesController.createService)
+adminRouter.post('/services/create',authMiddleware(["admin"]),checkAdminMiddleware,servicesController.createService)
 
 
 
