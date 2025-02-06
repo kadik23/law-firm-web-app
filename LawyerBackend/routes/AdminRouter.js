@@ -17,11 +17,15 @@ adminRouter.post('/categories/add',authMiddleware(["admin"]),checkAdminMiddlewar
 adminRouter.post('/attorney/add',authMiddleware(["admin"]),checkAdminMiddleware,attorneysController.createAttorney);
 adminRouter.delete('/categories/delete',authMiddleware(["admin"]),checkAdminMiddleware,categoriesController.deleteCategory);
 
+<<<<<<< HEAD
 adminRouter.post('/blogs/add',authMiddleware(["admin"]),checkAdminMiddleware,blogsController.addBlog)
 adminRouter.put('/blogs/update',authMiddleware(["admin"]),checkAdminMiddleware,blogsController.updateBlog)
 adminRouter.delete('/blogs/delete',authMiddleware(["admin"]),checkAdminMiddleware,blogsController.deleteBlog)
 
 adminRouter.post('/services/create',authMiddleware(["admin"]),checkAdminMiddleware,servicesController.createService)
+=======
+adminRouter.post('/services/create',authMiddleware,checkAdminMiddleware,servicesController.createService)
+>>>>>>> af101a2bbc2b378d5f72c10187f83b1ce341ca7f
 
 
 

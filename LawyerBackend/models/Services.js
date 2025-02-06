@@ -19,11 +19,19 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
     coverImage: {
+<<<<<<< HEAD
       type: DataTypes.TEXT("long") ,
       allowNull: false,
     },
     price: {
       type: DataTypes.FLOAT,
+=======
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    price: {
+      type: DataTypes.STRING,
+>>>>>>> af101a2bbc2b378d5f72c10187f83b1ce341ca7f
       allowNull: false,
     },
     createdBy: {
