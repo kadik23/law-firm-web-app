@@ -19,6 +19,7 @@ userRouter.post('/uploadFiles', authMiddleware(["client","admin","attorney"]),us
 userRouter.post('/signin' ,userController.signIn);
 userRouter.get('/current' ,authMiddleware(["client","admin","attorney"]),userController.getCurrentClient);
 userRouter.get('/validate' ,authMiddleware(["client","admin","attorney"]),userController.checkUserAuthentication);
+userRouter.get('/logout' ,authMiddleware(["client","admin","attorney"]),userController.logout);
 
 userRouter.get('/categories/all',categoriesController.getAllCategories);
 userRouter.get('/categories/name',categoriesController.getCategoryByName);
