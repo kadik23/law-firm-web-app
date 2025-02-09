@@ -11,7 +11,7 @@ import useCategories from "@/hooks/useCategories";
 
 const Page = () => {
   const { id } = useParams() as { id: string };
-  const { fetchBlog, blog, loading } = useBlog();
+  const { fetchBlog, blog, loading, isFavorited, setisFavorited } = useBlog();
   const {
     blogs,
     blogsLoading,
@@ -48,7 +48,7 @@ const Page = () => {
         setSelectedCategory={setSelectedCategory}
         selectedCategory={selectedCategory}
       />
-      <BLogInfromation blog={blog} />
+      <BLogInfromation blog={blog} isFavorited={isFavorited} setisFavorited={setisFavorited} />
       <ReaderFeedback />
       <div className="font-bold text-3xl md:text-4xl text-primary mb-3">
         D{"'"} autres blogs

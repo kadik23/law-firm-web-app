@@ -1,7 +1,13 @@
 interface avocatEntity{
     id?: string;
+    user_id: string;
+    status: string;
+    linkedin_url: string;
     name: string;
-    linkedin: string;
-    image: string;
-    date: string;
+    certificats: string[];
+    date_membership: string;
+    picture_path: string;
+    createdAt: string;
+    updatedAt: string;
+    picture: string;
 }

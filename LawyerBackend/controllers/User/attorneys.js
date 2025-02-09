@@ -1,6 +1,8 @@
 require('dotenv').config();
 const db = require('../../models');
-const attorneys = db.Attorney;
+const path = require('path');
+const fs = require('fs');
+const attorneys = db.attorneys;
 
 /**
  * @swagger
@@ -24,11 +26,29 @@ const attorneys = db.Attorney;
  *       500:
  *         description: Internal Server Error - An error occurred while fetching attorneys
  */
+
+
 const getAllAttorneys = async (req, res) => {
   try {
     let attorneyList = await attorneys.findAll();
+
     if (attorneyList) {
-      return res.status(200).send(attorneyList);
+      attorneyList = await Promise.all(attorneyList.map(async (attorney) => {
+        const filePath = path.resolve(__dirname, '..', '..', attorney.picture_path);
+
+        let base64Image = null;
+        if (fs.existsSync(filePath)) {
+          const fileData = fs.readFileSync(filePath);
+          base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
+        }
+
+        return {
+          ...attorney.toJSON(),
+          picture: base64Image
+        };
+      }));
+
+      return res.status(200).json(attorneyList);
     } else {
       return res.status(401).send('Error fetching attorneys');
     }
@@ -37,6 +57,10 @@ const getAllAttorneys = async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 };
+
+
+
+
 
 module.exports = {
   getAllAttorneys

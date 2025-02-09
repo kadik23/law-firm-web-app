@@ -15,7 +15,7 @@ pids
 *.pid
 *.seed
 *.pid.lock
-
+/uploads
 # Directory for local environment data
 .env.local
 .env.development.local
@@ -33,3 +33,5 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+/uploads

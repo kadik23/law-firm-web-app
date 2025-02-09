@@ -1,45 +1,52 @@
 import useDateFormatter from "@/hooks/useDateFormatter";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
-import { useState, useEffect } from "react";
-import { useAuth } from "@/hooks/useAuth";
+import { Dispatch, SetStateAction } from "react";
 import { useFavorites } from "@/hooks/useFavourites";
 
-const BlogInformation = ({ blog }: { blog: Blog }) => {
-  const { user } = useAuth();
+const BlogInformation = ({
+  blog,
+  setisFavorited,
+  isFavorited,
+}: {
+  blog: Blog;
+  setisFavorited: Dispatch<SetStateAction<boolean>>;
+  isFavorited: boolean;
+}) => {
   const { addToFavorites, removeFromFavorites } = useFavorites();
-  const [isFavorite, setIsFavorite] = useState(false);
 
   const handleFavoriteToggle = async () => {
-    if (!user) {
-      alert("Please sign in to add favorites");
-      return;
-    }
-
-    const success = isFavorite 
+    const success = isFavorited
       ? await removeFromFavorites(blog.id)
       : await addToFavorites(blog.id);
 
     if (success) {
-      setIsFavorite(!isFavorite);
+      setisFavorited(!isFavorited);
     }
   };
 
   return (
     <div className="w-full flex md:flex-col flex-col-reverse mb-8">
-      <div className="pb-4 my-4 w-full flex md:flex-row flex-col gap-3 justify-between items-center
-          md:border-0 border-b-[1px] border-black">
+      <div
+        className="pb-4 my-4 w-full flex md:flex-row flex-col gap-3 justify-between items-center
+          md:border-0 border-b-[1px] border-black"
+      >
         <div className="text-sm font-medium text-gray-600">
-          {useDateFormatter(blog.createdAt)}. {blog.readingDuration} minutes de lecture
+          {useDateFormatter(blog.createdAt)}. {blog.readingDuration} minutes de
+          lecture
         </div>
 
         <div className="flex gap-3">
-          <button className="text-primary border-[1px] border-black font-semibold px-4 py-2 rounded-md
-                      flex items-center gap-1 md:hidden">
+          <button
+            className="text-primary border-[1px] border-black font-semibold px-4 py-2 rounded-md
+                      flex items-center gap-1 md:hidden"
+          >
             <Icon icon="mdi:comment" width={20} className="text-black" />
             <span className="">Commenter</span>
           </button>
-          <button className="text-primary border-[1px] border-black font-semibold px-4 py-2 rounded-md
-                      flex items-center gap-1 hover:bg-primary hover:text-white">
+          <button
+            className="text-primary border-[1px] border-black font-semibold px-4 py-2 rounded-md
+                      flex items-center gap-1 hover:bg-primary hover:text-white"
+          >
             <Icon icon="mdi:share" width={20} />
             <span className="md:flex hidden">Partager</span>
           </button>
@@ -56,7 +63,11 @@ const BlogInformation = ({ blog }: { blog: Blog }) => {
           <div className="w-full text-white absolute bottom-0 p-4 flex items-center justify-between">
             <div className="flex items-center gap-1">
               <button className="relative group overflow-visible">
-                <Icon icon="mdi:like" width={20} className="group-hover:text-secondary"/>
+                <Icon
+                  icon="mdi:like"
+                  width={20}
+                  className="group-hover:text-secondary"
+                />
                 <span className="absolute -top-4 right-2 hidden group-hover:block text-xs font-semibold text-nowrap">
                   Like
                 </span>
@@ -64,17 +75,19 @@ const BlogInformation = ({ blog }: { blog: Blog }) => {
               {blog.likes}
             </div>
             <div>
-              <button 
+              <button
                 onClick={handleFavoriteToggle}
                 className="relative group overflow-visible"
               >
-                <Icon 
-                  icon="mdi:heart" 
-                  width={20} 
-                  className={`group-hover:text-secondary ${isFavorite ? 'text-red-500' : ''}`}
+                <Icon
+                  icon="mdi:heart"
+                  width={20}
+                  className={`group-hover:text-secondary ${
+                    isFavorited ? "text-red-500" : ""
+                  }`}
                 />
                 <span className="absolute -top-4 right-2 hidden group-hover:block text-xs font-semibold text-nowrap">
-                  {isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                  {isFavorited ? "Remove from favorites" : "Add to favorites"}
                 </span>
               </button>
             </div>

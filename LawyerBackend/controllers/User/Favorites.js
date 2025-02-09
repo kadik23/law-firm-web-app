@@ -1,7 +1,7 @@
-require('dotenv').config();
-const db = require('../../models');
+require("dotenv").config();
+const db = require("../../models");
 const { users, blogs, favorites } = db;
-const { Op } = require('sequelize');
+const { Op } = require("sequelize");
 /**
  * @swagger
  * /user/favorites:
@@ -60,16 +60,27 @@ const CreateFavoriteBlog = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const existingFavorite = await favorites.findOne({ where: { userId, blogId } });
+    const existingFavorite = await favorites.findOne({
+      where: { userId, blogId },
+    });
     if (existingFavorite) {
       return res.status(400).json({ message: "Blog is already favorited." });
     }
 
     const newFavorite = await favorites.create({ userId, blogId });
-    res.status(201).json({ message: "Blog added to favorites successfully.", favorite: newFavorite });
+    res
+      .status(201)
+      .json({
+        message: "Blog added to favorites successfully.",
+        favorite: newFavorite,
+      });
   } catch (error) {
     console.error("Error creating favorite blog:", error);
-    res.status(500).json({ message: "An error occurred while adding the blog to favorites." });
+    res
+      .status(500)
+      .json({
+        message: "An error occurred while adding the blog to favorites.",
+      });
   }
 };
 
@@ -126,8 +137,8 @@ const GetAllFavoriteBlogs = async (req, res) => {
       include: [
         {
           model: blogs,
-          as: 'FavoriteBlogs',
-          attributes: ['id', 'title', 'body'],
+          as: "FavoriteBlogs",
+          attributes: ["id", "title", "body", "createdAt"],
           through: { attributes: [] },
         },
       ],
@@ -136,7 +147,9 @@ const GetAllFavoriteBlogs = async (req, res) => {
     });
 
     if (!favoriteBlogs) {
-      return res.status(404).json({ message: 'User not found or no favorite blogs' });
+      return res
+        .status(404)
+        .json({ message: "User not found or no favorite blogs" });
     }
 
     res.status(200).json({
@@ -144,8 +157,10 @@ const GetAllFavoriteBlogs = async (req, res) => {
       favorites: favoriteBlogs.FavoriteBlogs,
     });
   } catch (error) {
-    console.error('Error retrieving favorite blogs:', error);
-    res.status(500).json({ message: 'An error occurred while retrieving favorites.' });
+    console.error("Error retrieving favorite blogs:", error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while retrieving favorites." });
   }
 };
 
@@ -188,11 +203,15 @@ const DeleteFavoriteBlog = async (req, res) => {
   const blogId = req.params.id;
 
   if (!blogId) {
-    return res.status(400).json({ message: "Blog ID is missing in the request." });
+    return res
+      .status(400)
+      .json({ message: "Blog ID is missing in the request." });
   }
 
   try {
-    const favoriteToDelete = await favorites.findOne({ where: { userId, blogId } });
+    const favoriteToDelete = await favorites.findOne({
+      where: { userId, blogId },
+    });
     if (!favoriteToDelete) {
       return res.status(404).json({ message: "Favorite not found." });
     }
@@ -201,7 +220,9 @@ const DeleteFavoriteBlog = async (req, res) => {
     res.status(200).json({ message: "Favorite deleted successfully." });
   } catch (error) {
     console.error("Error deleting favorite blog:", error);
-    res.status(500).json({ message: "An error occurred while deleting the favorite." });
+    res
+      .status(500)
+      .json({ message: "An error occurred while deleting the favorite." });
   }
 };
 
@@ -235,16 +256,18 @@ const DeleteAllFavorites = async (req, res) => {
 
   try {
     const deletedCount = await favorites.destroy({
-      where: { userId }
+      where: { userId },
     });
 
     res.status(200).json({
       message: "All favorites deleted successfully",
-      deletedCount
+      deletedCount,
     });
   } catch (error) {
     console.error("Error deleting all favorites:", error);
-    res.status(500).json({ message: "An error occurred while deleting all favorites." });
+    res
+      .status(500)
+      .json({ message: "An error occurred while deleting all favorites." });
   }
 };
 
@@ -285,13 +308,6 @@ const DeleteAllFavorites = async (req, res) => {
  *         required: false
  *         schema:
  *           type: string
- *       - name: updatedAt
- *         in: query
- *         description: Search by update date (YYYY-MM-DD)
- *         required: false
- *         schema:
- *           type: string
- *           format: date
  *     responses:
  *       200:
  *         description: A list of favorite blogs with pagination
@@ -315,7 +331,7 @@ const DeleteAllFavorites = async (req, res) => {
  *                       body:
  *                         type: string
  *                         example: "This is the content of the blog post."
- *                       updatedAt:
+ *                       createdAt:
  *                         type: string
  *                         format: date-time
  *                         example: "2025-01-01T12:00:00Z"
@@ -342,45 +358,32 @@ const DeleteAllFavorites = async (req, res) => {
  *       - bearerAuth: []
  */
 
-
 const SearchFavoriteBlogs = async (req, res) => {
   const userId = req.user?.id;
-  const { page = 1, limit = 10, title, description, updatedAt } = req.query;
+  const { page = 1, limit = 10, q } = req.query;
 
   if (!userId) {
-    return res.status(400).json({ message: 'User ID is required.' });
+    return res.status(400).json({ message: "User ID is required." });
   }
 
   const offset = (page - 1) * limit;
 
   try {
-    const whereClause = {};
+    const blogWhereClause = {};
 
-    if (title && typeof title === 'string') {
-      whereClause.title = { [Op.like]: `%${title}%` };  // Use LIKE for MySQL
-    }
-
-    if (description && typeof description === 'string') {
-      whereClause.body = { [Op.like]: `%${description}%` }; // Use LIKE for MySQL
-    }
-
-    if (updatedAt) {
-      const startDate = new Date(updatedAt);
-      const endDate = new Date(startDate);
-      endDate.setDate(endDate.getDate() + 1);
-      whereClause.updatedAt = {
-        [Op.between]: [startDate, endDate]
-      };
-    }
+    blogWhereClause[Op.or] = [
+      { title: { [Op.like]: `%${q}%` } },
+      { body: { [Op.like]: `%${q}%` } },
+    ];
 
     const { count, rows } = await favorites.findAndCountAll({
       where: { userId },
       include: [
         {
           model: blogs,
-          as: 'blog',  // Using 'blog' alias as defined in the associations
-          where: whereClause,  // Corrected to use the correct 'whereClause' variable
-          attributes: ['id', 'title', 'body', 'updatedAt'],
+          as: "blog", 
+          where: blogWhereClause,
+          attributes: ["id", "title", "body", "createdAt"],
         },
       ],
       limit: parseInt(limit, 10),
@@ -388,7 +391,7 @@ const SearchFavoriteBlogs = async (req, res) => {
     });
 
     res.status(200).json({
-      data: rows.map((favorite) => favorite.blog),
+      data: rows.map((favorite) => favorite.blog).filter(Boolean),
       pagination: {
         currentPage: parseInt(page, 10),
         totalPages: Math.ceil(count / limit),
@@ -397,16 +400,21 @@ const SearchFavoriteBlogs = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Error searching favorite blogs:', error);
+    console.error("Error searching favorite blogs:", error);
 
-    if (error.name === 'SequelizeEagerLoadingError') {
-      return res.status(500).json({ message: 'Database association error. Check your model associations.' });
+    if (error.name === "SequelizeEagerLoadingError") {
+      return res
+        .status(500)
+        .json({
+          message: "Database association error. Check your model associations.",
+        });
     }
 
-    res.status(500).json({ message: 'An error occurred while searching favorite blogs.' });
+    res
+      .status(500)
+      .json({ message: "An error occurred while searching favorite blogs." });
   }
 };
-
 
 /**
  * @swagger
@@ -435,18 +443,78 @@ const GetFavoritesCount = async (req, res) => {
 
   try {
     const count = await favorites.count({
-      where: { userId }
+      where: { userId },
     });
 
     res.status(200).json({
-      totalFavorites: count
+      totalFavorites: count,
     });
   } catch (error) {
     console.error("Error counting favorites:", error);
-    res.status(500).json({ message: "An error occurred while counting favorites." });
+    res
+      .status(500)
+      .json({ message: "An error occurred while counting favorites." });
   }
 };
 
+/**
+ * @swagger
+ * /user/favorites/check/{blogId}:
+ *   get:
+ *     summary: Check if a blog is favorited by the user
+ *     description: This endpoint checks if a specific blog is favorited by the authenticated user.
+ *     tags:
+ *       - Favorites
+ *     parameters:
+ *       - name: blogId
+ *         in: path
+ *         description: The ID of the blog to check
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     responses:
+ *       200:
+ *         description: Status indicating if the blog is favorited
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 isFavorited:
+ *                   type: boolean
+ *                   example: true
+ *       404:
+ *         description: Blog not found
+ *       500:
+ *         description: Internal Server Error
+ */
+const IsBlogFavorited = async (req, res) => {
+  const userId = req.user.id;
+  const blogId = req.params.blogId;
+
+  if (!blogId) {
+    return res.status(400).json({ message: "Blog ID is required." });
+  }
+
+  try {
+    const blogExists = await blogs.findByPk(blogId);
+    if (!blogExists) {
+      return res.status(404).json({ message: "Blog not found." });
+    }
+
+    const favorite = await favorites.findOne({
+      where: { userId, blogId },
+    });
+
+    res.status(200).json({ isFavorited: !!favorite });
+  } catch (error) {
+    console.error("Error checking if blog is favorited:", error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while checking favorite status." });
+  }
+};
 
 module.exports = {
   CreateFavoriteBlog,
@@ -455,4 +523,5 @@ module.exports = {
   DeleteAllFavorites,
   SearchFavoriteBlogs,
   GetFavoritesCount,
+  IsBlogFavorited
 };
