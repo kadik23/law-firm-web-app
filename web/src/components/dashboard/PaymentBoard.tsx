@@ -1,30 +1,28 @@
+import { paymentData } from "@/consts/payments";
+import usePagination from "@/hooks/usePagination ";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
-import React from "react";
-
-const paymentData = [
-  {
-    id: 1,
-    totalAmount: "70000DA",
-    paidAmount: "70000DA",
-    remainingBalance: "0DA",
-    paymentDate: "06/18/2024",
-    service: "Service1",
-    status: "confirmé",
-    statusColor: "bg-green-500",
-  },
-  {
-    id: 2,
-    totalAmount: "50000DA",
-    paidAmount: "25000DA",
-    remainingBalance: "25000DA",
-    paymentDate: "07/01/2024",
-    service: "Service2",
-    status: "en attente",
-    statusColor: "bg-black/75",
-  },
-];
+import React, { useEffect, useState } from "react";
 
 function PaymentBoard() {
+  const paimentsPerPage = 6;
+  const [filteredPaiments, setfilteredPaiments] = useState<paimentEntity[]>([]);
+  const {
+    currentPage,
+    totalPages,
+    goToPreviousPage,
+    goToNextPage,
+    generatePaginationNumbers,
+    setCurrentPage,
+  } = usePagination(filteredPaiments.length, paimentsPerPage);
+
+  useEffect(() => {
+    setfilteredPaiments(paymentData);
+  }, [paymentData]);
+
+  const startIndex = (currentPage - 1) * paimentsPerPage;
+  const endIndex = startIndex + paimentsPerPage;
+  const paimentsToDisplay = filteredPaiments.slice(startIndex, endIndex);
+
   return (
     <div className="border shadow-md rounded-lg py-4 overflow-x-auto pl-2">
       <table className="w-full table-auto text-left">
@@ -125,21 +123,27 @@ function PaymentBoard() {
           </tr>
         </thead>
         <tbody>
-          {paymentData.map((item) => (
+          {paimentsToDisplay.map((item) => (
             <tr key={item.id} className="text-xs border-b">
               <td className="px-4 py-3 border">{item.id}</td>
               <td className="px-4 py-3 border">{item.totalAmount}</td>
               <td className="px-4 py-3 border">{item.paidAmount}</td>
-              <td className="px-4 py-3 border">{item.remainingBalance}</td>
+              <td className="px-4 py-3 border">
+                {item.totalAmount - item.paidAmount}
+              </td>
               <td className="px-4 py-3 border">{item.paymentDate}</td>
               <td className="px-4 py-3 border">
                 <div className="border rounded-md py-1 px-2">
-                  {item.service}
+                  {item.service.title}
                 </div>
               </td>
               <td className="px-4 py-3 border">
                 <div className="flex items-center gap-2 text-nowrap">
-                  <div className={`w-2 h-2 ${item.statusColor} rounded-full`} />
+                  <div
+                    className={`w-2 h-2 ${
+                      item.status == "finished" ? "bg-green-400" : "bg-black/55"
+                    } rounded-full`}
+                  />
                   {item.status}
                 </div>
               </td>
@@ -167,34 +171,52 @@ function PaymentBoard() {
           ))}
         </tbody>
       </table>
-      <div className="flex items-center mt-8 gap-2">
-        <div className="border cursor-pointer hover:border-black rounded-md flex items-center justify-center bg-gray-200 w-8 h-8 p-2">
-          <Icon
-            icon="iconamoon:arrow-left-2-duotone"
-            width="12"
-            height="12"
-          />
-        </div>
-        <div className="border cursor-pointer hover:border-black border-black rounded-md flex items-center justify-center p-2 w-8 h-8">1</div>
-        <div className="border cursor-pointer hover:border-black rounded-md flex items-center justify-center p-2 w-8 h-8">2</div>
-        <div className="border cursor-pointer hover:border-black rounded-md flex items-center justify-center p-2 w-8 h-8">3</div>
-        <div className="border cursor-pointer hover:border-black rounded-md flex items-center justify-center p-2 w-8 h-8">4</div>
-        <div className="border cursor-pointer hover:border-black rounded-md flex items-center justify-center p-2 w-8 h-8">
-          <Icon
-            icon="iconamoon:arrow-right-2-duotone"
-            width="12"
-            height="12"
-          />
-        </div>
-        <div className="border cursor-pointer hover:border-black hover:text-black rounded-md p-2 flex gap-16 items-center h-8">
-          10
-          <Icon icon="fe:arrow-down" className="text-gray-300" width="12" height="12" />
-        </div>
-        <div className="text-xs">
+      {totalPages > 1 && (
+        <div className="flex gap-3 justify-start items-center mt-4">
+          {currentPage > 1 && (
+            <button
+              onClick={goToPreviousPage}
+              className="px-2 py-1 bg-btnSecondary text-white rounded-md"
+            >
+              <Icon
+                icon="iconamoon:arrow-left-2-duotone"
+                width="12"
+                height="12"
+              />
+            </button>
+          )}
 
-        /Page
+          <div className="flex gap-2">
+            {generatePaginationNumbers().map((pageNumber: number) => (
+              <button
+                key={pageNumber}
+                onClick={() => setCurrentPage(pageNumber)}
+                className={`px-3 py-1 rounded-md ${
+                  currentPage === pageNumber
+                    ? "bg-primary text-white font-bold"
+                    : "bg-gray-200 hover:bg-gray-300"
+                }`}
+              >
+                {pageNumber}
+              </button>
+            ))}
+          </div>
+
+          {currentPage < totalPages && (
+            <button
+              onClick={goToNextPage}
+              className="px-2 py-1 bg-btnSecondary text-white rounded-md"
+            >
+              <Icon
+                icon="iconamoon:arrow-right-2-duotone"
+                width="12"
+                height="12"
+              />
+            </button>
+          )}
+          <div className="text-sm">/Pages</div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
