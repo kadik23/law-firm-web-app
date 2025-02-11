@@ -62,24 +62,6 @@ const getAllServices = async (req, res) => {
       order: [['createdAt', 'DESC']], // Trier du plus récent au plus ancien
     });
 
-    // Convertir coverImage en Base64
-    services = await Promise.all(
-      services.map(async (service) => {
-        const filePath = path.resolve(__dirname, '..', '..', service.coverImage);
-        let base64Image = null;
-
-        if (fs.existsSync(filePath)) {
-          const fileData = fs.readFileSync(filePath);
-          base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
-        }
-
-        return {
-          ...service.toJSON(),
-          coverImage: base64Image,
-        };
-      })
-    );
-
     return res.status(200).json(services);
   } catch (error) {
     console.error('Error fetching services:', error);
