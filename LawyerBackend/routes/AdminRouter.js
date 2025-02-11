@@ -17,11 +17,16 @@ adminRouter.post('/categories/add',authMiddleware(["admin"]),checkAdminMiddlewar
 adminRouter.post('/attorney/add',authMiddleware(["admin"]),checkAdminMiddleware,attorneysController.createAttorney);
 adminRouter.delete('/categories/delete',authMiddleware(["admin"]),checkAdminMiddleware,categoriesController.deleteCategory);
 
+
 adminRouter.post('/blogs/add',authMiddleware(["admin"]),checkAdminMiddleware,blogsController.addBlog)
 adminRouter.put('/blogs/update',authMiddleware(["admin"]),checkAdminMiddleware,blogsController.updateBlog)
 adminRouter.delete('/blogs/delete',authMiddleware(["admin"]),checkAdminMiddleware,blogsController.deleteBlog)
 
 adminRouter.post('/services/create',authMiddleware(["admin"]),checkAdminMiddleware,servicesController.createService)
+<<<<<<< testimonials_managment
+
+=======
+>>>>>>> main
 
 
 
