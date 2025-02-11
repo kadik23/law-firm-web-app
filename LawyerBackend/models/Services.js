@@ -51,8 +51,8 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
     });
+    Service.hasMany(models.testimonials, { foreignKey: "serviceId", as: "testimonials" });
   };
-  
 
   return Service;
 };
