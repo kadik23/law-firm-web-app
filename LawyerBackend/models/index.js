@@ -42,6 +42,7 @@ db.blogs = require('./Blogs.js')(sequelize, DataTypes);
 db.favorites = require('./Favorites.js')(sequelize, DataTypes);
 db.blogcomments = require('./BlogComments.js')(sequelize, DataTypes);
 db.services = require('./Services.js')(sequelize, DataTypes);
+db.testimonials = require("./Testimonials")(sequelize, DataTypes);
 
 
 db.files.belongsTo(db.users, {
@@ -113,6 +114,17 @@ db.users.hasMany(db.services, {
   foreignKey: 'createdBy',
   as: 'userServices',
 });
+db.testimonials.belongsTo(db.users, {
+  foreignKey: 'userId',
+  allowNull: false,
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
+
+db.users.hasMany(db.testimonials, {
+  foreignKey: 'userId',
+  as: 'userTestimonials',
+});
 
 Object.keys(db).forEach((modelName) => {
   if (db[modelName].associate) {
@@ -135,5 +147,7 @@ console.log(db.services);  // Ensure it's not undefined
 console.log(db.blogs.associations);
 console.log(db.users.associations);
 console.log(db.favorites.associations);
+console.log("Loaded Models:", Object.keys(db));
+console.log("Testimonial Associations:", db.testimonials?.associations);
 
 module.exports = db;

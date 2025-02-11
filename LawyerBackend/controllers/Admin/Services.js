@@ -1,11 +1,8 @@
 const db = require('../../models');
-<<<<<<< HEAD
 const { upload } = require('../../middlewares/FilesMiddleware');
 const path = require('path');
 const fs = require('fs');
 
-=======
->>>>>>> af101a2bbc2b378d5f72c10187f83b1ce341ca7f
 const Service = db.services;
 
 /**
@@ -19,18 +16,10 @@ const Service = db.services;
  *     requestBody:
  *       required: true
  *       content:
-<<<<<<< HEAD
  *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:
-=======
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - id
->>>>>>> af101a2bbc2b378d5f72c10187f83b1ce341ca7f
  *               - name
  *               - description
  *               - requestedFiles
@@ -38,12 +27,6 @@ const Service = db.services;
  *               - price
  *               - createdBy
  *             properties:
-<<<<<<< HEAD
-=======
- *               id:
- *                 type: string
- *                 example: "123e4567-e89b-12d3-a456-426614174000"
->>>>>>> af101a2bbc2b378d5f72c10187f83b1ce341ca7f
  *               name:
  *                 type: string
  *                 example: "Premium Service"
@@ -57,7 +40,6 @@ const Service = db.services;
  *                 example: ["file1.png", "file2.pdf"]
  *               coverImage:
  *                 type: string
-<<<<<<< HEAD
  *                 format: binary
  *               price:
  *                 type: string
@@ -65,28 +47,11 @@ const Service = db.services;
  *     responses:
  *       201:
  *         description: Service created successfully
-=======
- *                 example: "https://example.com/image.jpg"
- *               price:
- *                 type: string
- *                 example: "199.99"
- *               createdBy:
- *                 type: integer
- *                 example: 1
- *     responses:
- *       201:
- *         description: Service created successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
->>>>>>> af101a2bbc2b378d5f72c10187f83b1ce341ca7f
  *       400:
  *         description: Invalid input data
  *       500:
  *         description: Server error
  */
-<<<<<<< HEAD
 
 const uploadFile = upload.single('coverImage');
 
@@ -135,35 +100,6 @@ const createService = async (req, res) => {
     });
   } catch (error) {
     console.error('Error creating service:', error);
-=======
-const createService = async (req, res) => {
-  try {
-    const { id, name, description, requestedFiles, coverImage, price } = req.body;
-    const createdBy = req.user.id;
-
-    if (!id || !name || !description || !requestedFiles || !coverImage || !price) {
-      return res.status(400).json({ error: 'All fields are required.' });
-    }
-
-    const service = await Service.create({
-      id,
-      name,
-      description,
-      requestedFiles,
-      coverImage,
-      price,
-      createdBy,
-    });
-
-
-    return res.status(201).json(service);
-  } catch (error) {
-    console.error('Error creating service:', error);
-
-    if (error.name === 'SequelizeValidationError') {
-      return res.status(400).json({ error: 'Validation error: ' + error.errors.map(err => err.message).join(', ') });
-    }
->>>>>>> af101a2bbc2b378d5f72c10187f83b1ce341ca7f
     return res.status(500).json({ error: 'Server error: ' + error.message });
   }
 };

@@ -7,7 +7,7 @@ const attorneysController = require('../controllers/User/attorneys.js');
 const favoritesController = require('../controllers/User/Favorites.js');
 const blogCommentsController = require('../controllers/User/BlogComments');
 const servicesController = require('../controllers/User/Services.js');
-
+const testimonialsController = require("../controllers/User/testimonials");
 
 
 const userRouter = require('express').Router()
@@ -47,6 +47,11 @@ userRouter.get('/favorites/IsBlogFavorited/:blogId',authMiddleware(["client","ad
 userRouter.delete('/favorites',authMiddleware(["client"]),favoritesController.DeleteAllFavorites);
 
 userRouter.get('/services',authMiddleware(["client"]),servicesController.getAllServices);
+
+
+userRouter.post('/testimonials', authMiddleware(["client"]), testimonialsController.CreateTestimonial);
+userRouter.get('/testimonials', testimonialsController.GetAllTestimonials);
+userRouter.get('/testimonials/service/:serviceId', testimonialsController.GetTestimonialsByService);
 
 
 module.exports = userRouter
