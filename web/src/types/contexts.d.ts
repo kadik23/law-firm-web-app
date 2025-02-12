@@ -19,4 +19,5 @@ interface BlogsFiltersContextType {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  logout: () => Promise<void>;
 }

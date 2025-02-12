@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<null | string>(null);
   const [isSigninModalOpen, setSigninModalOpen] = useState(false);
   const [isSignupModalOpen, setSignupModalOpen] = useState(false);
@@ -25,7 +26,7 @@ function Header() {
   };
 
 
-  const {user} = useAuth();
+  const {user, logout} = useAuth();
 
   useEffect(() => {
     const sections = document.querySelectorAll("section");
@@ -140,20 +141,60 @@ function Header() {
             </button>
           </div>
           <div className={` items-center justify-between gap-4 ${user ? "hidden md:flex" : "hidden"}`}>
-            <button
-              className="bg-primary rounded-md p-2 capitalize text-white btn font-semibold shadow-lg"
-            >
-              Bienvenu {user?.name}
-            </button>
+            <div className="relative">
+              <button
+                className="flex items-center bg-primary rounded-md p-2 capitalize 
+                text-white btn font-semibold shadow-lg"
+                onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+              >
+                Bienvenu {user?.name}
+                <Icon
+                  icon="tabler:chevron-down" 
+                  style={{ strokeWidth: 3 }}
+                  width="17"
+                  height="17"
+                  className="ml-2"/>
+              </button>
+              {profileMenuOpen && 
+                <div className="flex flex-col gap-3 items-end p-4 rounded-md 
+                absolute w-full top-11 bg-primary text-white">
+                  {/* Close icon */}
+                  <Icon
+                    icon="mdi:close"
+                    style={{ strokeWidth: 3 }}
+                    width="20"
+                    height="20"
+                    onClick={() => setProfileMenuOpen(false)}
+                    className="hover:text-secondary cursor-pointer"
+                  />
+
+                  <div className="w-full flex flex-col gap-2">
+                    <Link 
+                      href={"/profile"} 
+                      className="bg-secondary rounded-md text-sm py-1 text-center font-semibold 
+                      hover:text-primary">
+                        Voir mon compte
+                      </Link>
+                    <button 
+                      onClick={logout}
+                      className="bg-secondary rounded-md text-sm py-1 text-center font-semibold
+                       hover:text-primary">
+                        Déconnectez
+                    </button>
+                  </div>
+                </div>
+              } 
+            </div>
             <button
               className="bg-secondary w-11 h-11 rounded-full text-center text-lg p-2 btn font-semibold shadow-lg"
             >
               {user?.name[0]}
             </button>
           </div>
+           
         </div>
 
-        <div className="flex lg:hidden items-center gap-2">
+        <div className="flex md:hidden items-center gap-2">
           <div className="flex md:hidden items-center text-primary font-semibold text-sm">
             <Icon icon="ic:outline-phone" width="20" height="20" className="mr-2" />
             0 26 45 23 45
@@ -169,7 +210,7 @@ function Header() {
         </div>
         {/* Dropdown menu for small screens */}
         {menuOpen && (
-          <div className="absolute top-14 right-4 bg-white text-primary rounded-md shadow-lg p-4 flex flex-col gap-2 lg:hidden">
+          <div className="absolute top-14 right-4 bg-white text-primary rounded-md shadow-lg p-4 flex flex-col gap-2 md:hidden">
             {links.map((link, index) => (
               <a
                 key={index}
@@ -212,11 +253,50 @@ function Header() {
                 </button>
               </div>
               <div className={`${user ? "flex" : "hidden"} flex-col my-4 items-center justify-between gap-4 `}>
-                <button
-                  className="bg-primary rounded-md p-2 capitalize text-white btn font-semibold shadow-lg"
-                >
-                  Bienvenu {user?.name}
-                </button>
+                <div className="relative">
+                  <button
+                    className="flex items-center bg-primary rounded-md p-2 capitalize 
+                    text-white btn font-semibold shadow-lg"
+                    onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+                  >
+                    Bienvenu {user?.name}
+                    <Icon
+                      icon="tabler:chevron-down" 
+                      style={{ strokeWidth: 3 }}
+                      width="17"
+                      height="17"
+                      className="ml-2"/>
+                  </button>
+                  {profileMenuOpen && 
+                    <div className="flex flex-col gap-3 items-end p-4 rounded-md 
+                    absolute w-full top-11 bg-primary text-white">
+                      {/* Close icon */}
+                      <Icon
+                        icon="mdi:close"
+                        style={{ strokeWidth: 3 }}
+                        width="20"
+                        height="20"
+                        onClick={() => setProfileMenuOpen(false)}
+                        className="hover:text-secondary cursor-pointer"
+                      />
+
+                      <div className="w-full flex flex-col gap-2">
+                        <Link 
+                          href={"/profile"} 
+                          className="bg-secondary rounded-md text-sm py-1 text-center font-semibold 
+                          hover:text-primary">
+                            Voir mon compte
+                          </Link>
+                        <Link 
+                          href={"/logout"} 
+                          className="bg-secondary rounded-md text-sm py-1 text-center font-semibold
+                          hover:text-primary">
+                            déconnectez
+                        </Link>
+                      </div>
+                    </div>
+                  } 
+                </div>
                 <button
                   className="bg-secondary w-11 h-11 rounded-full text-center text-lg p-2 btn font-semibold shadow-lg"
                 >
