@@ -170,11 +170,13 @@ function Header() {
 
                   <div className="w-full flex flex-col gap-2">
                     <Link 
-                      href={"/profile"} 
+                      href={`/client/dashboard/compte`} 
                       className="bg-secondary rounded-md text-sm py-1 text-center font-semibold 
-                      hover:text-primary">
+                      hover:text-primary"
+                      onClick={() => setProfileMenuOpen(false)}
+                    >
                         Voir mon compte
-                      </Link>
+                    </Link>
                     <button 
                       onClick={logout}
                       className="bg-secondary rounded-md text-sm py-1 text-center font-semibold

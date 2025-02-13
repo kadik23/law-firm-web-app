@@ -32,11 +32,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async () => {
     try {
-      await axios.post("/user/logout", {}, { withCredentials: true });
+      await axios.get("/user/logout");
       setUser(null);
       router.push("/");
     } catch (err: unknown) {
-      console.error("An unexpected error occurred during logout:", err);
+      console.error("An unexpected error occurred during logout: ", err);
     }
   }
 
