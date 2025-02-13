@@ -225,12 +225,12 @@ const signIn = async (req, res) => {
         const user = await users.findOne({ where: { email } });
 
         if (!user) {
-            return res.status(401).send('Invalid email or password.');
+            return res.status(401).send('Invalid email');
         }
         const isMatch = await bcrypt.compare(password, user.password);
 
         if (!isMatch) {
-            return res.status(401).send('Invalid email or password.');
+            return res.status(401).send('Invalid password.');
         }
         const token = jwt.sign({ user }, process.env.SECRET, { expiresIn: '7d' });
 
@@ -301,11 +301,45 @@ const getCurrentClient = async (req, res) => {
 const checkUserAuthentication = async (req, res) => {
     res.status(200).send(req.user);
 };
+/**
+ * @swagger
+ * /user/logout:
+ *   get:
+ *     summary: Logout a user
+ *     description: This endpoint allows a user to logout.
+ *     tags:
+ *       - Authentication
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Successful logout
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal Server Error - An error occurred during logout
+ */
+const logout = (req, res) => {
+    try {
+        res.clearCookie('authToken', {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict',
+        });
+
+        res.status(200).json({ message: 'Logged out successfully' });
+        console.log('User logged out');
+    } catch (error) {
+        console.error('Error during logout:', error);
+        res.status(500).send('Internal Server Error');
+    }
+};
 
 module.exports = {
     signUp,
     addFiles,
     signIn,
     getCurrentClient,
-    checkUserAuthentication
+    checkUserAuthentication,
+    logout
 };

@@ -23,10 +23,6 @@ adminRouter.put('/blogs/update',authMiddleware(["admin"]),checkAdminMiddleware,b
 adminRouter.delete('/blogs/delete',authMiddleware(["admin"]),checkAdminMiddleware,blogsController.deleteBlog)
 
 adminRouter.post('/services/create',authMiddleware(["admin"]),checkAdminMiddleware,servicesController.createService)
-<<<<<<< testimonials_managment
-
-=======
->>>>>>> main
 
 
 

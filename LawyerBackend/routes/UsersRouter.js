@@ -19,6 +19,7 @@ userRouter.post('/uploadFiles', authMiddleware(["client","admin","attorney"]),us
 userRouter.post('/signin' ,userController.signIn);
 userRouter.get('/current' ,authMiddleware(["client","admin","attorney"]),userController.getCurrentClient);
 userRouter.get('/validate' ,authMiddleware(["client","admin","attorney"]),userController.checkUserAuthentication);
+userRouter.get('/logout' ,authMiddleware(["client","admin","attorney"]),userController.logout);
 
 userRouter.get('/categories/all',categoriesController.getAllCategories);
 userRouter.get('/categories/name',categoriesController.getCategoryByName);
@@ -47,15 +48,7 @@ userRouter.get('/favorites/IsBlogFavorited/:blogId',authMiddleware(["client","ad
 userRouter.delete('/favorites',authMiddleware(["client"]),favoritesController.DeleteAllFavorites);
 
 userRouter.get('/services',authMiddleware(["client","admin","attorney"]),servicesController.getAllServices);
-<<<<<<< testimonials_managment
-
-
-userRouter.post('/testimonials', authMiddleware(["client"]), testimonialsController.CreateTestimonial);
-userRouter.get('/testimonials', testimonialsController.GetAllTestimonials);
-userRouter.get('/testimonials/service/:serviceId', testimonialsController.GetTestimonialsByService);
-=======
 userRouter.get('/services/:id',authMiddleware(["client","admin","attorney"]),servicesController.getOneService);
->>>>>>> main
 
 
 module.exports = userRouter
