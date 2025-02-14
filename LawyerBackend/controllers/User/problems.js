@@ -6,7 +6,7 @@ const Problem = db.problems;
 
 /**
  * @swagger
- * /problems/{id}:
+ * user/problems/{id}:
  *   get:
  *     summary: Get a single problem
  *     description: Retrieves a specific problem by its ID.
@@ -45,7 +45,7 @@ const getProblemById = async (req, res) => {
 
 /**
  * @swagger
- * /problems:
+ * user/problems:
  *   get:
  *     summary: Get all problems
  *     description: Retrieves a list of all problems from the database.
