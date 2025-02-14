@@ -1,9 +1,15 @@
 "use client"
 import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation"; 
 
 const Account = () => {
   const { user, loading } = useAuth();
+  const router = useRouter();
+
+  if (!user) {
+    router.push("/");
+  }
 
   if (loading) {
     return (

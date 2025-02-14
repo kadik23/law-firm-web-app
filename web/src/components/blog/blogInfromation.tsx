@@ -56,7 +56,7 @@ const BlogInformation = ({
       <div className="w-full">
         <div className="relative lg:w-[500px] lg:h-[250px] float-left mr-4">
           <img
-            src="/images/blog.png"
+            src={`/images/${blog.image}`}
             alt={blog.title}
             className="rounded-md w-full h-full object-cover"
           />
