@@ -6,7 +6,7 @@ const Category = db.categories;
 
 /**
  * @swagger
- * /problems:
+ * /admin/problems:
  *   post:
  *     summary: Create a new problem
  *     description: Creates a new problem and associates it with a service and category.
@@ -73,7 +73,7 @@ const createProblem = async (req, res) => {
 
 /**
  * @swagger
- * /problems/{id}:
+ * admin/problems/{id}:
  *   delete:
  *     summary: Delete a problem by ID
  *     description: Deletes a specific problem from the database by its ID.
