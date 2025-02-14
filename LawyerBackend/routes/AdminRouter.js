@@ -3,6 +3,7 @@ const contactformController = require('../controllers/Admin/ContactForm.js')
 const blogsController = require('../controllers/Admin/Blogs.js')
 const attorneysController = require('../controllers/Admin/attorneys.js')
 const servicesController = require('../controllers/Admin/Services.js')
+const problemsController = require("../controllers/Admin/problems.js");
 
 const authMiddleware = require("../middlewares/AuthMiddleware.js")
 const checkAdminMiddleware = require("../middlewares/CheckAdminMiddleware.js")
@@ -24,7 +25,8 @@ adminRouter.delete('/blogs/delete',authMiddleware(["admin"]),checkAdminMiddlewar
 
 adminRouter.post('/services/create',authMiddleware(["admin"]),checkAdminMiddleware,servicesController.createService)
 
+adminRouter.post('/problems', authMiddleware(["admin"]), problemsController.createProblem);
 
-
+adminRouter.delete('/problems/:id', authMiddleware(["admin"]), problemsController.deleteProblem);
 
 module.exports = adminRouter
