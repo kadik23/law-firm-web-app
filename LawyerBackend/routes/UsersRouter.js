@@ -8,15 +8,16 @@ const favoritesController = require('../controllers/User/Favorites.js');
 const blogCommentsController = require('../controllers/User/BlogComments');
 const servicesController = require('../controllers/User/Services.js');
 const testimonialsController = require("../controllers/User/testimonials");
-
+const authSchema=require("../schema/authSchema.js")
+const validationErrors=require("../errorHandler/validationErrors")
 
 const userRouter = require('express').Router()
 
 
 
-userRouter.post('/signup' ,userController.signUp);
-userRouter.post('/uploadFiles', authMiddleware(["client","admin","attorney"]),userController.addFiles);
-userRouter.post('/signin' ,userController.signIn);
+userRouter.post('/signup',authSchema.signup,validationErrors,userController.signUp);
+userRouter.post('/uploadFiles', authMiddleware(["client","admin","attorney"]),userController.addFiles);//TODO("validation not working here")
+userRouter.post('/signin',authSchema.signIn,validationErrors ,userController.signIn);
 userRouter.get('/current' ,authMiddleware(["client","admin","attorney"]),userController.getCurrentClient);
 userRouter.get('/validate' ,authMiddleware(["client","admin","attorney"]),userController.checkUserAuthentication);
 userRouter.get('/logout' ,authMiddleware(["client","admin","attorney"]),userController.logout);
