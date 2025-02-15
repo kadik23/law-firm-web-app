@@ -48,7 +48,7 @@ export const Header = ({
                 </div>
             </div>
             <div className="pt-4 flex items-center justify-between gap-8 mb-4">
-                <div className="bg-white lg:w-fit w-full px-4 py-2 rounded-lg border-[1px] border-black
+                <div className="bg-white lg:w-fit w-full px-4 py-1.5 rounded-lg border-[1px] border-black
                     flex items-center justify-between flex-1 shadow-md max-w-[400px]">
                     <input 
                         type="text"  
@@ -67,7 +67,7 @@ export const Header = ({
 
                 <button 
                     onClick={handleDeleteAll}
-                    className="bg-btnSecondary text-white font-semibold px-4 py-3 rounded-md
+                    className="bg-btnSecondary text-white hover:opacity-75 font-semibold px-4 py-1.5 rounded-md
                     flex items-center gap-1"
                 >
                     <Icon
