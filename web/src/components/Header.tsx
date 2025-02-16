@@ -6,6 +6,14 @@ import Signup from "./Signup";
 import Signin from "./Signin";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
+import { usePathname } from "next/navigation";
+import {
+  AccountIcon,
+  BlogsIcon,
+  DashboardIcon,
+  PaymentsIcon,
+  ServiceIcon,
+} from "./dashboard/icons";
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -13,6 +21,7 @@ function Header() {
   const [activeSection, setActiveSection] = useState<null | string>(null);
   const [isSigninModalOpen, setSigninModalOpen] = useState(false);
   const [isSignupModalOpen, setSignupModalOpen] = useState(false);
+  const router = usePathname();
   const links = [
     { name: "accueil", href: "#accueil" },
     { name: "services", href: "#services" },
@@ -25,8 +34,7 @@ function Header() {
     setMenuOpen(!menuOpen);
   };
 
-
-  const {user, logout} = useAuth();
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     const sections = document.querySelectorAll("section");
@@ -52,38 +60,50 @@ function Header() {
     };
   }, []);
 
+  const routes = [
+    { Icon: DashboardIcon, alt: "Dashboard", path: "/client/dashboard" },
+    { Icon: AccountIcon, alt: "Compte", path: "/client/dashboard/compte" },
+    { Icon: PaymentsIcon, alt: "Payments", path: "/client/dashboard/payments" },
+    { Icon: ServiceIcon, alt: "Services", path: "/client/dashboard/services" },
+    { Icon: BlogsIcon, alt: "Vos blogs", path: "/client/dashboard/vos-blogs" },
+  ];
+
   return (
     <div className="flex flex-col w-full fixed top-0 left-0 z-50">
       <div className="hidden md:flex justify-between items-center w-full bg-[#4A84AA] py-2 px-4 md:px-8">
         <div className="flex items-center text-white font-semibold text-sm">
-          <Icon icon="ic:outline-phone" width="20" height="20" className="mr-2" />
+          <Icon
+            icon="ic:outline-phone"
+            width="20"
+            height="20"
+            className="mr-2"
+          />
           0 26 45 23 45
         </div>
         <div className="flex gap-3 items-center text-white">
           <span className="text-sm">Social Media</span>
-            {/* Facebook */}
-            <Icon 
-              icon="ic:outline-facebook" 
-              width={20} 
-              className="hover:text-blue-700"
-            />
-            {/* WhatsApp */}
-              <Icon
-                icon="mdi:whatsapp"
-                width={20}
-                className="hover:text-green-700"
-              />
-            {/* Linkedin */}
-            <Icon
-              icon="mdi:linkedin"
-              width={20}
-              className="hover:text-blue-900"
-            />
+          {/* Facebook */}
+          <Icon
+            icon="ic:outline-facebook"
+            width={20}
+            className="hover:text-blue-700"
+          />
+          {/* WhatsApp */}
+          <Icon
+            icon="mdi:whatsapp"
+            width={20}
+            className="hover:text-green-700"
+          />
+          {/* Linkedin */}
+          <Icon
+            icon="mdi:linkedin"
+            width={20}
+            className="hover:text-blue-900"
+          />
         </div>
       </div>
-      
+
       <div className="flex justify-between items-center w-full bg-third py-2 shadow-lg px-4 md:px-8 text-white">
-        
         <Link href={"/"}>
           <Image
             src="/images/Logo.png"
@@ -116,17 +136,20 @@ function Header() {
           ))}
         </div>
 
-        
         <div className="flex items-center gap-6">
-          <Link href={'/blog'} className="items-center gap-1 hidden md:flex text-primary hover:text-secondary cursor-pointer">
-              {/* Heart / Favorite */}
-              <Icon
-                icon="mdi:heart"
-                width={20}
-              />
-              <div className="uppercase font-semibold text-sm">My blogs</div>
+          <Link
+            href={"/blog"}
+            className="items-center gap-1 hidden md:flex text-primary hover:text-secondary cursor-pointer"
+          >
+            {/* Heart / Favorite */}
+            <Icon icon="mdi:heart" width={20} />
+            <div className="uppercase font-semibold text-sm">My blogs</div>
           </Link>
-          <div className={` items-center justify-between gap-4 ${user ? "hidden" : "hidden md:flex"}`}>
+          <div
+            className={` items-center justify-between gap-4 ${
+              user ? "hidden" : "hidden md:flex"
+            }`}
+          >
             <button
               className="bg-primary rounded-md p-2 btn font-semibold shadow-lg"
               onClick={() => setSigninModalOpen(true)}
@@ -140,7 +163,11 @@ function Header() {
               inscription
             </button>
           </div>
-          <div className={` items-center justify-between gap-4 ${user ? "hidden md:flex" : "hidden"}`}>
+          <div
+            className={` items-center justify-between gap-4 ${
+              user ? "hidden md:flex" : "hidden"
+            }`}
+          >
             <div className="relative">
               <button
                 className="flex items-center bg-primary rounded-md p-2 capitalize 
@@ -149,15 +176,18 @@ function Header() {
               >
                 Bienvenu {user?.name}
                 <Icon
-                  icon="tabler:chevron-down" 
+                  icon="tabler:chevron-down"
                   style={{ strokeWidth: 3 }}
                   width="17"
                   height="17"
-                  className="ml-2"/>
+                  className="ml-2"
+                />
               </button>
-              {profileMenuOpen && 
-                <div className="flex flex-col gap-3 items-end p-4 rounded-md 
-                absolute w-full top-11 bg-primary text-white">
+              {profileMenuOpen && (
+                <div
+                  className="flex flex-col gap-3 items-end p-4 rounded-md 
+                absolute w-full top-11 bg-primary text-white"
+                >
                   {/* Close icon */}
                   <Icon
                     icon="mdi:close"
@@ -169,36 +199,39 @@ function Header() {
                   />
 
                   <div className="w-full flex flex-col gap-2">
-                    <Link 
-                      href={`/client/dashboard/compte`} 
+                    <Link
+                      href={`/client/dashboard/compte`}
                       className="bg-secondary rounded-md text-sm py-1 text-center font-semibold 
                       hover:text-primary"
                       onClick={() => setProfileMenuOpen(false)}
                     >
-                        Voir mon compte
+                      Voir mon compte
                     </Link>
-                    <button 
+                    <button
                       onClick={logout}
                       className="bg-secondary rounded-md text-sm py-1 text-center font-semibold
-                       hover:text-primary">
-                        Déconnectez
+                       hover:text-primary"
+                    >
+                      Déconnectez
                     </button>
                   </div>
                 </div>
-              } 
+              )}
             </div>
-            <button
-              className="bg-secondary w-11 h-11 rounded-full text-center text-lg p-2 btn font-semibold shadow-lg"
-            >
+            <button className="bg-secondary w-11 h-11 rounded-full text-center text-lg p-2 btn font-semibold shadow-lg">
               {user?.name[0]}
             </button>
           </div>
-           
         </div>
 
         <div className="flex md:hidden items-center gap-2">
           <div className="flex md:hidden items-center text-primary font-semibold text-sm">
-            <Icon icon="ic:outline-phone" width="20" height="20" className="mr-2" />
+            <Icon
+              icon="ic:outline-phone"
+              width="20"
+              height="20"
+              className="mr-2"
+            />
             0 26 45 23 45
           </div>
 
@@ -212,7 +245,7 @@ function Header() {
         </div>
         {/* Dropdown menu for small screens */}
         {menuOpen && (
-          <div className="absolute top-14 right-4 bg-white text-primary rounded-md shadow-lg p-4 flex flex-col gap-2 md:hidden">
+          <div className="absolute top-14 right-4 bg-white text-primary rounded-md shadow-lg py-8 px-4 flex flex-col gap-2 md:hidden">
             {links.map((link, index) => (
               <a
                 key={index}
@@ -226,15 +259,19 @@ function Header() {
               </a>
             ))}
             <div className="flex flex-col items-center mt-3 border-t pt-2">
-              <Link  href={'/blog'} className="flex items-center gap-2 text-primary hover:text-secondary cursor-pointer">
-                  {/* Heart / Favorite */}
-                  <Icon
-                    icon="mdi:heart"
-                    width={20}
-                  />
-                  <span className="uppercase font-semibold text-sm">My blogs</span>
+              <Link
+                href={"/blog"}
+                className="flex items-center gap-2 text-primary hover:text-secondary cursor-pointer"
+              >
+                {/* Heart / Favorite */}
+                <Icon icon="mdi:heart" width={20} />
+                <span className="uppercase font-semibold text-sm">
+                  My blogs
+                </span>
               </Link>
-              <div className={`${user ? "hidden" : "flex"} flex-col gap-2 mt-4 `}>
+              <div
+                className={`${user ? "hidden" : "flex"} flex-col gap-2 mt-4 `}
+              >
                 <button
                   onClick={() => {
                     setSigninModalOpen(true);
@@ -254,24 +291,31 @@ function Header() {
                   inscription
                 </button>
               </div>
-              <div className={`${user ? "flex" : "hidden"} flex-col my-4 items-center justify-between gap-4 `}>
+              <div
+                className={`${
+                  user ? "flex" : "hidden"
+                } my-4 items-center justify-between gap-4 `}
+              >
                 <div className="relative">
                   <button
                     className="flex items-center bg-primary rounded-md p-2 capitalize 
-                    text-white btn font-semibold shadow-lg"
+                    text-white btn font-normal md:font-semibold text-sm md:text-base shadow-lg"
                     onClick={() => setProfileMenuOpen(!profileMenuOpen)}
                   >
                     Bienvenu {user?.name}
                     <Icon
-                      icon="tabler:chevron-down" 
+                      icon="tabler:chevron-down"
                       style={{ strokeWidth: 3 }}
                       width="17"
                       height="17"
-                      className="ml-2"/>
+                      className="ml-2"
+                    />
                   </button>
-                  {profileMenuOpen && 
-                    <div className="flex flex-col gap-3 items-end p-4 rounded-md 
-                    absolute w-full top-11 bg-primary text-white">
+                  {profileMenuOpen && (
+                    <div
+                      className="flex flex-col gap-3 items-end p-4 rounded-md 
+                    absolute w-full top-11 bg-primary text-white"
+                    >
                       {/* Close icon */}
                       <Icon
                         icon="mdi:close"
@@ -283,27 +327,44 @@ function Header() {
                       />
 
                       <div className="w-full flex flex-col gap-2">
-                        <Link 
-                          href={"/profile"} 
+                        <Link
+                          href={"/client/dashboard"}
                           className="bg-secondary rounded-md text-sm py-1 text-center font-semibold 
-                          hover:text-primary">
-                            Voir mon compte
-                          </Link>
-                        <Link 
-                          href={"/logout"} 
-                          className="bg-secondary rounded-md text-sm py-1 text-center font-semibold
-                          hover:text-primary">
-                            déconnectez
+                          hover:text-primary"
+                        >
+                          Voir mon compte
                         </Link>
+                        <button
+                          onClick={logout}
+                          className="bg-secondary rounded-md text-sm py-1 text-center font-semibold
+                          hover:text-primary"
+                        >
+                          déconnectez
+                        </button>
                       </div>
                     </div>
-                  } 
+                  )}
                 </div>
-                <button
-                  className="bg-secondary w-11 h-11 rounded-full text-center text-lg p-2 btn font-semibold shadow-lg"
-                >
+                <button className="bg-secondary w-11 h-11 rounded-full text-center text-lg p-2 btn font-semibold shadow-lg">
                   {user?.name[0]}
                 </button>
+              </div>
+              <div className="flex flex-col gap-2">
+                {user &&
+                  routes.map((route) => (
+                    <Link
+                      href={route.path}
+                      key={route.path}
+                      className={`py-1 flex items-center px-4 rounded-md transition cursor-pointer ${
+                        router === route.path
+                          ? "bg-primary text-white"
+                          : "text-gray-600 hover:bg-gray-200"
+                      }`}
+                    >
+                      <route.Icon />
+                      <div>{route.alt}</div>
+                    </Link>
+                  ))}
               </div>
             </div>
           </div>

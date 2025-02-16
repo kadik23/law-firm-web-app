@@ -10,7 +10,7 @@ function Statistics() {
       icon_text: "text-green-700",
       name: "Paiment",
       number: "33",
-      border: "border-r border-dashed",
+      border: "md:border-r border-t md:border-t-0 border-dashed",
       container: 'justify-start'
     },
     {
@@ -19,7 +19,7 @@ function Statistics() {
       icon_text: "text-orange-700",
       name: "Services concernées",
       number: "8",
-      border: "border-r border-dashed",
+      border: "md:border-r border-t md:border-t-0 border-dashed",
       container: 'justify-center'
     },
     {
@@ -32,11 +32,11 @@ function Statistics() {
     },
   ]);
   return (
-    <div className=" border rounded-xl flex items-center">
+    <div className="w-fit md:w-full border rounded-xl flex flex-col md:flex-row items-start md:items-center">
       {statistics.map((stat) => (
         <div
           key={stat.name}
-          className={`w-1/3 py-4 flex px-8 items-center gap-2 ${stat.container} ${stat?.border}`}
+          className={`md:w-1/3 py-4 flex px-8 items-center gap-2 ${stat.container} ${stat?.border}`}
         >
           <div className={`w-10 h-10 flex items-center justify-center rounded-full ${stat.icon_bg}`}>
             <Icon

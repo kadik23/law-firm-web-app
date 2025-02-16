@@ -6,7 +6,7 @@ import { paymentData } from "@/consts/payments";
 function RecentPayment() {
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex justify-between">
+      <div className="flex flex-col md:flex-row gap-4 md:gap-0 justify-between">
         <div className="text-black/50 font-medium">Recent paiments</div>
         <div className="flex items-center gap-2">
           <div className="border-[1.5px] py-1 px-2 flex items-center rounded-md gap-2">

@@ -16,11 +16,11 @@ function PaymentModal({ isModalOpen, setIsModalOpen }: Props) {
       onClose={() => setIsModalOpen(false)}
       isNotStepOne={true}
     >
-      <div className="px-8 py-4 flex flex-col items-center gap-4 rounded-md">
+      <div className="px-8 py-8 md:py-4 flex flex-col items-center gap-4 rounded-md">
         <div className="text-white font-semibold">
           Ajouter votre paiement totale
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col md:flex-row items-center gap-4 md:gap-2">
           <div className="flex items-center text-white relative py-2 px-2 border rounded-sm border-white">
             <div className="bg-[#2C3E50] absolute text-xs -top-2 left-2">
               Montant Total
@@ -49,7 +49,7 @@ function PaymentModal({ isModalOpen, setIsModalOpen }: Props) {
           <input type="number" className="bg-transparent py-2 w-full outline-none" />
           <div>DA</div>
         </div>
-        <div className="flex items-center gap-2 w-full">
+        <div className="flex flex-col md:flex-row items-center md:gap-2 gap-4 w-full">
           <div className="w-full justify-between text-white relative py-2 px-2 border rounded-sm border-white">
             <div className="bg-[#2C3E50] absolute text-xs -top-2 left-2">
               Service Associé
@@ -68,7 +68,7 @@ function PaymentModal({ isModalOpen, setIsModalOpen }: Props) {
             </select>
           </div>
         </div>
-        <div className="flex w-full gap-2">
+        <div className="flex flex-col md:flex-row w-full gap-2">
           <button
             type="submit"
             className={`${
@@ -81,7 +81,7 @@ function PaymentModal({ isModalOpen, setIsModalOpen }: Props) {
             <Icon icon="material-symbols:upload" width="24" height="24" />
             Enregistrer
           </button>
-          <div className="hidden md:flex items-center justify-between w-full gap-8">
+          <div className="flex items-center justify-between w-full gap-8">
             <button
               onClick={() => {
                 setIsModalOpen(false);

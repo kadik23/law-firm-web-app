@@ -16,7 +16,7 @@ function UnderPaymentModal({ isModalOpen, setIsModalOpen }: Props) {
       onClose={() => setIsModalOpen(false)}
       isNotStepOne={true}
     >
-      <div className="px-8 py-4 flex flex-col items-center gap-4 rounded-md">
+      <div className="px-8 md:py-4 py-8 flex flex-col items-center gap-4 rounded-md">
         <div className="flex  items-center">
           <div className="text-white font-medium text-sm">
             Enregistrez votre paiement en remplissant ce formulaire
@@ -29,7 +29,7 @@ function UnderPaymentModal({ isModalOpen, setIsModalOpen }: Props) {
             Payer avec baridi mob
           </button>
         </div>
-        <div className="flex w-full items-center gap-2">
+        <div className="flex flex-col md:flex-row w-full items-center gap-2">
           <div className="flex items-center w-full text-white relative py-2 px-2 border rounded-sm border-white">
             <div className="bg-[#2C3E50] absolute text-xs -top-2 left-2">
               Montant payé
@@ -67,7 +67,7 @@ function UnderPaymentModal({ isModalOpen, setIsModalOpen }: Props) {
             <input type="date" className="bg-transparent py-2 w-full outline-none" />
           </div>
         </div>
-        <div className="flex items-center gap-2 w-full">
+        <div className="flex flex-col md:flex-row items-center gap-2 w-full">
           <div className="w-full justify-between text-white relative py-2 px-2 border rounded-sm border-white">
             <div className="bg-[#2C3E50] absolute text-xs -top-2 left-2">
               Service Associé
@@ -86,7 +86,7 @@ function UnderPaymentModal({ isModalOpen, setIsModalOpen }: Props) {
             </select>
           </div>
         </div>
-        <div className="flex w-full gap-2">
+        <div className="flex flex-col md:flex-row w-full gap-2">
           <button
             type="submit"
             className={`${
@@ -99,7 +99,7 @@ function UnderPaymentModal({ isModalOpen, setIsModalOpen }: Props) {
             <Icon icon="material-symbols:upload" width="24" height="24" />
             Enregistrer
           </button>
-          <div className="hidden md:flex items-center justify-between w-full gap-8">
+          <div className="items-center justify-between w-full gap-8">
             <button
               onClick={() => {
                 setIsModalOpen(false);
