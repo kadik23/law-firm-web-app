@@ -10,9 +10,11 @@ import {
   BlogsIcon,
   LogoutIcon
 } from './icons';
+import { useAuth } from "@/hooks/useAuth";
 
 const Sidebar = () => {
     const pathname = usePathname() || "";
+    const {logout} = useAuth();
 
     const routes = [
         { Icon: DashboardIcon, alt: "Dashboard", path: "/client/dashboard" },
@@ -49,7 +51,11 @@ const Sidebar = () => {
                     );
                 })}
             </ul>
-            <button className="flex items-center gap-2 py-2 px-3 bg-white text-textColor font-semibold w-fit rounded-lg mx-6">
+            <button 
+                className="flex items-center gap-2 py-2 px-3 bg-white text-textColor 
+                font-semibold w-fit rounded-lg mx-6"
+                onClick={logout}
+            >
                 <LogoutIcon className="text-textColor" />
                 <span>Déconnexion</span>
             </button>
