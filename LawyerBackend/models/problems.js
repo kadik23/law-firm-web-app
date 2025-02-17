@@ -18,7 +18,9 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     }
   });
-
+  Problem.associate = function(models) {
+    Problem.hasMany(models.Consultation, { foreignKey: "problem_id", as: "consultations" });
+  };
   return Problem;
 };
 
