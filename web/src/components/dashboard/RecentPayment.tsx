@@ -17,7 +17,7 @@ function RecentPayment() {
               className="outline-none border-none text-sm placeholder:text-xs"
             />
           </div>
-          <button className="border border-black px-2 py-1 text-sm rounded-md">
+          <button className="border border-black hover:bg-black hover:text-white px-2 py-1 text-sm rounded-md">
             Filter
           </button>
         </div>

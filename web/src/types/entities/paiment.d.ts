@@ -5,5 +5,6 @@ interface paimentEntity{
     service_id: number;
     service: serviceEntity;
     paymentDate: number;
+    remainingBalance: number
     status: 'finished' | 'unfinished';
 }

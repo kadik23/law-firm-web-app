@@ -1,8 +1,8 @@
 import usePagination from "@/hooks/usePagination ";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
-function PaymentBoard({paymentData}: {paymentData: paimentEntity[]}) {
+function PaymentBoard({ paymentData }: { paymentData: paimentEntity[] }) {
   const paimentsPerPage = 6;
   const [filteredPaiments, setfilteredPaiments] = useState<paimentEntity[]>([]);
   const {
@@ -14,108 +14,534 @@ function PaymentBoard({paymentData}: {paymentData: paimentEntity[]}) {
     setCurrentPage,
   } = usePagination(filteredPaiments.length, paimentsPerPage);
 
+  // State for each filter modal visibility
+  const [totalAmountModal, setTotalAmountModal] = useState(false);
+  const [paidAmountModal, setPaidAmountModal] = useState(false);
+  const [remainingAmountModal, setRemainingAmountModal] = useState(false);
+  const [paymentDateModal, setPaymentDateModal] = useState(false);
+  const [serviceModal, setServiceModal] = useState(false);
+  const [statusModal, setStatusModal] = useState(false);
+
+  // State to store filter values
+  const [filterValues, setFilterValues] = useState({
+    totalAmount: "",
+    paidAmount: "",
+    remainingAmount: "",
+    paymentDate: "",
+    service: "",
+    status: "",
+  });
+
+  // State to track active filters for each column
+  const [activeFilters, setActiveFilters] = useState<{
+    totalAmount: boolean;
+    paidAmount: boolean;
+    remainingAmount: boolean;
+    paymentDate: boolean;
+    service: boolean;
+    status: boolean;
+  }>({
+    totalAmount: false,
+    paidAmount: false,
+    remainingAmount: false,
+    paymentDate: false,
+    service: false,
+    status: false,
+  });
+
+  const totalAmountRef = useRef<HTMLDivElement>(null);
+  const paidAmountRef = useRef<HTMLDivElement>(null);
+  const remainingAmountRef = useRef<HTMLDivElement>(null);
+  const paymentDateRef = useRef<HTMLDivElement>(null);
+  const serviceRef = useRef<HTMLDivElement>(null);
+  const statusRef = useRef<HTMLDivElement>(null);
+
+  const totalAmountInputRef = useRef<HTMLInputElement>(null);
+  const paidAmountInputRef = useRef<HTMLInputElement>(null);
+  const remainingAmountInputRef = useRef<HTMLInputElement>(null);
+  const paymentDateInputRef = useRef<HTMLInputElement>(null);
+  const serviceSelectRef = useRef<HTMLSelectElement>(null);
+  const statusSelectRef = useRef<HTMLSelectElement>(null);
+
   useEffect(() => {
     setfilteredPaiments(paymentData);
   }, [paymentData]);
+
+  // Apply all active filters whenever filterValues or activeFilters change
+  useEffect(() => {
+    applyAllFilters();
+  }, [filterValues, activeFilters]);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        totalAmountModal &&
+        totalAmountRef.current &&
+        !totalAmountRef.current.contains(event.target as Node)
+      ) {
+        setTotalAmountModal(false);
+      }
+      if (
+        paidAmountModal &&
+        paidAmountRef.current &&
+        !paidAmountRef.current.contains(event.target as Node)
+      ) {
+        setPaidAmountModal(false);
+      }
+      if (
+        remainingAmountModal &&
+        remainingAmountRef.current &&
+        !remainingAmountRef.current.contains(event.target as Node)
+      ) {
+        setRemainingAmountModal(false);
+      }
+      if (
+        paymentDateModal &&
+        paymentDateRef.current &&
+        !paymentDateRef.current.contains(event.target as Node)
+      ) {
+        setPaymentDateModal(false);
+      }
+      if (
+        serviceModal &&
+        serviceRef.current &&
+        !serviceRef.current.contains(event.target as Node)
+      ) {
+        setServiceModal(false);
+      }
+      if (
+        statusModal &&
+        statusRef.current &&
+        !statusRef.current.contains(event.target as Node)
+      ) {
+        setStatusModal(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [
+    totalAmountModal,
+    paidAmountModal,
+    remainingAmountModal,
+    paymentDateModal,
+    serviceModal,
+    statusModal,
+  ]);
 
   const startIndex = (currentPage - 1) * paimentsPerPage;
   const endIndex = startIndex + paimentsPerPage;
   const paimentsToDisplay = filteredPaiments.slice(startIndex, endIndex);
 
+  // Function to apply all filters at once
+  const applyAllFilters = () => {
+    let result = [...paymentData];
+
+    if (activeFilters.totalAmount && filterValues.totalAmount) {
+      result = result.filter((paiment) => 
+        String(paiment.totalAmount).includes(filterValues.totalAmount)
+      );
+    }
+
+    if (activeFilters.paidAmount && filterValues.paidAmount) {
+      result = result.filter((paiment) => 
+        String(paiment.paidAmount).includes(filterValues.paidAmount)
+      );
+    }
+
+    if (activeFilters.remainingAmount && filterValues.remainingAmount) {
+      result = result.filter((paiment) => {
+        const remaining = paiment.totalAmount - paiment.paidAmount;
+        return String(remaining).includes(filterValues.remainingAmount);
+      });
+    }
+
+    if (activeFilters.paymentDate && filterValues.paymentDate) {
+      result = result.filter((paiment) => 
+        String(paiment.paymentDate).includes(filterValues.paymentDate)
+      );
+    }
+
+    if (activeFilters.service && filterValues.service) {
+      result = result.filter((paiment) => 
+        paiment.service.title === filterValues.service
+      );
+    }
+
+    if (activeFilters.status && filterValues.status) {
+      result = result.filter((paiment) => 
+        paiment.status === filterValues.status
+      );
+    }
+
+    setfilteredPaiments(result);
+  };
+
+  const handleFilterChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    field: keyof typeof filterValues
+  ) => {
+    const value = e.target.value.trim();
+
+    // Update the filter value
+    setFilterValues({
+      ...filterValues,
+      [field]: value,
+    });
+
+    // Update active status
+    setActiveFilters({
+      ...activeFilters,
+      [field]: value !== "",
+    });
+  };
+
+  const toggleModal = (
+    modalState: boolean,
+    modalSetter: React.Dispatch<React.SetStateAction<boolean>>
+  ) => {
+    closeAllModals();
+    modalSetter(!modalState);
+  };
+
+  const closeAllModals = () => {
+    setTotalAmountModal(false);
+    setPaidAmountModal(false);
+    setRemainingAmountModal(false);
+    setPaymentDateModal(false);
+    setServiceModal(false);
+    setStatusModal(false);
+  };
+
+  const clearFilter = (
+    field: keyof typeof activeFilters,
+    inputRef: React.RefObject<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    // Clear the filter value
+    setFilterValues({
+      ...filterValues,
+      [field]: "",
+    });
+
+    // Deactivate the filter
+    setActiveFilters({
+      ...activeFilters,
+      [field]: false,
+    });
+
+    // Reset the input field
+    if (inputRef.current) {
+      if (inputRef === statusSelectRef) {
+        inputRef.current.value = "Tous";
+      } else if (inputRef === serviceSelectRef) {
+        inputRef.current.value = "Tous les services";
+      } else {
+        inputRef.current.value = "";
+      }
+    }
+  };
+
   return (
-    <div className="border shadow-md rounded-lg py-4 overflow-x-auto pl-2">
-      <table className="w-full table-auto text-left">
+    <div className="pb-4 overflow-x-auto -mx-8">
+      <table className="w-full rounded-lg  table-auto text-left shadow-md">
         <thead>
           <tr className="text-xs ">
             <td className="px-4 py-2 border">#</td>
-            <td className="px-4 py-2 border">
+            <td
+              className={`px-4 py-2 border text-nowrap relative ${
+                activeFilters.totalAmount && "border-textColor border"
+              }`}
+            >
+              <div
+                ref={totalAmountRef}
+                className={`bg-secondary ${
+                  totalAmountModal ? "flex" : "hidden"
+                } flex-col gap-2 p-2 absolute -bottom-16 left-0 z-10`}
+              >
+                <div className="text-white">Filtrer en le saisant </div>
+                <div className="flex rounded-md bg-white py-1 px-2">
+                  <input
+                    ref={totalAmountInputRef}
+                    type="number"
+                    className=" outline-none placeholder:font-normal"
+                    placeholder="Montant total"
+                    onChange={(e) => handleFilterChange(e, "totalAmount")}
+                  />
+                  DA
+                </div>
+              </div>
               Montant total
               <Icon
                 icon="solar:sort-linear"
                 width="12"
                 height="12"
-                className="inline-block ml-1"
+                className={`inline-block ml-1 ${
+                  activeFilters.totalAmount
+                    ? "text-textColor cursor-pointer"
+                    : "hidden"
+                }`}
+                onClick={() =>
+                  activeFilters.totalAmount &&
+                  clearFilter("totalAmount", totalAmountInputRef)
+                }
               />
               <Icon
                 icon="ri:filter-line"
                 width="12"
                 height="12"
-                className="inline-block ml-1"
+                className="inline-block ml-1 cursor-pointer hover:text-btnSecondary"
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent outside click handler
+                  toggleModal(totalAmountModal, setTotalAmountModal);
+                }}
               />
             </td>
-            <td className="px-4 py-2 border">
+            <td
+              className={`px-4 py-2 border text-nowrap relative ${
+                activeFilters.paidAmount && "border-textColor border"
+              }`}
+            >
+              <div
+                ref={paidAmountRef}
+                className={`bg-secondary ${
+                  paidAmountModal ? "flex" : "hidden"
+                } flex-col gap-2 p-2 absolute -bottom-16 left-0 z-10`}
+              >
+                <div className="text-white">Filtrer en le saisant </div>
+                <div className="flex rounded-md bg-white py-1 px-2">
+                  <input
+                    type="number"
+                    className=" outline-none placeholder:font-normal"
+                    placeholder="Montant payé"
+                    onChange={(e) => handleFilterChange(e, "paidAmount")}
+                    ref={paidAmountInputRef}
+                  />
+                  DA
+                </div>
+              </div>
               Montant Payé
               <Icon
                 icon="solar:sort-linear"
                 width="12"
                 height="12"
-                className="inline-block ml-1"
+                className={`inline-block ml-1 ${
+                  activeFilters.paidAmount
+                    ? "text-textColor cursor-pointer"
+                    : "hidden"
+                }`}
+                onClick={() =>
+                  activeFilters.paidAmount &&
+                  clearFilter("paidAmount", paidAmountInputRef)
+                }
               />
               <Icon
                 icon="ri:filter-line"
                 width="12"
                 height="12"
-                className="inline-block ml-1"
+                className="inline-block ml-1 cursor-pointer hover:text-btnSecondary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleModal(paidAmountModal, setPaidAmountModal);
+                }}
               />
             </td>
-            <td className="px-4 py-2 border">
+            <td
+              className={`px-4 py-2 border text-nowrap relative ${
+                activeFilters.remainingAmount && "border-textColor border"
+              }`}
+            >
+              <div
+                ref={remainingAmountRef}
+                className={`bg-secondary ${
+                  remainingAmountModal ? "flex" : "hidden"
+                } flex-col gap-2 p-2 absolute -bottom-16 left-0 z-10`}
+              >
+                <div className="text-white">Filtrer en le saisant </div>
+                <div className="flex rounded-md bg-white py-1 px-2">
+                  <input
+                    type="number"
+                    className=" outline-none placeholder:font-normal"
+                    placeholder="Montant restant"
+                    ref={remainingAmountInputRef}
+                    onChange={(e) => handleFilterChange(e, "remainingAmount")}
+                  />
+                  DA
+                </div>
+              </div>
               Solde restant
               <Icon
                 icon="solar:sort-linear"
                 width="12"
                 height="12"
-                className="inline-block ml-1"
+                className={`inline-block ml-1 ${
+                  activeFilters.remainingAmount
+                    ? "text-textColor cursor-pointer"
+                    : "hidden"
+                }`}
+                onClick={() =>
+                  activeFilters.remainingAmount &&
+                  clearFilter("remainingAmount", remainingAmountInputRef)
+                }
               />
               <Icon
                 icon="ri:filter-line"
                 width="12"
                 height="12"
-                className="inline-block ml-1"
+                className="inline-block ml-1 cursor-pointer hover:text-btnSecondary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleModal(remainingAmountModal, setRemainingAmountModal);
+                }}
               />
             </td>
-            <td className="px-4 py-2 border">
+            <td
+              className={`px-4 py-2 border text-nowrap relative ${
+                activeFilters.paymentDate && "border-textColor border"
+              }`}
+            >
+              <div
+                ref={paymentDateRef}
+                className={`bg-secondary ${
+                  paymentDateModal ? "flex" : "hidden"
+                } flex-col gap-2 p-2 absolute -bottom-16 left-0 z-10`}
+              >
+                <div className="text-white">Filtrer en le saisant </div>
+                <div className="flex rounded-md bg-white py-1 px-2">
+                  <input
+                    type="date"
+                    className=" outline-none placeholder:font-normal"
+                    placeholder="Date de paiement"
+                    onChange={(e) => handleFilterChange(e, "paymentDate")}
+                    ref={paymentDateInputRef}
+                  />
+                </div>
+              </div>
               Date de paiement
               <Icon
                 icon="solar:sort-linear"
                 width="12"
                 height="12"
-                className="inline-block ml-1"
+                className={`inline-block ml-1 ${
+                  activeFilters.paymentDate
+                    ? "text-textColor cursor-pointer"
+                    : "hidden"
+                }`}
+                onClick={() =>
+                  activeFilters.paymentDate &&
+                  clearFilter("paymentDate", paymentDateInputRef)
+                }
               />
               <Icon
                 icon="ri:filter-line"
                 width="12"
                 height="12"
-                className="inline-block ml-1"
+                className="inline-block ml-1 cursor-pointer hover:text-btnSecondary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleModal(paymentDateModal, setPaymentDateModal);
+                }}
               />
             </td>
-            <td className="px-4 py-2 border">
+            <td
+              className={`px-4 py-2 border text-nowrap relative ${
+                activeFilters.service && "border-textColor border"
+              }`}
+            >
+              <div
+                ref={serviceRef}
+                className={`bg-secondary ${
+                  serviceModal ? "flex" : "hidden"
+                } flex-col gap-2 p-2 absolute -bottom-16 left-0 z-10`}
+              >
+                <div className="text-white">Filtrer le service </div>
+                <select
+                  ref={serviceSelectRef}
+                  className="outline-none bg-white py-1 px-2 rounded-md"
+                  onChange={(e) => handleFilterChange(e, "service")}
+                >
+                  <option value="">Tous les services</option>
+                  {Array.from(
+                    new Set(paymentData.map((p) => p.service.title))
+                  ).map((title) => (
+                    <option key={title} value={title}>
+                      {title}
+                    </option>
+                  ))}
+                </select>
+              </div>
               Service
               <Icon
                 icon="solar:sort-linear"
                 width="12"
                 height="12"
-                className="inline-block ml-1"
+                className={`inline-block ml-1 ${
+                  activeFilters.service
+                    ? "text-textColor cursor-pointer"
+                    : "hidden"
+                }`}
+                onClick={() =>
+                  activeFilters.service &&
+                  clearFilter("service", serviceSelectRef)
+                }
               />
               <Icon
                 icon="ri:filter-line"
                 width="12"
                 height="12"
-                className="inline-block ml-1"
+                className="inline-block ml-1 cursor-pointer hover:text-btnSecondary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleModal(serviceModal, setServiceModal);
+                }}
               />
             </td>
-            <td className="px-4 py-2 border">
+            <td
+              className={`px-4 py-2 border text-nowrap relative ${
+                activeFilters.status && "border-textColor border"
+              }`}
+            >
+              <div
+                ref={statusRef}
+                className={`bg-secondary ${
+                  statusModal ? "flex" : "hidden"
+                } flex-col gap-2 p-2 absolute -bottom-16 left-0 z-10`}
+              >
+                <div className="text-white">Filtrer le status </div>
+                <select
+                  className="outline-none rounded-md bg-white py-1 px-2"
+                  ref={statusSelectRef}
+                  onChange={(e) => handleFilterChange(e, "status")}
+                >
+                  <option value="">Tous</option>
+                  <option value="finished">Fini</option>
+                  <option value="pending">Non fini</option>
+                </select>
+              </div>
               Status
               <Icon
                 icon="solar:sort-linear"
                 width="12"
                 height="12"
-                className="inline-block ml-1"
+                className={`inline-block ml-1 ${
+                  activeFilters.status
+                    ? "text-textColor cursor-pointer"
+                    : "hidden"
+                }`}
+                onClick={() =>
+                  activeFilters.status && clearFilter("status", statusSelectRef)
+                }
               />
               <Icon
                 icon="ri:filter-line"
                 width="12"
                 height="12"
-                className="inline-block ml-1"
+                className="inline-block ml-1 cursor-pointer hover:text-btnSecondary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleModal(statusModal, setStatusModal);
+                }}
               />
             </td>
             <td className="px-4 py-2 border">Action</td>
