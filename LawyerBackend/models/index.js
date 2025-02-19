@@ -44,6 +44,7 @@ db.blogcomments = require('./BlogComments.js')(sequelize, DataTypes);
 db.services = require('./Services.js')(sequelize, DataTypes);
 db.testimonials = require("./Testimonials")(sequelize, DataTypes);
 db.problems = require("./problems.js")(sequelize, DataTypes);
+db.Consultation = require("./Consultation")(sequelize, DataTypes);
 
 db.files.belongsTo(db.users, {
   foreignKey: 'userId',

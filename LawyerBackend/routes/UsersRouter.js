@@ -8,6 +8,7 @@ const blogCommentsController = require('../controllers/User/BlogComments');
 const servicesController = require('../controllers/User/Services.js');
 const testimonialsController = require("../controllers/User/Testimonials");
 const problemsController = require("../controllers/User/problems.js");
+const consultationController = require("../controllers/User/consultation.js");
 
 const userRouter = require('express').Router();
 
@@ -59,5 +60,8 @@ userRouter.get('/testimonials/service/:serviceId', testimonialsController.GetTes
 // Problems Routes
 userRouter.get('/problems', authMiddleware(["client", "admin", "attorney"]), problemsController.getAllProblems);
 userRouter.get('/problems/:id', authMiddleware(["client", "admin", "attorney"]), problemsController.getProblemById);
+
+// Consultation Routes
+userRouter.post('/consultations', authMiddleware(["client"]), consultationController.createConsultation);
 
 module.exports = userRouter;

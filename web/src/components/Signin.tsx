@@ -73,7 +73,7 @@ function Signin({ isModalOpen, setModalOpen }: SigninProps) {
               },
             })}
             placeholder="Enter votre email"
-            className="py-1 px-4 outline-none text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
+            className="py-1 px-4 outline-none text-sm text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
           />
           {errors.email && <p className="error">{errors.email.message}</p>}
         </div>
@@ -91,7 +91,7 @@ function Signin({ isModalOpen, setModalOpen }: SigninProps) {
               },
             })}
             placeholder="Enter votre mot de passe"
-            className="py-1 px-4 outline-none text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
+            className="py-1 px-4 outline-none text-sm text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
           />
           {errors.password && (
             <p className="error">{errors.password.message}</p>
