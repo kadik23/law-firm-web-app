@@ -11,6 +11,7 @@ import {
   AccountIcon,
   BlogsIcon,
   DashboardIcon,
+  LogoutIcon,
   PaymentsIcon,
   ServiceIcon,
 } from "./dashboard/icons";
@@ -245,12 +246,12 @@ function Header() {
         </div>
         {/* Dropdown menu for small screens */}
         {menuOpen && (
-          <div className="absolute top-14 right-4 bg-white text-primary rounded-md shadow-lg py-8 px-4 flex flex-col gap-2 md:hidden">
+          <div className="absolute top-12 right-4 bg-secondary text-white rounded-md shadow-lg py-8 px-4 flex flex-col gap-2 md:hidden">
             {links.map((link, index) => (
               <a
                 key={index}
                 href={link.href}
-                className={`uppercase text-sm hover:underline text-primary font-semibold transition duration-300 ${
+                className={`uppercase text-sm hover:underline text-white font-semibold transition duration-300 ${
                   activeSection === link.href.substring(1) ? "underline" : ""
                 }`}
                 onClick={() => setMenuOpen(false)}
@@ -258,19 +259,17 @@ function Header() {
                 {link.name}
               </a>
             ))}
-            <div className="flex flex-col items-center mt-3 border-t pt-2">
-              <Link
-                href={"/blog"}
-                className="flex items-center gap-2 text-primary hover:text-secondary cursor-pointer"
-              >
-                {/* Heart / Favorite */}
-                <Icon icon="mdi:heart" width={20} />
-                <span className="uppercase font-semibold text-sm">
-                  My blogs
-                </span>
-              </Link>
+            <Link
+              href={"/blog"}
+              className="flex items-center justify-start gap-2 text-white hover:text-secondary cursor-pointer"
+            >
+              <span className="uppercase font-semibold text-sm">My blogs</span>
+            </Link>
+            <div className="flex flex-col items-center ">
               <div
-                className={`${user ? "hidden" : "flex"} flex-col gap-2 mt-4 `}
+                className={`${
+                  user ? "hidden" : "flex"
+                } flex-col justify-center items-center gap-2 mt-4 `}
               >
                 <button
                   onClick={() => {
@@ -355,16 +354,24 @@ function Header() {
                     <Link
                       href={route.path}
                       key={route.path}
-                      className={`py-1 flex items-center px-4 rounded-md transition cursor-pointer ${
+                      className={`py-1.5 flex items-center px-4 rounded-md transition cursor-pointer ${
                         router === route.path
-                          ? "bg-primary text-white"
-                          : "text-gray-600 hover:bg-gray-200"
+                          ? "text-textColor bg-white hover:bg-gray-200"
+                          : "text-white"
                       }`}
                     >
                       <route.Icon />
-                      <div>{route.alt}</div>
+                      <div className="ml-4">{route.alt}</div>
                     </Link>
                   ))}
+                <button
+                  className="flex items-center gap-2 py-2 px-3 bg-white text-textColor 
+                font-semibold w-fit rounded-lg mx-6"
+                  onClick={logout}
+                >
+                  <LogoutIcon className="text-textColor" />
+                  <span>Déconnexion</span>
+                </button>
               </div>
             </div>
           </div>

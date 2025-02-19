@@ -17,17 +17,8 @@ function UnderPaymentModal({ isModalOpen, setIsModalOpen }: Props) {
       isNotStepOne={true}
     >
       <div className="px-8 md:py-4 py-8 flex flex-col items-center gap-4 rounded-md">
-        <div className="flex  items-center">
-          <div className="text-white font-medium text-sm">
-            Enregistrez votre paiement en remplissant ce formulaire
-          </div>
-          <button
-            type="submit"
-            className={`btn bg-secondary text-white text-sm rounded-md p-2 btn font-semibold shadow-lg w-full`}
-            disabled={isDisabled}
-          >
-            Payer avec baridi mob
-          </button>
+        <div className="text-white font-medium text-sm">
+          Enregistrez votre paiement en remplissant ce formulaire
         </div>
         <div className="flex flex-col md:flex-row w-full items-center gap-2">
           <div className="flex items-center w-full text-white relative py-2 px-2 border rounded-sm border-white">
@@ -64,7 +55,10 @@ function UnderPaymentModal({ isModalOpen, setIsModalOpen }: Props) {
                 }
               `}
             </style>
-            <input type="date" className="bg-transparent py-2 w-full outline-none" />
+            <input
+              type="date"
+              className="bg-transparent py-2 w-full outline-none"
+            />
           </div>
         </div>
         <div className="flex flex-col md:flex-row items-center gap-2 w-full">
@@ -93,11 +87,11 @@ function UnderPaymentModal({ isModalOpen, setIsModalOpen }: Props) {
               isDisabled
                 ? "btn_desabled active:scale-100"
                 : "btn bg-third text-textColor"
-            }  text-sm rounded-md p-2 btn font-semibold shadow-lg w-full flex items-center justify-center gap-2`}
+            }  text-sm rounded-md text-nowrap p-2 btn font-semibold shadow-lg w-full flex items-center justify-center gap-2`}
             disabled={isDisabled}
           >
             <Icon icon="material-symbols:upload" width="24" height="24" />
-            Enregistrer
+            Payer avec baridi mob
           </button>
           <div className="items-center justify-between w-full gap-8">
             <button

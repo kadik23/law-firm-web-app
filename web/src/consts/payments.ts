@@ -241,3 +241,96 @@ export const paymentData: paimentEntity[] = [
     },
   ];
   
+export const underPayments: underPaymentEntity[] = [
+  {
+    id: 2,
+    paidAmount: 15000,
+    service_id: 2,
+    service: {
+      id: "102",
+      image: "https://via.placeholder.com/150",
+      title: "Graphic Design",
+      body: "Logo and branding design package.",
+      price: 30000,
+    },
+    paymentDate: "1699000000",
+  },
+  {
+    id: 4,
+    paidAmount: 10000,
+    service_id: 4,
+    service: {
+      id: "104",
+      image: "https://via.placeholder.com/150",
+      title: "Social Media Management",
+      body: "Managing social media campaigns for businesses.",
+      price: 20000,
+    },
+    paymentDate: "1696000000",
+  },
+  {
+    id: 6,
+    paidAmount: 75000,
+    service_id: 6,
+    service: {
+      id: "106",
+      image: "https://via.placeholder.com/150",
+      title: "E-commerce Platform",
+      body: "Complete e-commerce platform with payment integrations.",
+      price: 100000,
+    },
+    paymentDate: "1694000000",
+  },
+  {
+    id: 9,
+    paidAmount: 50000,
+    service_id: 9,
+    service: {
+      id: "109",
+      image: "https://via.placeholder.com/150",
+      title: "Digital Marketing",
+      body: "Performance-based digital marketing services.",
+      price: 70000,
+    },
+    paymentDate: "1691000000",
+  },
+  {
+    id: 11,
+    paidAmount: 10000,
+    service_id: 11,
+    service: {
+      id: "111",
+      image: "https://via.placeholder.com/150",
+      title: "Technical Support",
+      body: "24/7 technical support services.",
+      price: 15000,
+    },
+    paymentDate: "1689000000",
+  },
+  {
+    id: 13,
+    paidAmount: 30000,
+    service_id: 13,
+    service: {
+      id: "113",
+      image: "https://via.placeholder.com/150",
+      title: "Data Analysis",
+      body: "Data-driven insights for business growth.",
+      price: 55000,
+    },
+    paymentDate: "1687000000",
+  },
+  {
+    id: 15,
+    paidAmount: 20000,
+    service_id: 15,
+    service: {
+      id: "115",
+      image: "https://via.placeholder.com/150",
+      title: "IT Consulting",
+      body: "Strategic IT consulting services.",
+      price: 40000,
+    },
+    paymentDate: "1685000000",
+  },
+];

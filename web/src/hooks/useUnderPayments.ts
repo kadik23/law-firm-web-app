@@ -2,51 +2,33 @@
 
 import { useEffect, useState } from "react";
 
-function usePayments(paymentData: paimentEntity[]) {
+function useUnderPayments(underPayments: underPaymentEntity[]) {
   const [filteredPaiments, setFilteredPaiments] =
-    useState<paimentEntity[]>(paymentData);
+    useState<underPaymentEntity[]>(underPayments);
 
   const [filterValues, setFilterValues] = useState({
-    totalAmount: "",
     paidAmount: "",
-    remainingAmount: "",
     paymentDate: "",
-    service: "",
-    status: "",
   });
 
   const [activeFilters, setActiveFilters] = useState<{
-    totalAmount: boolean;
     paidAmount: boolean;
-    remainingAmount: boolean;
     paymentDate: boolean;
-    service: boolean;
-    status: boolean;
   }>({
-    totalAmount: false,
     paidAmount: false,
-    remainingAmount: false,
     paymentDate: false,
-    service: false,
-    status: false,
   });
 
   useEffect(() => {
-    setFilteredPaiments(paymentData);
-  }, [paymentData]);
+    setFilteredPaiments(underPayments);
+  }, [underPayments]);
 
   useEffect(() => {
     applyAllFilters();
   }, [filterValues, activeFilters]);
 
   const applyAllFilters = () => {
-    let result = [...paymentData];
-
-    if (activeFilters.totalAmount && filterValues.totalAmount) {
-      result = result.filter((paiment) =>
-        String(paiment.totalAmount).includes(filterValues.totalAmount)
-      );
-    }
+    let result = [...underPayments];
 
     if (activeFilters.paidAmount && filterValues.paidAmount) {
       result = result.filter((paiment) =>
@@ -54,28 +36,9 @@ function usePayments(paymentData: paimentEntity[]) {
       );
     }
 
-    if (activeFilters.remainingAmount && filterValues.remainingAmount) {
-      result = result.filter((paiment) => {
-        const remaining = paiment.totalAmount - paiment.paidAmount;
-        return String(remaining).includes(filterValues.remainingAmount);
-      });
-    }
-
     if (activeFilters.paymentDate && filterValues.paymentDate) {
       result = result.filter((paiment) =>
         String(paiment.paymentDate).includes(filterValues.paymentDate)
-      );
-    }
-
-    if (activeFilters.service && filterValues.service) {
-      result = result.filter(
-        (paiment) => paiment.service.title === filterValues.service
-      );
-    }
-
-    if (activeFilters.status && filterValues.status) {
-      result = result.filter(
-        (paiment) => paiment.status === filterValues.status
       );
     }
 
@@ -109,4 +72,4 @@ function usePayments(paymentData: paimentEntity[]) {
   };
 }
 
-export default usePayments;
+export default useUnderPayments;

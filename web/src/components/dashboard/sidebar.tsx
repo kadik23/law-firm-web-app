@@ -14,7 +14,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 const Sidebar = () => {
     const pathname = usePathname() || "";
-    const {logout} = useAuth();
+    const { logout } = useAuth();
 
     const routes = [
         { Icon: DashboardIcon, alt: "Dashboard", path: "/client/dashboard" },
@@ -28,12 +28,13 @@ const Sidebar = () => {
         <div className="bg-secondary hidden md:flex flex-col max-w-[320px] pt-20 pb-10 sticky left-0">
             <ul className="mb-20 ml-6">
                 {routes.map(({ Icon, alt, path }) => {
-                    const isActive = pathname === path;
+                    const isActive = pathname === path || (pathname.startsWith(path) && path !== "/client/dashboard");
+
                     return (
                         <li
                             key={alt}
                             className={classNames(
-                                "mb-6 py-2 pl-3 rounded-s-full transition-all duration-0.5 flex items-center gap-3",
+                                "mb-6 py-2 pl-3 rounded-s-full group hover:bg-white hover:text-textColor transition-all duration-0.5 flex items-center gap-3",
                                 {
                                     "text-textColor bg-white": isActive,
                                     "text-white text-sm": !isActive,
@@ -43,7 +44,7 @@ const Sidebar = () => {
                             <Link href={path} className="flex items-center gap-3 font-semibold">
                                 <Icon className={classNames({
                                     "text-textColor": isActive,
-                                    "text-white": !isActive,
+                                    "text-white group-hover:bg-white group-hover:text-textColor": !isActive,
                                 })} />
                                 <span>{alt}</span>
                             </Link>
@@ -53,7 +54,7 @@ const Sidebar = () => {
             </ul>
             <button 
                 className="flex items-center gap-2 py-2 px-3 bg-white text-textColor 
-                font-semibold w-fit rounded-lg mx-6"
+                font-semibold w-fit rounded-lg mx-6 hover:opacity-90"
                 onClick={logout}
             >
                 <LogoutIcon className="text-textColor" />
