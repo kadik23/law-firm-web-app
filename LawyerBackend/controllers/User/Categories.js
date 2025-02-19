@@ -41,7 +41,7 @@ const getAllCategories= async (req,res)=>{
  *     description: This endpoint retrieves a category by its name.
  *     tags:
  *       - Categories
- *     requestBody:
+ *     requestParams:
  *       required: true
  *       content:
  *         application/json:
@@ -66,7 +66,7 @@ const getAllCategories= async (req,res)=>{
  */
 const getCategoryByName= async (req,res)=>{
     try {
-        const {name} = req.body;
+        const {name} = req.params;
         let category = await categories.findAll({ where: { name } });
 
 

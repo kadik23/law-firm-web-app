@@ -9,6 +9,9 @@ const blogCommentsController = require('../controllers/User/BlogComments');
 const servicesController = require('../controllers/User/Services.js');
 const testimonialsController = require("../controllers/User/testimonials");
 const authSchema=require("../schema/authSchema.js")
+const categoriesSchema=require("../schema/categoriesSchema.js")
+const blogsSchema=require("../schema/blogsSchema.js")
+const commentsSchema=require("../schema/blogCommentsSchema")
 const validationErrors=require("../errorHandler/validationErrors")
 
 const userRouter = require('express').Router()
@@ -23,20 +26,20 @@ userRouter.get('/validate' ,authMiddleware(["client","admin","attorney"]),userCo
 userRouter.get('/logout' ,authMiddleware(["client","admin","attorney"]),userController.logout);
 
 userRouter.get('/categories/all',categoriesController.getAllCategories);
-userRouter.get('/categories/name',categoriesController.getCategoryByName);
+userRouter.get('/categories/:name',categoriesSchema.getByName,validationErrors,categoriesController.getCategoryByName);
 
 userRouter.get('/blogs/all',blogsController.getAllBlogs);
-userRouter.post('/blogs/likeblog',authMiddleware(["client","admin","attorney"]),blogsController.likeBlog);
-userRouter.get('/blogs/sort',blogsController.sortBlogs);
-userRouter.get('/blogs/:id',blogsController.getBlogById);
+userRouter.post('/blogs/likeblog',authMiddleware(["client","admin","attorney"]),blogsSchema.like,validationErrors(),blogsController.likeBlog);
+userRouter.get('/blogs/sort',blogsSchema.sort,validationErrors,blogsController.sortBlogs);
+userRouter.get('/blogs/:id',blogsSchema.getById,validationErrors,blogsController.getBlogById);
 
 
-userRouter.post('/blogs/addcomment',authMiddleware(["client","admin","attorney"]), blogCommentsController.addBlogComment);
-userRouter.delete('/blogs/deletecomment',authMiddleware(["client","admin","attorney"]), blogCommentsController.deleteBlogComment);
-userRouter.put('/blogs/updatecomment',authMiddleware(["client","admin","attorney"]), blogCommentsController.updateBlogComment);
-userRouter.post('/blogs/replycomment',authMiddleware(["client","admin","attorney"]), blogCommentsController.replyComment);
-userRouter.post('/blogs/likecomment',authMiddleware(["client","admin","attorney"]), blogCommentsController.likeComment);
-userRouter.get('/blogs/commentsByBlog/:id',blogCommentsController.getCommentsByBlog);
+userRouter.post('/blogs/addcomment',authMiddleware(["client","admin","attorney"]),commentsSchema.add,validationErrors, blogCommentsController.addBlogComment);
+userRouter.delete('/blogs/deletecomment',authMiddleware(["client","admin","attorney"]),commentsSchema.remove,validationErrors, blogCommentsController.deleteBlogComment);
+userRouter.put('/blogs/updatecomment',authMiddleware(["client","admin","attorney"]),commentsSchema.update,validationErrors, blogCommentsController.updateBlogComment);
+userRouter.post('/blogs/replycomment',authMiddleware(["client","admin","attorney"]),commentsSchema.reply,validationErrors, blogCommentsController.replyComment);
+userRouter.post('/blogs/likecomment',authMiddleware(["client","admin","attorney"]),commentsSchema.like,validationErrors, blogCommentsController.likeComment);
+userRouter.get('/blogs/commentsByBlog/:id',commentsSchema.getByBlog,validationErrors,blogCommentsController.getCommentsByBlog);
 
 userRouter.get('/attorneys',attorneysController.getAllAttorneys);
 
