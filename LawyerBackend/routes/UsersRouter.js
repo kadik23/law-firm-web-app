@@ -50,7 +50,7 @@ userRouter.get('/favorites/IsBlogFavorited/:blogId', authMiddleware(["client", "
 userRouter.delete('/favorites', authMiddleware(["client"]), favoritesController.DeleteAllFavorites);
 
 // Services Routes
-userRouter.get('/services', authMiddleware(["client"]), servicesController.getAllServices);
+userRouter.get('/services', servicesController.getAllServices);
 
 // Testimonials Routes
 userRouter.post('/testimonials', authMiddleware(["client"]), testimonialsController.CreateTestimonial);

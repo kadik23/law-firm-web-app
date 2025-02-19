@@ -60,9 +60,9 @@ const Documents = () => {
           <div className="border-b border-gray-400/25 md:py-4 md:px-8 text-primary font-semibold md:text-lg w-full px-2">
             Voici les documents que vous allez ajouter pour le “nom de service”
           </div>
-          <div className="shadow-md md:flex gap-2 items-center hidden cursor-pointer text-secondary hover:text-white hover:bg-secondary transition-all duration-200 bg-white px-4 py-2 rounded-xl">
+          <div className="shadow-md md:flex gap-2 items-center hidden cursor-pointer text-secondary hover:text-white hover:bg-secondary transition-all duration-200 bg-white px-4 py-1 rounded-xl">
             <Icon icon="material-symbols:delete" width="24" height="24" />
-            <div className="font-semibold text-nowrap">Suprimer tous </div>
+            <div className="font-semibold text-nowrap">Supprimer tous </div>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 text-sm gap-4 py-4 md:px-8  px-2">

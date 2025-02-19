@@ -30,7 +30,7 @@ const Account = () => {
   ];
 
   return (
-    <div className="flex flex-col gap-10 w-full">
+    <div className="flex flex-col gap-10 w-full md:px-0 px-8">
       <div className="flex items-center gap-4">
         <Image
           src={"/images/profile.png"}
@@ -49,7 +49,7 @@ const Account = () => {
       </div>
 
       <div className="flex flex-col gap-6">
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {infoToShow.map((info, index) => (
             <div key={index} className="flex flex-col gap-1">
               <span className="text-sm font-semibold">{info.label}</span>
