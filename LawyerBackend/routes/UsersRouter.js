@@ -51,6 +51,7 @@ userRouter.delete('/favorites', authMiddleware(["client"]), favoritesController.
 
 // Services Routes
 userRouter.get('/services', servicesController.getAllServices);
+userRouter.get('/services/:id',servicesController.getOneService)
 
 // Testimonials Routes
 userRouter.post('/testimonials', authMiddleware(["client"]), testimonialsController.CreateTestimonial);
