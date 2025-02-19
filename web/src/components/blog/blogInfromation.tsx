@@ -38,9 +38,9 @@ const BlogInformation = ({
         <div className="flex gap-3">
           <button
             className="text-primary border-[1px] border-black font-semibold px-4 py-2 rounded-md
-                      flex items-center gap-1 md:hidden"
+                      flex items-center gap-1 hover:bg-secondary hover:text-white hover:border-none"
           >
-            <Icon icon="mdi:comment" width={20} className="text-black" />
+            <Icon icon="mdi:comment" width={20} className="text-primary" />
             <span className="">Commenter</span>
           </button>
           <button
