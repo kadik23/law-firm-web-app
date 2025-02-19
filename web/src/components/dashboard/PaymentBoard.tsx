@@ -1,10 +1,20 @@
+"use client";
 import usePagination from "@/hooks/usePagination ";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import React, { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
+import usePayments from "@/hooks/usePayments";
 
 function PaymentBoard({ paymentData }: { paymentData: paimentEntity[] }) {
   const paimentsPerPage = 6;
-  const [filteredPaiments, setfilteredPaiments] = useState<paimentEntity[]>([]);
+  const {
+    filteredPaiments,
+    filterValues,
+    activeFilters,
+    setFilterValues,
+    setActiveFilters,
+    handleFilterChange,
+  } = usePayments(paymentData);
   const {
     currentPage,
     totalPages,
@@ -14,40 +24,12 @@ function PaymentBoard({ paymentData }: { paymentData: paimentEntity[] }) {
     setCurrentPage,
   } = usePagination(filteredPaiments.length, paimentsPerPage);
 
-  // State for each filter modal visibility
   const [totalAmountModal, setTotalAmountModal] = useState(false);
   const [paidAmountModal, setPaidAmountModal] = useState(false);
   const [remainingAmountModal, setRemainingAmountModal] = useState(false);
   const [paymentDateModal, setPaymentDateModal] = useState(false);
   const [serviceModal, setServiceModal] = useState(false);
   const [statusModal, setStatusModal] = useState(false);
-
-  // State to store filter values
-  const [filterValues, setFilterValues] = useState({
-    totalAmount: "",
-    paidAmount: "",
-    remainingAmount: "",
-    paymentDate: "",
-    service: "",
-    status: "",
-  });
-
-  // State to track active filters for each column
-  const [activeFilters, setActiveFilters] = useState<{
-    totalAmount: boolean;
-    paidAmount: boolean;
-    remainingAmount: boolean;
-    paymentDate: boolean;
-    service: boolean;
-    status: boolean;
-  }>({
-    totalAmount: false,
-    paidAmount: false,
-    remainingAmount: false,
-    paymentDate: false,
-    service: false,
-    status: false,
-  });
 
   const totalAmountRef = useRef<HTMLDivElement>(null);
   const paidAmountRef = useRef<HTMLDivElement>(null);
@@ -62,15 +44,6 @@ function PaymentBoard({ paymentData }: { paymentData: paimentEntity[] }) {
   const paymentDateInputRef = useRef<HTMLInputElement>(null);
   const serviceSelectRef = useRef<HTMLSelectElement>(null);
   const statusSelectRef = useRef<HTMLSelectElement>(null);
-
-  useEffect(() => {
-    setfilteredPaiments(paymentData);
-  }, [paymentData]);
-
-  // Apply all active filters whenever filterValues or activeFilters change
-  useEffect(() => {
-    applyAllFilters();
-  }, [filterValues, activeFilters]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -134,68 +107,10 @@ function PaymentBoard({ paymentData }: { paymentData: paimentEntity[] }) {
   const startIndex = (currentPage - 1) * paimentsPerPage;
   const endIndex = startIndex + paimentsPerPage;
   const paimentsToDisplay = filteredPaiments.slice(startIndex, endIndex);
+  const router = useRouter();
 
-  // Function to apply all filters at once
-  const applyAllFilters = () => {
-    let result = [...paymentData];
-
-    if (activeFilters.totalAmount && filterValues.totalAmount) {
-      result = result.filter((paiment) => 
-        String(paiment.totalAmount).includes(filterValues.totalAmount)
-      );
-    }
-
-    if (activeFilters.paidAmount && filterValues.paidAmount) {
-      result = result.filter((paiment) => 
-        String(paiment.paidAmount).includes(filterValues.paidAmount)
-      );
-    }
-
-    if (activeFilters.remainingAmount && filterValues.remainingAmount) {
-      result = result.filter((paiment) => {
-        const remaining = paiment.totalAmount - paiment.paidAmount;
-        return String(remaining).includes(filterValues.remainingAmount);
-      });
-    }
-
-    if (activeFilters.paymentDate && filterValues.paymentDate) {
-      result = result.filter((paiment) => 
-        String(paiment.paymentDate).includes(filterValues.paymentDate)
-      );
-    }
-
-    if (activeFilters.service && filterValues.service) {
-      result = result.filter((paiment) => 
-        paiment.service.title === filterValues.service
-      );
-    }
-
-    if (activeFilters.status && filterValues.status) {
-      result = result.filter((paiment) => 
-        paiment.status === filterValues.status
-      );
-    }
-
-    setfilteredPaiments(result);
-  };
-
-  const handleFilterChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-    field: keyof typeof filterValues
-  ) => {
-    const value = e.target.value.trim();
-
-    // Update the filter value
-    setFilterValues({
-      ...filterValues,
-      [field]: value,
-    });
-
-    // Update active status
-    setActiveFilters({
-      ...activeFilters,
-      [field]: value !== "",
-    });
+  const navigateToUnderPayment = (id: number) => {
+    router.push(`payments/${id}`);
   };
 
   const toggleModal = (
@@ -219,19 +134,16 @@ function PaymentBoard({ paymentData }: { paymentData: paimentEntity[] }) {
     field: keyof typeof activeFilters,
     inputRef: React.RefObject<HTMLInputElement | HTMLSelectElement>
   ) => {
-    // Clear the filter value
     setFilterValues({
       ...filterValues,
       [field]: "",
     });
 
-    // Deactivate the filter
     setActiveFilters({
       ...activeFilters,
       [field]: false,
     });
 
-    // Reset the input field
     if (inputRef.current) {
       if (inputRef === statusSelectRef) {
         inputRef.current.value = "Tous";
@@ -549,7 +461,11 @@ function PaymentBoard({ paymentData }: { paymentData: paimentEntity[] }) {
         </thead>
         <tbody>
           {paimentsToDisplay.map((item) => (
-            <tr key={item.id} className="text-xs border-b">
+            <tr
+              onClick={() => navigateToUnderPayment(item.id)}
+              key={item.id}
+              className="text-xs border-b cursor-pointer hover:bg-gray-50 hover:scale-105 transition-all duration-200"
+            >
               <td className="px-4 py-3 border">{item.id}</td>
               <td className="px-4 py-3 border">{item.totalAmount}</td>
               <td className="px-4 py-3 border">{item.paidAmount}</td>
