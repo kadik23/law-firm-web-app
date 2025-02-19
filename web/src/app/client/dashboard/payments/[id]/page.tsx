@@ -6,7 +6,7 @@ import { underPayments } from "@/consts/payments";
 import { useParams, useRouter } from "next/navigation";
 import UnderPaymentBoard from "@/components/dashboard/UnderPaymentsBoard";
 
-function page() {
+function Page() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const params = useParams();
   const id = params.id;
@@ -85,4 +85,4 @@ function page() {
   );
 }
 
-export default page;
+export default Page;

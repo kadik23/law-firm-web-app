@@ -1,5 +1,5 @@
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
-import React, { useState } from "react";
+import React from "react";
 import Modal from "../Modal";
 
 interface Props {
@@ -8,7 +8,7 @@ interface Props {
 }
 
 function PaymentModal({ isModalOpen, setIsModalOpen }: Props) {
-  const [isDisabled, setIsDisabled] = useState(true);
+  const isDisabled= true;
 
   return (
     <Modal
