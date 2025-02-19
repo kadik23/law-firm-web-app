@@ -52,8 +52,11 @@ module.exports = (sequelize, DataTypes) => {
     },
   });
 
-  User.associate = (models) => {
-    User.hasMany(models.testimonials, { foreignKey: "userId", as: "testimonials" });
+  User.associate = function (models) {
+    if (!models.Consultation) {
+      throw new Error("Consultation model is not defined!");
+    }
+    User.hasMany(models.Consultation, { foreignKey: "client_id", as: "consultations" });
   };
   return User;
 };

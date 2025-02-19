@@ -5,7 +5,7 @@ const Service = db.services;
 
 /**
  * @swagger
- * /services:
+ * /user/services:
  *   get:
  *     summary: Get all services
  *     description: Retrieve a list of all services.
@@ -71,7 +71,7 @@ const getAllServices = async (req, res) => {
 
 /**
  * @swagger
- * /services/{id}:
+ * /user/services/{id}:
  *   get:
  *     summary: Get a service by its ID
  *     description: Retrieve a specific service using its unique ID.
