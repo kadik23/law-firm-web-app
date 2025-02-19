@@ -9,7 +9,7 @@ const add = [
 ];
 const remove = [
     body('id')
-        .isInt.withMessage("Comment s ID is required")
+        .isInt().withMessage("Comment s ID is required")
 ];
 const update = [
     body('body')
@@ -27,7 +27,7 @@ const reply = [
 ];
 const like = [
     body('id')
-        .isInt.withMessage("Comment s ID is required")
+        .isInt().withMessage("Comment s ID is required")
 ];
 const getByBlog=[
     param('id')

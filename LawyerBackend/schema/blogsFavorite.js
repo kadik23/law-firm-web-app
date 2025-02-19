@@ -2,11 +2,11 @@ const {body,query,param} = require("express-validator");
 
 const add = [
     body('blogId')
-        .isInt.withMessage("Blog s ID is required")
+        .isInt().withMessage("Blog s ID is required")
 ];
 const remove = [
     body('id')
-        .isInt.withMessage("Comment s ID is required")
+        .isInt().withMessage("Comment s ID is required")
 ];
 
 const search = [

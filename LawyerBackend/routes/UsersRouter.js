@@ -31,7 +31,7 @@ userRouter.get('/categories/all',categoriesController.getAllCategories);
 userRouter.get('/categories/:name',categoriesSchema.getByName,validationErrors,categoriesController.getCategoryByName);
 
 userRouter.get('/blogs/all',blogsController.getAllBlogs);
-userRouter.post('/blogs/likeblog',authMiddleware(["client","admin","attorney"]),blogsSchema.like,validationErrors(),blogsController.likeBlog);
+userRouter.post('/blogs/likeblog',authMiddleware(["client","admin","attorney"]),blogsSchema.like,validationErrors,blogsController.likeBlog);
 userRouter.get('/blogs/sort',blogsSchema.sort,validationErrors,blogsController.sortBlogs);
 userRouter.get('/blogs/:id',blogsSchema.getById,validationErrors,blogsController.getBlogById);
 
