@@ -12,6 +12,8 @@ const authSchema=require("../schema/authSchema.js")
 const categoriesSchema=require("../schema/categoriesSchema.js")
 const blogsSchema=require("../schema/blogsSchema.js")
 const commentsSchema=require("../schema/blogCommentsSchema")
+const favoriteSchema=require("../schema/blogsFavorite")
+const servicesSchema=require("../schema/servicesSchema")
 const validationErrors=require("../errorHandler/validationErrors")
 
 const userRouter = require('express').Router()
@@ -43,16 +45,16 @@ userRouter.get('/blogs/commentsByBlog/:id',commentsSchema.getByBlog,validationEr
 
 userRouter.get('/attorneys',attorneysController.getAllAttorneys);
 
-userRouter.post('/favorites',authMiddleware(["client"]),favoritesController.CreateFavoriteBlog);
+userRouter.post('/favorites',authMiddleware(["client"]),favoriteSchema.add,validationErrors,favoritesController.CreateFavoriteBlog);
 userRouter.get('/favorites',authMiddleware(["client"]),favoritesController.GetAllFavoriteBlogs);
-userRouter.delete('/favorites/:id',authMiddleware(["client"]),favoritesController.DeleteFavoriteBlog);
-userRouter.get('/favorites/search',authMiddleware(["client"]),favoritesController.SearchFavoriteBlogs);
+userRouter.delete('/favorites/:id',authMiddleware(["client"]),favoriteSchema.remove,validationErrors,favoritesController.DeleteFavoriteBlog);
+userRouter.get('/favorites/search',authMiddleware(["client"]),favoriteSchema.search,validationErrors,favoritesController.SearchFavoriteBlogs);
 userRouter.get('/favorites/count',authMiddleware(["client"]),favoritesController.GetFavoritesCount);
-userRouter.get('/favorites/IsBlogFavorited/:blogId',authMiddleware(["client","admin","attorney"]),favoritesController.IsBlogFavorited);
+userRouter.get('/favorites/IsBlogFavorited/:blogId',authMiddleware(["client","admin","attorney"]),favoriteSchema.isFavorite,validationErrors,favoritesController.IsBlogFavorited);
 userRouter.delete('/favorites',authMiddleware(["client"]),favoritesController.DeleteAllFavorites);
 
 userRouter.get('/services',authMiddleware(["client","admin","attorney"]),servicesController.getAllServices);
-userRouter.get('/services/:id',authMiddleware(["client","admin","attorney"]),servicesController.getOneService);
+userRouter.get('/services/:id',authMiddleware(["client","admin","attorney"]),servicesSchema.getById,validationErrors,servicesController.getOneService);
 
 
 module.exports = userRouter
