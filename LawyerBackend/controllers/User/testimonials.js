@@ -5,7 +5,7 @@ const { Op } = require("sequelize");
 
 /**
  * @swagger
- * /testimonials:
+ * /user/testimonials:
  *   post:
  *     summary: Add a new testimonial
  *     description: This endpoint allows a user to add a testimonial.
@@ -61,7 +61,7 @@ const CreateTestimonial = async (req, res) => {
 
 /**
  * @swagger
- * /testimonials:
+ * /user/testimonials:
  *   get:
  *     summary: Retrieve all testimonials
  *     description: Fetch all testimonials with pagination.

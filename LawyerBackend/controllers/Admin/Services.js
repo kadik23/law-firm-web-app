@@ -7,7 +7,7 @@ const Service = db.services;
 
 /**
  * @swagger
- * /services:
+ * /admin/services:
  *   post:
  *     summary: Create a new service
  *     description: Create a new service in the system.

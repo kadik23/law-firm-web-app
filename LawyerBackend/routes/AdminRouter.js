@@ -9,6 +9,7 @@ const categoriesSchema=require('../schema/categoriesSchema')
 const attroneySchema=require('../schema/attroneySchema')
 const blogsSchema=require('../schema/blogsSchema')
 const servicesSchema=require('../schema/servicesSchema')
+const problemsController = require("../controllers/Admin/problems.js");
 
 const authMiddleware = require("../middlewares/AuthMiddleware.js")
 
@@ -29,6 +30,8 @@ adminRouter.delete('/blogs/delete',authMiddleware(["admin"]),blogsSchema.remove,
 
 adminRouter.post('/services/create',authMiddleware(["admin"]),servicesSchema.add,validationErrors,servicesController.createService)
 
+adminRouter.post('/problems', authMiddleware(["admin"]), problemsController.createProblem);
 
+adminRouter.delete('/problems/:id', authMiddleware(["admin"]), problemsController.deleteProblem);
 
 module.exports = adminRouter
