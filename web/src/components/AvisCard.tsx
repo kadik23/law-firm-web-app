@@ -10,7 +10,7 @@ function AvisCard({ user , image, feedback, createdAt, userId, serviceId }: avis
 
   return (
     <div className="lg:max-w-[calc(100%/3)] max-w-full md:max-w-[calc(100%/2)] flex-shrink-0 py-6 px-8 rounded-lg text-white bg-primary">
-      <div className="flex gap-2 items-center">
+      <div className="flex gap-4 items-center">
         <Image
           src={`/images/${image}`}
           alt="service"
@@ -21,9 +21,9 @@ function AvisCard({ user , image, feedback, createdAt, userId, serviceId }: avis
         />
         <div className="font-semibold">{user.name}</div>
       </div>
-      <div className="my-4">{feedback}</div>
+      <div className="my-2 text-sm">{feedback}</div>
       {/* delete and modify buttons for authenticated users only */}
-      <div className="pt-3 flex items-center justify-between">
+      <div className="pt-2 flex items-center justify-between">
         {USERAuth?.id == userId && (
           <div className="flex gap-2 items-center mr-4">
             {/* delete button */}
@@ -42,7 +42,7 @@ function AvisCard({ user , image, feedback, createdAt, userId, serviceId }: avis
         )}
         {createdAt && (
           <div className="flex flex-col items-start">
-            <div className="text-sm font-medium text-gray-300">
+            <div className="text-xs font-medium text-gray-300">
               {formattedDate}
             </div>
           </div>
