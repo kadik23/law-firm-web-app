@@ -1,15 +1,15 @@
 import axios from "@/lib/utils/axiosClient";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-export const useTestimonials = () => {
+export const useTestimonialsByService = () => {
   const [testimonials, setTestimonials] = useState<avisEntity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchTestimonials = async () => {
+  const fetchTestimonials = async (service_id: number) => {
     try {
       setLoading(true);
-      const response = await axios.get("/user/testimonials");
+      const response = await axios.get(`/user/testimonials/service/${service_id}`);
       setTestimonials(response.data.testimonials);
     } catch (err) {
       setError("Failed to fetch testimonials");
@@ -19,14 +19,10 @@ export const useTestimonials = () => {
     }
   };
 
-  useEffect(() => {
-    fetchTestimonials();
-  }, []);
-
   return {
     testimonials,
     loading,
     error,
-    refetchTestimonials: fetchTestimonials,
+    fetchTestimonials,
   };
 };

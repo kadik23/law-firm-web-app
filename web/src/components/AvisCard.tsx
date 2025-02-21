@@ -4,21 +4,16 @@ import useDateFormatter from "@/hooks/useDateFormatter";
 import { useAuth } from "@/hooks/useAuth";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 
-function AvisCard({ user , image, feedback, createdAt, userId, serviceId }: avisEntity) {
+function AvisCard({ user , feedback, createdAt, userId, serviceId }: avisEntity) {
   const formattedDate = useDateFormatter(createdAt || "");
   const {user : USERAuth} = useAuth();
 
   return (
-    <div className="lg:max-w-[calc(100%/3)] max-w-full md:max-w-[calc(100%/2)] flex-shrink-0 py-6 px-8 rounded-lg text-white bg-primary">
+    <div className="max-w-full lg:max-w-[calc(100%/3)] md:max-w-[calc(100%/2)] flex-shrink-0 py-6 px-8 rounded-lg text-white bg-primary">
       <div className="flex gap-4 items-center">
-        <Image
-          src={`/images/${image}`}
-          alt="service"
-          width={32}
-          height={32}
-          className="rounded-full"
-          priority
-        />
+        <div className="w-8 h-8 capitalize flex items-center justify-center text-sm text-white rounded-full bg-black">
+          {user.name[0]}
+        </div>
         <div className="font-semibold">{user.name}</div>
       </div>
       <div className="my-2 text-sm">{feedback}</div>

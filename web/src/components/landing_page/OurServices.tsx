@@ -10,7 +10,7 @@ import Link from "next/link";
 function OurServices() {
   const { services, loading, error } = useServices();
   const serviceItems = Array(6).fill(null);
-  
+
   const {
     currentIndex: currentServiceIndex,
     handlePrev: handlePrevService,
@@ -20,16 +20,16 @@ function OurServices() {
     visibleItems: serviceVisibleItems,
   } = useCarousel(serviceItems.length, 3.5);
 
-  const ServicesLoadingChecker = () => { 
-    if (loading) return <h1 className="text-center text-6xl mt-6">Loading...</h1>;
-    if (error) return <h1 className="text-center text-6xl mt-6">Error: {error}</h1>;
-  }
+  const ServicesLoadingChecker = () => {
+    if (loading)
+      return <h1 className="text-center text-6xl mt-6">Chargement...</h1>;
+    if (error)
+      return <h1 className="text-center text-6xl mt-6">Error: {error}</h1>;
+  };
   console.log("services loaded", services);
-  
 
   return (
     <section id="services" className="p-4 md:p-8 bg-[#dddddd]/30">
-
       {/* services title & description */}
       <div className="">
         <div className=" font-bold text-3xl mb-4 text-center md:text-start">
@@ -50,7 +50,7 @@ function OurServices() {
       {ServicesLoadingChecker()}
       <div className="overflow-hidden py-4">
         <motion.div
-          className="flex gap-4"
+          className="flex gap-8"
           animate={{
             x: `-${
               (currentServiceIndex * serviceOffset) / serviceVisibleItems
@@ -59,25 +59,25 @@ function OurServices() {
           transition={{ type: "spring", stiffness: 50 }}
         >
           {services.map((service) => (
-          <Link href={`services/${service.id}`} passHref className="h-full">
             <ServiceCard
               name={service.name}
+              id={service.id as number}
               key={service.id}
               description={service.description}
-              image={service.image ? service.image : "serviceImg.png"}
+              coverImage={service.coverImage || "serviceImg.png"}
               isDescription
-              style="items-start text-white bg-primary h-full"
+              style="items-start text-black bg-white h-full"
             />
-          </Link>
           ))}
         </motion.div>
       </div>
-      
+
       {/* carousel indicators */}
       <div className="flex justify-center items-center w-full gap-4 mt-8">
         <button
           onClick={handlePrevService}
           disabled={currentServiceIndex === 0}
+          className="flex items-center"
         >
           <Icon icon="ep:arrow-left" width="24" height="24" className="btn" />
         </button>
@@ -92,7 +92,8 @@ function OurServices() {
         ))}
         <button
           onClick={handleNextService}
-          disabled={currentServiceIndex >= serviceItems.length - 3.5}
+          className="flex items-center"
+          disabled={currentServiceIndex >= serviceItems.length - 4}
         >
           <Icon icon="ep:arrow-right" width="24" height="24" className="btn" />
         </button>

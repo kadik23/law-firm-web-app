@@ -3,7 +3,7 @@ feedback: string;
 createdAt: string;
 serviceId: number;
 user: {
-    name: number;
+    name: string;
 }
 userId: number;
 image?: string;
