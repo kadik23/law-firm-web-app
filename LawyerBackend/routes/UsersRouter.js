@@ -21,7 +21,7 @@ const userRouter = require('express').Router();
 
 // Authentication Routes
 userRouter.post('/signup',authSchema.signup,validationErrors,userController.signUp);
-userRouter.post('/uploadFiles', authMiddleware(["client","admin","attorney"]),userController.addFiles);//TODO("validation not working here")
+userRouter.post('/uploadFiles', authMiddleware(["client","admin","attorney"]),authSchema.uploadFiles, validationErrors, userController.addFiles);//TODO("validation not working here")
 userRouter.post('/signin',authSchema.signIn,validationErrors ,userController.signIn);
 userRouter.get('/current' ,authMiddleware(["client","admin","attorney"]),userController.getCurrentClient);
 userRouter.get('/validate' ,authMiddleware(["client","admin","attorney"]),userController.checkUserAuthentication);

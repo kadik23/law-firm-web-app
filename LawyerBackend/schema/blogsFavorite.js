@@ -5,8 +5,8 @@ const add = [
         .isInt().withMessage("Blog s ID is required")
 ];
 const remove = [
-    body('id')
-        .isInt().withMessage("Comment s ID is required")
+    param('id')
+        .isInt().withMessage("Favorite s ID is required")
 ];
 
 const search = [
