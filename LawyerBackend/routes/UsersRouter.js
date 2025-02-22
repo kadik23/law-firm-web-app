@@ -19,6 +19,7 @@ const validationErrors=require("../errorHandler/validationErrors")
 const testimonialsController = require("../controllers/User/Testimonials");
 const problemsController = require("../controllers/User/problems.js");
 const consultationController = require("../controllers/User/consultation.js");
+const {upload} = require("../middlewares/FilesMiddleware");
 
 const userRouter = require('express').Router();
 
@@ -61,6 +62,9 @@ userRouter.delete('/favorites',authMiddleware(["client"]),favoritesController.De
 //Services Routes
 userRouter.get('/services',authMiddleware(["client","admin","attorney"]),servicesController.getAllServices);
 userRouter.get('/services/:id',authMiddleware(["client","admin","attorney"]),servicesSchema.getById,validationErrors,servicesController.getOneService);
+userRouter.post('/services/assign_client',authMiddleware(["client", "admin", "attorney"]),servicesSchema.assignClient,validationErrors,servicesController.assignClient);
+userRouter.delete('/service-files', authMiddleware(["client", "admin", "attorney"]), servicesController.deleteAllFiles);
+userRouter.put('/service-files/:id',authMiddleware(["client", "admin", "attorney"]),upload.single('file'),servicesController.updateServiceFile);
 
 // Testimonials Routes
 userRouter.post('/testimonials', authMiddleware(["client"]),testimonialSchema.add,validationErrors, testimonialsController.CreateTestimonial);
