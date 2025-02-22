@@ -12,6 +12,8 @@ import { useService } from "@/hooks/useService";
 import { useParams } from "next/navigation";
 import { useTestimonialsByService } from "@/hooks/useTestimonialsByService";
 import { EmojiPicker } from "@/components/EmojiPicker";
+import { useTestimony } from "@/hooks/useTestimony";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 function Page() {
   const { id } = useParams();
@@ -23,6 +25,7 @@ function Page() {
     loading: testimonialsLoading,
     error: testimonialError,
     fetchTestimonials,
+    setTestimonials,
   } = useTestimonialsByService();
   const {
     service,
@@ -37,7 +40,14 @@ function Page() {
   const CommentCount = testimonials.length;
   const [showCommentInput, setShowCommentInput] = useState(false);
   const [showEmojis, setShowEmojis] = useState(false);
-  const [comment, setComment] = useState("");
+  const {
+    comment,
+    setComment,
+    loading: testimonyLoading,
+    error: testimonyError,
+    testimony,
+    newTestimonialObject,
+  } = useTestimony();
 
   const addEmoji = (emoji: string) => {
     setComment((prev) => prev + emoji);
@@ -90,6 +100,16 @@ function Page() {
   useEffect(() => {
     fetchTestimonials(serviceId as number);
   }, []);
+
+  useEffect(() => {
+    setTestimonials((prev) => [
+      ...prev,
+      {
+        ...newTestimonialObject,
+        user: AuthUSER,
+      } as avisEntity,
+    ]);
+  }, [newTestimonialObject]);
 
   const ServicesLoadingChecker = () => {
     if (servicesLoading)
@@ -163,7 +183,7 @@ function Page() {
         <div className="relative transition-all duration-100">
           {/* comment Input */}
           {AuthUSER && showCommentInput && (
-            <div className="w-full absolute top-0 border border-primary bg-[#E9F4FE] rounded-md p-4">
+            <div className="w-full z-50 absolute top-0 border border-primary bg-[#E9F4FE] rounded-md p-4">
               <div className="flex items-center justify-between border-b border-gray-300 pb-4 mb-4">
                 <div className="flex items-center gap-1">
                   {/* profile image of the authenticated user */}
@@ -206,10 +226,19 @@ function Page() {
                 </div>
                 {/* Envoyer Button */}
                 <button
+                  disabled={testimonialsLoading}
+                  onClick={() => {
+                    if (comment == "")
+                      alert("Veuillez remplir le champ d'entrée");
+                    else {
+                      testimony(serviceId as number);
+                      setShowCommentInput(false);
+                    }
+                  }}
                   className="self-end md:self-center text-white font-semibold px-4 py-2 rounded-md bg-primary hover:bg-secondary
                   hover:text-white hover:border-none text-sm"
                 >
-                  Envoyer
+                  {testimonyLoading ? <LoadingSpinner /> : <span>Envoyer</span>}
                 </button>
               </div>
             </div>

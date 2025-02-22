@@ -37,7 +37,7 @@ function AvisCard({ user , feedback, createdAt, userId, serviceId }: avisEntity)
         )}
         {createdAt && (
           <div className="flex flex-col items-start">
-            <div className="text-xs font-medium text-gray-300">
+            <div className="text-xs font-medium text-gray-300 text-nowrap">
               {formattedDate}
             </div>
           </div>

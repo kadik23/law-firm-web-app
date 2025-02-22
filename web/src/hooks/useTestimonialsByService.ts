@@ -24,5 +24,6 @@ export const useTestimonialsByService = () => {
     loading,
     error,
     fetchTestimonials,
+    setTestimonials
   };
 };
