@@ -12,6 +12,9 @@ const blogsSchema=require("../schema/blogsSchema.js")
 const commentsSchema=require("../schema/blogCommentsSchema")
 const favoriteSchema=require("../schema/blogsFavorite")
 const servicesSchema=require("../schema/servicesSchema")
+const testimonialSchema=require("../schema/testimonialSchema")
+const problemsSchema=require("../schema/problemsSchema")
+const consultationSchema=require("../schema/consultationSchema")
 const validationErrors=require("../errorHandler/validationErrors")
 const testimonialsController = require("../controllers/User/Testimonials");
 const problemsController = require("../controllers/User/problems.js");
@@ -21,7 +24,7 @@ const userRouter = require('express').Router();
 
 // Authentication Routes
 userRouter.post('/signup',authSchema.signup,validationErrors,userController.signUp);
-userRouter.post('/uploadFiles', authMiddleware(["client","admin","attorney"]),authSchema.uploadFiles, validationErrors, userController.addFiles);//TODO("validation not working here")
+userRouter.post('/uploadFiles', authMiddleware(["client","admin","attorney"]), userController.addFiles);
 userRouter.post('/signin',authSchema.signIn,validationErrors ,userController.signIn);
 userRouter.get('/current' ,authMiddleware(["client","admin","attorney"]),userController.getCurrentClient);
 userRouter.get('/validate' ,authMiddleware(["client","admin","attorney"]),userController.checkUserAuthentication);
@@ -60,15 +63,15 @@ userRouter.get('/services',authMiddleware(["client","admin","attorney"]),service
 userRouter.get('/services/:id',authMiddleware(["client","admin","attorney"]),servicesSchema.getById,validationErrors,servicesController.getOneService);
 
 // Testimonials Routes
-userRouter.post('/testimonials', authMiddleware(["client"]), testimonialsController.CreateTestimonial);
+userRouter.post('/testimonials', authMiddleware(["client"]),testimonialSchema.add,validationErrors, testimonialsController.CreateTestimonial);
 userRouter.get('/testimonials', testimonialsController.GetAllTestimonials);
-userRouter.get('/testimonials/service/:serviceId', testimonialsController.GetTestimonialsByService);
+userRouter.get('/testimonials/service/:serviceId',testimonialSchema.getByService,validationErrors, testimonialsController.GetTestimonialsByService);
 
 // Problems Routes
 userRouter.get('/problems', authMiddleware(["client", "admin", "attorney"]), problemsController.getAllProblems);
-userRouter.get('/problems/:id', authMiddleware(["client", "admin", "attorney"]), problemsController.getProblemById);
+userRouter.get('/problems/:id', authMiddleware(["client", "admin", "attorney"]),problemsSchema.getByID,validationErrors, problemsController.getProblemById);
 
 // Consultation Routes
-userRouter.post('/consultations', authMiddleware(["client"]), consultationController.createConsultation);
+userRouter.post('/consultations', authMiddleware(["client"]),consultationSchema.add,validationErrors, consultationController.createConsultation);
 
 module.exports = userRouter;
