@@ -9,7 +9,7 @@ function AvisCard({ user , feedback, createdAt, userId, serviceId }: avisEntity)
   const {user : USERAuth} = useAuth();
 
   return (
-    <div className="max-w-full lg:max-w-[calc(100%/3)] md:max-w-[calc(100%/2)] flex-shrink-0 py-6 px-8 rounded-lg text-white bg-primary">
+    <div className="max-w-full lg:max-w-[calc(100%/3)] md:max-w-[calc(100%/2)] w-full flex-shrink-0 py-6 px-8 rounded-lg text-white bg-primary">
       <div className="flex gap-4 items-center">
         <div className="w-8 h-8 capitalize flex items-center justify-center text-sm text-white rounded-full bg-black">
           {user.name[0]}
