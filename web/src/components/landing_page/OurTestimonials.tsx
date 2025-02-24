@@ -10,8 +10,6 @@ function OurTestimonials() {
   const {
     testimonials,
     loading: testimonialsLoading,
-    error: testimoniaError,
-    refetchTestimonials,
   } = useTestimonials();
   const {
     currentIndex: currentAvisIndex,
@@ -37,16 +35,21 @@ function OurTestimonials() {
           }}
           transition={{ type: "spring", stiffness: 50 }}
         >
-          {testimonials.map((testimonial, index) => (
-            <AvisCard
-              feedback={testimonial.feedback}
-              user={testimonial.user}
-              serviceId={testimonial.serviceId}
-              createdAt={testimonial.createdAt}
-              userId={testimonial.userId}
-              key={index}
-            />
-          ))}
+          {testimonialsLoading
+            ? "Chargement..."
+            : testimonials.map((testimonial, index) => (
+                <AvisCard
+                  feedback={testimonial.feedback}
+                  user={testimonial.user}
+                  serviceId={testimonial.serviceId}
+                  createdAt={testimonial.createdAt}
+                  userId={testimonial.userId}
+                  key={index}
+                />
+              ))}
+          {testimonials.length == 0 &&
+            !testimonialsLoading &&
+            "Testimonials introuvable."}
         </motion.div>
       </div>
       <div className="flex justify-center items-center w-full gap-4 mt-8">
