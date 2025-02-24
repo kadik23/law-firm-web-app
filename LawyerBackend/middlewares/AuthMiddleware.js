@@ -11,7 +11,11 @@ module.exports = (roles = []) => {
       if (!authToken) {
         return res.status(401).json({ error: "Unauthorized - Missing Token" });
       }
-
+      try {
+         jwt.verify(authToken, process.env.SECRET);
+      } catch (error) {
+        return res.status(401).json({ error: "Unauthorized - Invalid Token" });
+      }
       const data = jwt.verify(authToken, process.env.SECRET);
 
       if (!data.user) {

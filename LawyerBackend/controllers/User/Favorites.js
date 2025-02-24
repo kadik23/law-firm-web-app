@@ -459,7 +459,7 @@ const GetFavoritesCount = async (req, res) => {
 
 /**
  * @swagger
- * /user/favorites/check/{blogId}:
+ * /user/favorites/IsBlogFavorited/{blogId}:
  *   get:
  *     summary: Check if a blog is favorited by the user
  *     description: This endpoint checks if a specific blog is favorited by the authenticated user.
