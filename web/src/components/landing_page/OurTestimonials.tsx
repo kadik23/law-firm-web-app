@@ -4,9 +4,13 @@ import { motion } from "framer-motion";
 import React from "react";
 import AvisCard from "../AvisCard";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
+import { useTestimonials } from "@/hooks/useTestimonials";
 
 function OurTestimonials() {
-  const avisItems = Array(12).fill(null);
+  const {
+    testimonials,
+    loading: testimonialsLoading,
+  } = useTestimonials();
   const {
     currentIndex: currentAvisIndex,
     handlePrev: handlePrevAvis,
@@ -14,7 +18,7 @@ function OurTestimonials() {
     handleIndicatorClick: handleAvisIndicatorClick,
     offset: avisOffset,
     visibleItems: avisVisibleItems,
-  } = useCarousel(avisItems.length, 3.5);
+  } = useCarousel(testimonials.length, 3.5);
 
   return (
     <section className="p-4 md:p-8 bg-[#dddddd]/30">
@@ -31,21 +35,32 @@ function OurTestimonials() {
           }}
           transition={{ type: "spring", stiffness: 50 }}
         >
-          {avisItems.map((_, index) => (
-            <AvisCard
-              name="Name of customer"
-              avis="It’s page very important for our users, take it tomorrow, plz and call me after this tasks"
-              image="serviceImg.png"
-              key={index}
-            />
-          ))}
+          {testimonialsLoading
+            ? "Chargement..."
+            : testimonials.map((testimonial, index) => (
+                <AvisCard
+                  feedback={testimonial.feedback}
+                  user={testimonial.user}
+                  serviceId={testimonial.serviceId}
+                  createdAt={testimonial.createdAt}
+                  userId={testimonial.userId}
+                  key={index}
+                />
+              ))}
+          {testimonials.length == 0 &&
+            !testimonialsLoading &&
+            "Testimonials introuvable."}
         </motion.div>
       </div>
       <div className="flex justify-center items-center w-full gap-4 mt-8">
-        <button onClick={handlePrevAvis} disabled={currentAvisIndex === 0}>
+        <button
+          onClick={handlePrevAvis}
+          disabled={currentAvisIndex === 0}
+          className="flex items-center"
+        >
           <Icon icon="ep:arrow-left" width="24" height="24" className="btn" />
         </button>
-        {avisItems.map((_, index) => (
+        {testimonials.map((_, index) => (
           <div
             key={index}
             onClick={() => handleAvisIndicatorClick(index)}
@@ -56,18 +71,19 @@ function OurTestimonials() {
         ))}
         <button
           onClick={handleNextAvis}
-          disabled={currentAvisIndex >= avisItems.length - 3.5}
+          disabled={currentAvisIndex >= testimonials.length - 3.5}
+          className="flex items-center"
         >
           <Icon icon="ep:arrow-right" width="24" height="24" className="btn" />
         </button>
       </div>
       <div className="flex justify-center mt-4 mb-8">
-        <a
-          href="#voirplus"
+        <button
+          onClick={handleNextAvis}
           className="btn bg-[#C2E6F1] rounded-md py-1 px-4 text-primary font-semibold"
         >
           Voir plus{">"}
-        </a>
+        </button>
       </div>
     </section>
   );
