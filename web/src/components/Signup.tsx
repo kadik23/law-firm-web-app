@@ -8,6 +8,7 @@ import {
   useFieldArray,
 } from "react-hook-form";
 import axiosClient from "@/lib/utils/axiosClient";
+import { useAlert } from "@/contexts/AlertContext";
 
 interface SignupProps {
   isModalOpen: boolean;
@@ -76,6 +77,8 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
     console.log(errors);
   };
 
+  const {showAlert} = useAlert();
+
   const onsubmit = async (data: SignupformType) => {
     try{
       const response = await axiosClient.post("/user/signup",{
@@ -91,11 +94,11 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
         terms_accepted: true,
       });
       if(response.status == 200){
-        alert("Success sign in")
+        showAlert("success", "Login success", "You successfully read this important message.");
         setModalOpen(false);
         window.location.href = `/${response.data.type}/dashboard`;
       }else {
-        alert(response.data)
+        showAlert("error", "Oh snap!", "Change a few things up and try submitting again.");
       }
     }catch(err){
       console.log(err)

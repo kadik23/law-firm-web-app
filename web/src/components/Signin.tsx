@@ -4,6 +4,7 @@ import Modal from "./Modal";
 import useLoginForm from "@/hooks/useLoginForm";
 import { DevTool } from "@hookform/devtools";
 import axiosClient from "@/lib/utils/axiosClient";
+import { useAlert } from "@/contexts/AlertContext";
 
 interface SigninProps {
   isModalOpen: boolean;
@@ -19,6 +20,8 @@ function Signin({ isModalOpen, setModalOpen }: SigninProps) {
     errors,
     isValid,
   } = useLoginForm(); 
+  const { showAlert } = useAlert();
+
 
   useEffect(() => {
     setIsDisabled(!isValid); 
@@ -34,14 +37,14 @@ function Signin({ isModalOpen, setModalOpen }: SigninProps) {
         { withCredentials: true }
       );
       if (response.status === 200) {
-        alert("Success sign in"); 
+        showAlert("success", "Login success", "You successfully read this important message.");
         setModalOpen(false)   
         window.location.href = `/${response.data.type}/dashboard`;
       } else {
-        alert("Failed to sign in");
+        showAlert("error", "Oh snap!", "Change a few things up and try submitting again.");
       }
     } catch (err) {
-      alert("Failed to sign in");
+      showAlert("error", "Oh snap!", "Change a few things up and try submitting again.");
       console.error("Error signing in:", err);
     }
   };
