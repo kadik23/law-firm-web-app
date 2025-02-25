@@ -4,7 +4,7 @@ import { createContext, ReactNode, useContext, useState, useCallback } from "rea
 
 type AlertContextType = {
   showAlert: (type: string, title: string, message: string) => void;
-  closeAlert: () => void; // Allow manual closing
+  closeAlert: () => void; 
 };
 
 const AlertContext = createContext<AlertContextType | undefined>(undefined);
@@ -15,7 +15,7 @@ export const AlertProvider = ({ children }: { children: ReactNode }) => {
   const showAlert = (type: string, title: string, message: string) => {
     setAlert({ type, title, message });
 
-    // Auto-hide after 6 seconds (increased from 4)
+    // Auto-hide after 20 seconds
     setTimeout(() => setAlert(null), 20000);
   };
 
@@ -29,7 +29,7 @@ export const AlertProvider = ({ children }: { children: ReactNode }) => {
           alertType={alert.type}
           alertTitle={alert.title}
           alertMessage={alert.message}
-          onClose={closeAlert} // Pass the close function to Alert component
+          onClose={closeAlert} 
         />
       )}
     </AlertContext.Provider>

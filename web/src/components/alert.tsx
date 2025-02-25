@@ -4,7 +4,7 @@ type AlertProps = {
   alertType: string;
   alertTitle: string;
   alertMessage: string;
-  onClose: () => void; // Accept onClose function to close alert
+  onClose: () => void; 
 };
 
 export const Alert = ({ alertType, alertTitle, alertMessage, onClose }: AlertProps) => {
