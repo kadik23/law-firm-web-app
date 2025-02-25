@@ -29,20 +29,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head/>
-      <body
-        className={`antialiased `}
-      >
-        <AuthClientWrapper>
-          
+      <head />
+      <body className={`antialiased `}>
+        <AlertProvider>
+          <AuthClientWrapper>
             <div>
-              <AlertProvider>
-                <Header />
-                <div className="mt-12 md:mt-14">{children}</div>
-                <Footer />
-              </AlertProvider>
+              <Header />
+              <div className="mt-12 md:mt-14">{children}</div>
+              <Footer />
             </div>
-        </AuthClientWrapper>
+          </AuthClientWrapper>
+        </AlertProvider>
       </body>
     </html>
   );

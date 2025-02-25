@@ -16,7 +16,7 @@ export const AlertProvider = ({ children }: { children: ReactNode }) => {
     setAlert({ type, title, message });
 
     // Auto-hide after 20 seconds
-    setTimeout(() => setAlert(null), 20000);
+    setTimeout(() => setAlert(null), 5000);
   };
 
   const closeAlert = useCallback(() => setAlert(null), []);

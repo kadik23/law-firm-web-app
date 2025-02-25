@@ -14,6 +14,7 @@ import { useTestimonialsByService } from "@/hooks/useTestimonialsByService";
 import { EmojiPicker } from "@/components/EmojiPicker";
 import { useTestimony } from "@/hooks/useTestimony";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { useAlert } from "@/contexts/AlertContext";
 
 function Page() {
   const { id } = useParams();
@@ -71,12 +72,17 @@ function Page() {
     offset: avisOffset,
     visibleItems: avisVisibleItems,
   } = useCarousel(testimonials.length, 3.5);
+  const { showAlert } = useAlert();
 
   const toggleComment = () => {
     if (AuthUSER) {
       setShowCommentInput(!showCommentInput);
     } else {
-      alert("Veuillez vous connecter pour commenter.");
+      showAlert(
+        "warning",
+        "Avertissement!",
+        "Veuillez vous connecter pour commenter."
+      );
     }
   };
   const ServiceLoadingChecker = () => {
@@ -229,7 +235,11 @@ function Page() {
                   disabled={testimonialsLoading}
                   onClick={() => {
                     if (comment == "")
-                      alert("Veuillez remplir le champ d'entrée");
+                      showAlert(
+                        "warning",
+                        "Avertissement!",
+                        "Veuillez remplir le champ d'entrée."
+                      );
                     else {
                       testimony(serviceId as number);
                       setShowCommentInput(false);

@@ -13,38 +13,48 @@ interface SigninProps {
 
 function Signin({ isModalOpen, setModalOpen }: SigninProps) {
   const [isDisabled, setIsDisabled] = useState(true);
-  const {
-    register,
-    control,
-    handleSubmit,
-    errors,
-    isValid,
-  } = useLoginForm(); 
+  const { register, control, handleSubmit, errors, isValid } = useLoginForm();
   const { showAlert } = useAlert();
 
-
   useEffect(() => {
-    setIsDisabled(!isValid); 
-  }, [isValid]); 
+    setIsDisabled(!isValid);
+  }, [isValid]);
 
   const onSubmit = async (data: SigninformType) => {
     try {
       console.log("Submitting:", data);
-      const response = await axiosClient.post("/user/signin", {
+      const response = await axiosClient.post(
+        "/user/signin",
+        {
           email: data.email,
           password: data.password,
         },
         { withCredentials: true }
       );
       if (response.status === 200) {
-        showAlert("success", "Login success", "You successfully read this important message.");
-        setModalOpen(false)   
-        window.location.href = `/${response.data.type}/dashboard`;
+        showAlert(
+          "success",
+          "Connexion réussie",
+          "Vous avez lu avec succès ce message important."
+        );
+        setModalOpen(false);
+        setTimeout(
+          () => (window.location.href = `/${response.data.type}/dashboard`),
+          2100
+        );
       } else {
-        showAlert("error", "Oh snap!", "Change a few things up and try submitting again.");
+        showAlert(
+          "error",
+          "Oh claquement !",
+          "Modifiez quelques éléments et réessayez de soumettre."
+        );
       }
     } catch (err) {
-      showAlert("error", "Oh snap!", "Change a few things up and try submitting again.");
+      showAlert(
+        "error",
+        "Oh claquement !",
+        "Modifiez quelques éléments et réessayez de soumettre."
+      );
       console.error("Error signing in:", err);
     }
   };
@@ -59,7 +69,9 @@ function Signin({ isModalOpen, setModalOpen }: SigninProps) {
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col items-start gap-4"
       >
-        {process.env.NODE_ENV === "development" && <DevTool control={control} />}
+        {process.env.NODE_ENV === "development" && (
+          <DevTool control={control} />
+        )}
         <div className="text-xl">Re-bienvenue</div>
         <div>Entrer vos informations svp !</div>
         <div className="flex gap-16"></div>

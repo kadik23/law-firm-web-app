@@ -3,10 +3,7 @@ import React, { useEffect, useState } from "react";
 import Modal from "./Modal";
 import useRegisterForm from "@/hooks/useRegisterForm";
 import { DevTool } from "@hookform/devtools";
-import {
-  FieldErrors,
-  useFieldArray,
-} from "react-hook-form";
+import { FieldErrors, useFieldArray } from "react-hook-form";
 import axiosClient from "@/lib/utils/axiosClient";
 import { useAlert } from "@/contexts/AlertContext";
 
@@ -17,23 +14,22 @@ interface SignupProps {
 }
 
 function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
-  const { register, control, handleSubmit, errors, watch } =
-    useRegisterForm();
+  const { register, control, handleSubmit, errors, watch } = useRegisterForm();
 
   const [formStep, setFormStep] = useState(0);
 
   useEffect(() => {
     const subscription = watch((value) => {
       console.log("Watched values:", value);
-      if(formStep === 0) {
-        validateSteps('stepOne', formStep, false);
+      if (formStep === 0) {
+        validateSteps("stepOne", formStep, false);
       } else if (formStep === 1) {
-        validateSteps('stepTwo', formStep, false);
+        validateSteps("stepTwo", formStep, false);
       } else {
-        validateSteps('stepThree', formStep, false);
+        validateSteps("stepThree", formStep, false);
       }
     });
-  
+
     return () => subscription.unsubscribe();
   }, [formStep]);
 
@@ -42,15 +38,17 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
   const [isDisabled3, setIsDisabled3] = useState(true);
 
   const validateSteps = async (
-    stepName: 'stepOne' | 'stepTwo' | 'stepThree',
+    stepName: "stepOne" | "stepTwo" | "stepThree",
     currentStep: number,
     toNextStep = false
   ) => {
     const stepData = watch()[stepName];
     const stepErrors = errors[stepName] || {};
-  
+
     const hasErrors = Object.values(stepErrors).some((error) => error);
-    const hasEmptyFields = Object.values(stepData || {}).some((value) => !value);
+    const hasEmptyFields = Object.values(stepData || {}).some(
+      (value) => !value
+    );
 
     const isValidStep = !hasErrors && !hasEmptyFields;
     if (stepName === "stepOne") {
@@ -60,11 +58,11 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
     } else if (stepName === "stepThree") {
       setIsDisabled3(!isValidStep);
     }
-  
+
     if (isValidStep && toNextStep) {
       moveNewStep(currentStep, currentStep + 1);
     }
-  
+
     return isValidStep;
   };
 
@@ -77,11 +75,11 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
     console.log(errors);
   };
 
-  const {showAlert} = useAlert();
+  const { showAlert } = useAlert();
 
   const onsubmit = async (data: SignupformType) => {
-    try{
-      const response = await axiosClient.post("/user/signup",{
+    try {
+      const response = await axiosClient.post("/user/signup", {
         name: data.stepOne.name,
         surname: data.stepOne.surname,
         email: data.stepOne.email,
@@ -90,18 +88,34 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
         pays: data.stepTwo.pays,
         ville: data.stepTwo.ville,
         age: data.stepTwo.age,
-        sex: data.stepTwo.gender == 'Femal' ? 'Femme' : 'Homme',
+        sex: data.stepTwo.gender == "Femal" ? "Femme" : "Homme",
         terms_accepted: true,
       });
-      if(response.status == 200){
-        showAlert("success", "Login success", "You successfully read this important message.");
+      if (response.status == 200) {
+        showAlert(
+          "success",
+          "Connexion réussie",
+          "Vous avez lu avec succès ce message important."
+        );
         setModalOpen(false);
-        window.location.href = `/${response.data.type}/dashboard`;
-      }else {
-        showAlert("error", "Oh snap!", "Change a few things up and try submitting again.");
+        setTimeout(
+          () => (window.location.href = `/${response.data.type}/dashboard`),
+          2100
+        );
+      } else {
+        showAlert(
+          "error",
+          "Oh claquement !",
+          "Modifiez quelques éléments et réessayez de soumettre."
+        );
       }
-    }catch(err){
-      console.log(err)
+    } catch (err) {
+      showAlert(
+        "error",
+        "Oh claquement !",
+        "Modifiez quelques éléments et réessayez de soumettre."
+      );
+      console.log(err);
     }
   };
 
@@ -264,7 +278,7 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
             </button>
             <button
               onClick={async () => {
-                const isValid = await validateSteps('stepOne',0,true);
+                const isValid = await validateSteps("stepOne", 0, true);
                 if (isValid) {
                   moveNewStep(0, 1);
                 } else {
@@ -311,7 +325,8 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
                 valueAsNumber: true,
                 validate: {
                   pattern: (value) =>
-                    /^[0-9]{10}$/.test(value.toString()) || "Format de téléphone invalide",
+                    /^[0-9]{10}$/.test(value.toString()) ||
+                    "Format de téléphone invalide",
                 },
               })}
               className="py-1 px-4 outline-none w-full text-sm md:text-base text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
@@ -410,7 +425,7 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
             )}{" "}
           </div>
           <div className="flex justify-start items-center gap-2 w-full">
-            <input type="checkbox" required/>
+            <input type="checkbox" required />
             <div className="text-textColor text-sm font-semibold">
               J’accepte tout
             </div>
@@ -425,7 +440,7 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
               </button>
               {isUploadFiles ? (
                 <button
-                  onClick={() => validateSteps('stepTwo',1,true)}
+                  onClick={() => validateSteps("stepTwo", 1, true)}
                   className={`${
                     isDisabled2
                       ? "btn_desabled active:scale-100"
@@ -486,7 +501,7 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
           <div className="hidden md:flex flex-col items-center justify-between gap-4 w-full">
             <div className="hidden md:flex items-center justify-between w-full gap-8">
               <button
-                onClick={() => validateSteps('stepThree',2,true)}
+                onClick={() => validateSteps("stepThree", 2, true)}
                 className="bg-textColor text-sm rounded-md p-2 btn font-semibold shadow-lg w-full"
               >
                 Retour
