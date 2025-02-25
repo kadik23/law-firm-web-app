@@ -1,7 +1,7 @@
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 
 type AlertProps = {
-  alertType: string;
+  alertType: string; // "success" or "warning" or "error" or "help"
   alertTitle: string;
   alertMessage: string;
   onClose: () => void; 
