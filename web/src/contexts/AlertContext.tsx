@@ -1,9 +1,10 @@
-"use client"
+"use client";
 import { Alert } from "@/components/alert";
-import { createContext, ReactNode, useContext, useState } from "react";
+import { createContext, ReactNode, useContext, useState, useCallback } from "react";
 
 type AlertContextType = {
   showAlert: (type: string, title: string, message: string) => void;
+  closeAlert: () => void; // Allow manual closing
 };
 
 const AlertContext = createContext<AlertContextType | undefined>(undefined);
@@ -13,13 +14,24 @@ export const AlertProvider = ({ children }: { children: ReactNode }) => {
 
   const showAlert = (type: string, title: string, message: string) => {
     setAlert({ type, title, message });
-    setTimeout(() => setAlert(null), 4000); // Hide after 4 seconds
+
+    // Auto-hide after 6 seconds (increased from 4)
+    setTimeout(() => setAlert(null), 20000);
   };
 
+  const closeAlert = useCallback(() => setAlert(null), []);
+
   return (
-    <AlertContext.Provider value={{ showAlert }}>
+    <AlertContext.Provider value={{ showAlert, closeAlert }}>
       {children}
-      {alert && <Alert alertType={alert.type} alertTitle={alert.title} alertMessage={alert.message} />}
+      {alert && (
+        <Alert
+          alertType={alert.type}
+          alertTitle={alert.title}
+          alertMessage={alert.message}
+          onClose={closeAlert} // Pass the close function to Alert component
+        />
+      )}
     </AlertContext.Provider>
   );
 };
