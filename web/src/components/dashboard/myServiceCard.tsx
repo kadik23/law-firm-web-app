@@ -9,7 +9,7 @@ function Myservice({ service }: MyServiceCardProps) {
   return (
     <div className="rounded-xl shadow-md relative">
       <Image
-        src={`/images/${service.image}`}
+        src={`${service.coverImage}`}
         alt="service"
         layout="responsive"
         width={75}
@@ -18,7 +18,7 @@ function Myservice({ service }: MyServiceCardProps) {
         priority
       />
       <div className="flex justify-between w-full p-2">
-        <div className="font-semibold text-lg">{service.title}</div>
+        <div className="font-semibold text-lg">{service.name}</div>
         <div className="text-xs font-semibold btn mt-2">
           <a
             href={`services/${service.id}`}

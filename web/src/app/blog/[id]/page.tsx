@@ -29,7 +29,7 @@ const Page = () => {
   if (loading) {
     return (
       <div className="h-screen flex items-center justify-center">
-        <h1 className="text-3xl font-bold">Loading...</h1>
+        <h1 className="text-3xl font-bold">Chargement...</h1>
       </div>
     );
   }
@@ -37,7 +37,7 @@ const Page = () => {
   if (!blog)
     return (
       <div className="h-screen flex items-center justify-center">
-        <h1 className="text-7xl font-bold">Blog not found!</h1>
+        <h1 className="text-7xl font-bold">Blog introuvable !</h1>
       </div>
     );
 
@@ -48,7 +48,11 @@ const Page = () => {
         setSelectedCategory={setSelectedCategory}
         selectedCategory={selectedCategory}
       />
-      <BLogInfromation blog={blog} isFavorited={isFavorited} setisFavorited={setisFavorited} />
+      <BLogInfromation
+        blog={blog}
+        isFavorited={isFavorited}
+        setisFavorited={setisFavorited}
+      />
       <ReaderFeedback />
       <div className="font-bold text-3xl md:text-4xl text-primary mb-3">
         D{"'"} autres blogs
@@ -68,7 +72,7 @@ const Page = () => {
           />
           <p>
             {blogsLoading
-              ? "Loading..."
+              ? "Chargement..."
               : "Aucun blog disponible pour le moment."}
           </p>
         </>

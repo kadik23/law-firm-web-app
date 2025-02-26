@@ -36,7 +36,7 @@ const Blogs = () => {
           />
           <p>
             {blogsLoading
-              ? "Loading..."
+              ? "Chargement..."
               : "Aucun blog disponible pour le moment."}
           </p>
         </>

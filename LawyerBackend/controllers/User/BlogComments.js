@@ -1,6 +1,7 @@
 require('dotenv').config();
 const db = require('../../models')
 const comments=db.blogcomments
+const Blog=db.blogs
 
 /**
  * @swagger
@@ -43,6 +44,10 @@ const addBlogComment = async (req,res)=> {
     try {
             const {body, blogId} = req.body;
             const userId=req.user.id
+            const blogExists = await Blog.findByPk(blogId);
+            if (!blogExists) {
+                return res.status(400).json({ error: "Blog not found" });
+            }
             let newBlogComment = await comments.create({
                body: body,userId:userId,blogId:blogId,isAReply:false
             });
@@ -105,7 +110,7 @@ const deleteBlogComment= async (req,res)=>{
         let comment = await comments.findByPk(id);
 
         if (!comment) {
-            return res.status(404).json("Blog not found");
+            return res.status(404).json("Comment not found");
         }
         if(comment.userId!==req.user.id)
         {
@@ -310,7 +315,7 @@ const likeComment = async (req,res)=> {
 };
 /**
  * @swagger
- * /user/blogs/allcomments:
+ * /user/blogs/commentsByBlog/:id:
  *   get:
  *     summary: Retrieve a list of all comments of a blog
  *     tags:

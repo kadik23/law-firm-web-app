@@ -1,10 +1,12 @@
 "use client";
+import { useAlert } from "@/contexts/AlertContext";
 import axiosClient from "@/lib/utils/axiosClient";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 function useContactForm() {
   const [isDisabled, setIsDisabled] = useState(true);
+  const {showAlert} = useAlert();
   const form = useForm<ContactUs>({
     mode: "all",
     defaultValues: {
@@ -31,7 +33,7 @@ function useContactForm() {
         message: data.message,
       });
       if (response.status == 200) {
-        alert("Success Contact us");
+        showAlert("success", "Submitted Successfully!", "Your request was successfully submitted.")
       } else {
         alert(response.data);
       }
