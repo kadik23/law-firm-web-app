@@ -5,7 +5,6 @@ import ServiceCard from "../ServiceCard";
 import { motion } from "framer-motion";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import { useServices } from "@/hooks/useServices";
-import Link from "next/link";
 
 function OurServices() {
   const { services, loading, error } = useServices();

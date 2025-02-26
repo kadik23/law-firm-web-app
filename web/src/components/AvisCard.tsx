@@ -1,10 +1,9 @@
 import React from "react";
-import Image from "next/image";
 import useDateFormatter from "@/hooks/useDateFormatter";
 import { useAuth } from "@/hooks/useAuth";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 
-function AvisCard({ user , feedback, createdAt, userId, serviceId }: avisEntity) {
+function AvisCard({ user , feedback, createdAt, userId }: avisEntity) {
   const formattedDate = useDateFormatter(createdAt || "");
   const {user : USERAuth} = useAuth();
 

@@ -11,7 +11,7 @@ import useCategories from "@/hooks/useCategories";
 
 const Page = () => {
   const { id } = useParams() as { id: string };
-  const { fetchBlog, blog, loading, isFavorited, setisFavorited } = useBlog();
+  const { fetchBlog, blog, loading, isFavorited, setisFavorited, isLike, setisLike, setBlog } = useBlog();
   const {
     blogs,
     blogsLoading,
@@ -24,6 +24,7 @@ const Page = () => {
     if (id) {
       fetchBlog(parseInt(id));
     }
+    console.log("isLike: ",isLike)
   }, [id]);
 
   if (loading) {
@@ -51,7 +52,10 @@ const Page = () => {
       <BLogInfromation
         blog={blog}
         isFavorited={isFavorited}
+        setisLike={setisLike}
+        isLike={isLike}
         setisFavorited={setisFavorited}
+        setBlog= {setBlog}
       />
       <ReaderFeedback />
       <div className="font-bold text-3xl md:text-4xl text-primary mb-3">

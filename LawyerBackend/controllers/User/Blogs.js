@@ -1,6 +1,6 @@
 require('dotenv').config();
 const db = require('../../models')
-const blogs=db.blogs
+const {blogs, like} =db
 /**
  * @swagger
  * /user/blogs/all:
@@ -101,7 +101,7 @@ const getBlogById= async (req,res)=>{
  *                   example: 1
  *       responses:
  *         '200':
- *           description: "Blog updated successfully"
+ *           description: "Blog liked successfully"
  *         '401':
  *           description: "Unauthorized - Missing or Invalid Token"
  *         '404':
@@ -113,14 +113,94 @@ const getBlogById= async (req,res)=>{
 const likeBlog= async (req,res)=> {
     try {
         const {id} = req.body;
+        const userId = req.user.id;
 
         const blog = await blogs.findByPk(id);
         if (!blog) {
             return res.status(404).send('Blog not found');
         }
 
+        const existingLike = await like.findOne({
+            where: { userId, blogId: id },
+          });
+          if (existingLike) {
+            return res.status(400).json({ message: "Blog is already like." });
+          }
+      
+        await like.create({ userId, blogId: id });
+
         const updatedBlog = await blogs.update(
             {likes: blog.likes + 1},
+            {where: {id}}
+        );
+
+        if (!updatedBlog[0]) {
+            return res.status(404).send('Error updating blog');
+        } else {
+            return res.status(200).send('Blog updated successfully');
+        }
+
+    } catch (e) {
+        console.error('Error updating blog', e);
+        res.status(500).send('Internal Server Error');
+    }
+}
+
+
+/**
+ * @swagger
+ * paths:
+ *   /user/blogs/dislike:
+ *     post:
+ *       summary: "Dislike a blog"
+ *       tags:
+ *         - Blogs
+ *       security:
+ *         - BearerAuth: []
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               required:
+ *                 - id
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   example: 1
+ *       responses:
+ *         '200':
+ *           description: "Blog liked successfully"
+ *         '401':
+ *           description: "Unauthorized - Missing or Invalid Token"
+ *         '404':
+ *           description: "Blog not found"
+ *         '500':
+ *           description: "Internal Server Error"
+ */
+
+const dislikeBlog= async (req,res)=> {
+    try {
+        const {id} = req.body;
+        const userId = req.user.id;
+
+        const blog = await blogs.findByPk(id);
+        if (!blog) {
+            return res.status(404).send('Blog not found');
+        }
+
+        const likeToDelete = await like.findOne({
+            where: { userId, blogId: id },
+          });
+        if (!likeToDelete) {
+        return res.status(404).json({ message: "Like not found." });
+        }      
+
+        await likeToDelete.destroy();
+
+        const updatedBlog = await blogs.update(
+            {likes: blog.likes - 1},
             {where: {id}}
         );
 
@@ -234,9 +314,113 @@ const sortBlogs= async (req,res)=>{
         res.status(500).send('Internal Server Error');
     }
 };
+
+/**
+ * @swagger
+ * /user/blogs/IsBlogliked/{blogId}:
+ *   get:
+ *     summary: Check if a blog is liked by the user
+ *     description: This endpoint checks if a specific blog is liked by the authenticated user.
+ *     tags:
+ *       - Blogs
+ *     parameters:
+ *       - name: blogId
+ *         in: path
+ *         description: The ID of the blog to check
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     responses:
+ *       200:
+ *         description: Status indicating if the blog is liked
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 isLiked:
+ *                   type: boolean
+ *                   example: true
+ *       404:
+ *         description: Blog not found
+ *       500:
+ *         description: Internal Server Error
+ */
+const IsBlogLiked = async (req, res) => {
+    const userId = req.user.id;
+    const blogId = req.params.blogId;
+  
+    if (!blogId) {
+      return res.status(400).json({ message: "Blog ID is required." });
+    }
+  
+    try {
+      const blogExists = await blogs.findByPk(blogId);
+      if (!blogExists) {
+        return res.status(404).json({ message: "Blog not found." });
+      }
+  
+      const likeDb = await like.findOne({
+        where: { userId, blogId },
+      });
+  
+      res.status(200).json({ isliked: !!likeDb });
+    } catch (error) {
+      console.error("Error checking if blog is liked:", error);
+      res
+        .status(500)
+        .json({ message: "An error occurred while checking like status." });
+    }
+  };
+
+/**
+ * @swagger
+ * /user/blogs/like/count/:id:
+ *   get:
+ *     summary: Get total count of like blogs
+ *     description: Returns the total number of blogs in the user's likes
+ *     tags:
+ *       - Blogs
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved likes count
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 totalLikes:
+ *                   type: integer
+ *                   example: 50
+ *       500:
+ *         description: Internal Server Error
+ */
+const GetLikesCount = async (req, res) => {
+    const blogId = req.params.id;
+  
+    try {
+      const count = await like.count({
+        where: { blogId },
+      });
+  
+      res.status(200).json({
+        totalLikes: count,
+      });
+    } catch (error) {
+      console.error("Error counting likes:", error);
+      res
+        .status(500)
+        .json({ message: "An error occurred while counting likes." });
+    }
+};  
+
 module.exports = {
     getAllBlogs,
     getBlogById,
     likeBlog,
-    sortBlogs
+    sortBlogs,
+    dislikeBlog,
+    IsBlogLiked,
+    GetLikesCount
 };
