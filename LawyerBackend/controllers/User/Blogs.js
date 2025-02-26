@@ -22,15 +22,30 @@ const blogs=db.blogs
  *         description: Internal Server Error - An error occurred while fetching blogs
  */
 
-const getAllBlogs= async (req,res)=>{
+const getAllBlogs = async (req, res) => {
     try {
-        let blogsList = await blogs.findAll();
-        return res.status(200).send(blogsList);
+        const page = parseInt(req.query.page) || 1;
+        const pageSize = 6;
+        const offset = (page - 1) * pageSize;
+
+        const { count, rows: blogsList } = await blogs.findAndCountAll({
+            limit: pageSize,
+            offset: offset,
+        });
+
+        return res.status(200).json({
+            success: true,
+            currentPage: page,
+            totalPages: Math.ceil(count / pageSize),
+            totalBlogs: count,
+            blogs: blogsList
+        });
     } catch (e) {
         console.error('Error fetching blogs', e);
         res.status(500).send('Internal Server Error');
     }
 };
+
 /**
  * @swagger
  * /user/blogs/:id:
@@ -199,41 +214,45 @@ const likeBlog= async (req,res)=> {
  *           format: date-time
  *           description: The date and time the blog was created.
  */
-const sortBlogs= async (req,res)=>{
+const sortBlogs = async (req, res) => {
     try {
-        const {categoryId,sort,title} = req.query;
+        const { categoryId, sort, title, page } = req.query;
 
-        let blogsList = await blogs.findAll();
+        const pageSize = 6;  // Number of blogs per page
+        const currentPage = parseInt(page) || 1;
+        const offset = (currentPage - 1) * pageSize;
 
-        if(categoryId){
-            blogsList = blogsList.filter(blog => blog.categoryId === Number(categoryId));
 
-        }
-        if (title) {
-            const searchTitle = title.toLowerCase();
-            blogsList = blogsList.filter(blog => blog.title.toLowerCase().startsWith(searchTitle));
-        }
-        if (sort) {
+        let whereCondition = {};
+        if (categoryId) whereCondition.categoryId = categoryId;
+        if (title) whereCondition.title = { [Op.like]: `${title}%` };
 
-            if (sort === "new") {
-                blogsList = blogsList.sort((a, b) => {
-                    const dateA = new Date(a.createdAt);
-                    const dateB = new Date(b.createdAt);
-                    console.log('Date A:', dateA, 'Date B:', dateB);
-                    return dateB - dateA;
-                });
-            }
-            if (sort === "best") {
-                blogsList = blogsList.sort((a, b) => b.likes - a.likes);
-            }
-        }
 
-        return res.status(200).send(blogsList);
+        let order = [];
+        if (sort === "new") order.push(["createdAt", "DESC"]);
+        if (sort === "best") order.push(["likes", "DESC"]);
+
+
+        const { count, rows: blogsList } = await blogs.findAndCountAll({
+            where: whereCondition,
+            limit: pageSize,
+            offset: offset,
+            order: order.length ? order : [["createdAt", "DESC"]] // Default: newest first
+        });
+
+        return res.status(200).json({
+            success: true,
+            currentPage,
+            totalPages: Math.ceil(count / pageSize),
+            totalBlogs: count,
+            blogs: blogsList
+        });
     } catch (e) {
-        console.error('Error fetching blogs', e);
-        res.status(500).send('Internal Server Error');
+        console.error("Error fetching blogs", e);
+        res.status(500).send("Internal Server Error");
     }
 };
+
 module.exports = {
     getAllBlogs,
     getBlogById,
