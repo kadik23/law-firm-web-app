@@ -45,7 +45,6 @@ function Page() {
     comment,
     setComment,
     loading: testimonyLoading,
-    error: testimonyError,
     testimony,
     newTestimonialObject,
   } = useTestimony();
