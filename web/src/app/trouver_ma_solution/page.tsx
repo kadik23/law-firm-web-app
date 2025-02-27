@@ -94,10 +94,11 @@ function page() {
           >
             {serviceItems.map((_, index) => (
               <ServiceCard
-                title="Service Title"
+                id={1}
+                name="Service Title"
                 key={index}
-                body="Preparation, review, and negotiation of contracts to ensure compliance and protection of business interests. This includes employment contracts, vendor agreements, non-disclosure agreements (NDAs)."
-                image="serviceImg.png"
+                description="Preparation, review, and negotiation of contracts to ensure compliance and protection of business interests. This includes employment contracts, vendor agreements, non-disclosure agreements (NDAs)."
+                coverImage="serviceImg.png"
                 style="items-center bg-primary text-white"
                 isDescription={false}
               />

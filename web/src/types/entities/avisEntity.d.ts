@@ -1,7 +1,7 @@
 interface avisEntity {
 feedback: string;
 createdAt: string;
-serviceId: number;
+serviceId?: number;
 user: {
     name: string;
 }

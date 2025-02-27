@@ -6,6 +6,7 @@ function useBlog() {
   const [blog, setBlog] = useState<Blog | null>();
   const [loading, setLoading] = useState(true);
   const [isFavorited, setisFavorited] = useState(false);
+  const [isLike, setisLike] = useState(false);
   const fetchBlog = async (id: number) => {
     try {
       const response = await axios.get(`/user/blogs/${id}`);
@@ -17,6 +18,13 @@ function useBlog() {
         );
         if(favResponse.status == 200){
           setisFavorited(favResponse.data.isFavorited)
+        }
+        const likeResponse = await axios.get(
+          `user/blogs/IsBlogLiked/${response.data.id}`,
+          { withCredentials: true }
+        );
+        if(likeResponse.status == 200){
+          setisLike(likeResponse.data.isliked)
         }
       }
     } catch (err: unknown) {
@@ -30,7 +38,7 @@ function useBlog() {
     }
   };
 
-  return { fetchBlog, blog, loading, isFavorited, setisFavorited };
+  return { fetchBlog, blog, loading, isFavorited, setisFavorited, isLike, setisLike, setBlog };
 }
 
 export default useBlog;
