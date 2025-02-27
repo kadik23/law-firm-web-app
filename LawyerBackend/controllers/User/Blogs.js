@@ -6,21 +6,44 @@ const blogs=db.blogs
  * /user/blogs/all:
  *   get:
  *     summary: Retrieve a list of all blogs
- *     description: This endpoint retrieves all blog entries from the database.
+ *     description: This endpoint retrieves all blog entries from the database with optional pagination.
  *     tags:
  *       - Blogs
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Page number for pagination (default is 1)
+ *         required: false
  *     responses:
  *       200:
  *         description: A list of blogs
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Blog'
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 currentPage:
+ *                   type: integer
+ *                   example: 1
+ *                 totalPages:
+ *                   type: integer
+ *                   example: 5
+ *                 totalBlogs:
+ *                   type: integer
+ *                   example: 50
+ *                 blogs:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Blog'
  *       500:
  *         description: Internal Server Error - An error occurred while fetching blogs
  */
+
 
 const getAllBlogs = async (req, res) => {
     try {
@@ -157,7 +180,6 @@ const likeBlog= async (req,res)=> {
  *   /user/blogs/sort:
  *     get:
  *       summary: Get filtered and sorted list of blogs
- *
  *       description: Retrieve blogs based on optional filtering and sorting criteria such as category, title, or sort order.
  *       tags:
  *         - Blogs
@@ -181,15 +203,36 @@ const likeBlog= async (req,res)=> {
  *             type: string
  *           description: Search blogs by title starting with the provided letters (case insensitive).
  *           required: false
+ *         - in: query
+ *           name: page
+ *           schema:
+ *             type: integer
+ *           description: The page number for pagination.
+ *           required: false
  *       responses:
  *         200:
  *           description: A list of blogs matching the filtering and sorting criteria.
  *           content:
  *             application/json:
  *               schema:
- *                 type: array
- *                 items:
- *                   $ref: '#/components/schemas/Blog'
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: boolean
+ *                     example: true
+ *                   currentPage:
+ *                     type: integer
+ *                     example: 1
+ *                   totalPages:
+ *                     type: integer
+ *                     example: 5
+ *                   totalBlogs:
+ *                     type: integer
+ *                     example: 50
+ *                   blogs:
+ *                     type: array
+ *                     items:
+ *                       $ref: '#/components/schemas/Blog'
  *         500:
  *           description: Internal Server Error
  * components:
@@ -200,20 +243,26 @@ const likeBlog= async (req,res)=> {
  *         id:
  *           type: integer
  *           description: Unique identifier for the blog.
+ *           example: 1
  *         title:
  *           type: string
  *           description: Title of the blog.
+ *           example: "Introduction to Next.js"
  *         categoryId:
  *           type: integer
  *           description: The ID of the category this blog belongs to.
+ *           example: 3
  *         likes:
  *           type: integer
  *           description: Number of likes the blog has received.
+ *           example: 150
  *         createdAt:
  *           type: string
  *           format: date-time
  *           description: The date and time the blog was created.
+ *           example: "2024-02-24T12:34:56Z"
  */
+
 const sortBlogs = async (req, res) => {
     try {
         const { categoryId, sort, title, page } = req.query;
