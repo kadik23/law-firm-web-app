@@ -134,14 +134,6 @@ const createService = async (req, res) => {
 
 
       const filePath = req.file.path;
-      let base64Image = null;
-      if (fs.existsSync(filePath)) {
-        const fileData = fs.readFileSync(filePath);
-        base64Image = `data:image/png;base64,${fileData.toString("base64")}`;
-        fs.unlink(filePath, (unlinkErr) => {
-          if (unlinkErr) console.error("Error deleting file:", unlinkErr);
-        });
-      }
 
       const createdBy = req.user?.id || "anonymous";
 
@@ -149,7 +141,7 @@ const createService = async (req, res) => {
         name,
         description,
         requestedFiles,
-        coverImage: base64Image,
+        coverImage: filePath,
         price,
         createdBy,
       });
