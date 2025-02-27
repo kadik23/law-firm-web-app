@@ -4,7 +4,6 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AuthClientWrapper from "@/components/AuthClientWrapper";
-import { Alert } from "@/components/alert";
 import { AlertProvider } from "@/contexts/AlertContext";
 
 // const geistSans = localFont({
