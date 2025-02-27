@@ -153,6 +153,59 @@ const createService = async (req, res) => {
     return res.status(500).json({ error: "Server error: " + error.message });
   }
 };
+/**
+ * @swagger
+ * /admin/services/delete:
+ *   delete:
+ *     summary: Delete multiple services
+ *     description: Deletes multiple services based on the provided list of IDs.
+ *     tags:
+ *       - Services
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               ids:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *                 example: [1, 2, 3]
+ *             required:
+ *               - ids
+ *     responses:
+ *       200:
+ *         description: Successfully deleted the specified services
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "3 services deleted"
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Server error"
+ *                 error:
+ *                   type: string
+ *                   example: "Error message here"
+ */
 const deleteServices = async (req, res) => {
   try {
     const { ids } = req.body;

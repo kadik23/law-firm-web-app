@@ -30,7 +30,7 @@ adminRouter.put('/blogs/update',authMiddleware(["admin"]),blogsSchema.update,val
 adminRouter.delete('/blogs/delete',authMiddleware(["admin"]),blogsSchema.remove,validationErrors,blogsController.deleteBlog)
 
 adminRouter.post('/services/create',authMiddleware(["admin"]),servicesController.createService)
-adminRouter.delete('/services/delete',authMiddleware(["admin","client"]),servicesSchema.remove,validationErrors,servicesController.deleteServices)
+adminRouter.delete('/services/delete',authMiddleware(["admin"]),servicesSchema.remove,validationErrors,servicesController.deleteServices)
 
 adminRouter.post('/problems', authMiddleware(["admin"]),problemsSchema.add,validationErrors, problemsController.createProblem);
 
