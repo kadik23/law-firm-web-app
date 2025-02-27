@@ -1,5 +1,7 @@
 require('dotenv').config();
 const db = require('../../models')
+const {resolve} = require("path");
+const {existsSync, readFileSync} = require("fs");
 const {blogs, like} =db
 /**
  * @swagger
@@ -56,13 +58,29 @@ const getAllBlogs = async (req, res) => {
             offset: offset,
         });
 
+        const updatedBlogsList = await Promise.all(blogsList.map(async (blog) => {
+            const filePath = resolve(__dirname, '..', '..', blog.image);
+
+            let base64Image = null;
+            if (fs.existsSync(filePath)) {
+                const fileData = fs.readFileSync(filePath);
+                base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
+            }
+
+            return {
+                ...blog.toJSON(),
+                image: base64Image
+            };
+        }));
+
         return res.status(200).json({
             success: true,
             currentPage: page,
             totalPages: Math.ceil(count / pageSize),
             totalBlogs: count,
-            blogs: blogsList
+            blogs: updatedBlogsList
         });
+
     } catch (e) {
         console.error('Error fetching blogs', e);
         res.status(500).send('Internal Server Error');
@@ -109,7 +127,17 @@ const getBlogById= async (req,res)=>{
         if (!blog) {
             return res.status(404).json({ message: 'Blog not found' });
         }
-        return res.status(200).send(blog);
+        const filePath = resolve(__dirname, '..', '..', blog.image);
+
+        let base64Image = null;
+        if (existsSync(filePath)) {
+            const fileData = readFileSync(filePath);
+            base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
+        }
+        return res.status(200).send({
+            ...blog.toJSON(),
+            image: base64Image
+        });
     } catch (e) {
         console.error('Error fetching blog', e);
         res.status(500).send('Internal Server Error');
