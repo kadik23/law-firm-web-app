@@ -18,7 +18,7 @@ export const BlogsFiltersProvider = ({ children }: { children: ReactNode }) => {
   const fetchBlogs = async () => {
     try {
       const response = await axios.get("/user/blogs/all");
-      setBlogs(response.data);
+      setBlogs(response.data.blogs);
     } catch (err: unknown) {
       if (isAxiosError(err) && err.response?.status === 401) {
         console.warn("Blog not found");
@@ -38,7 +38,7 @@ export const BlogsFiltersProvider = ({ children }: { children: ReactNode }) => {
       if (searchInput !== "") params.title = searchInput;
 
       const response = await axios.get("/user/blogs/sort", { params });
-      setBlogs(response.data);
+      setBlogs(response.data.blogs);
     } catch (err: unknown) {
       if (isAxiosError(err) && err.response?.status === 401) {
         console.warn("Blog not found");

@@ -3,6 +3,7 @@ const db = require('../../models')
 const {resolve} = require("path");
 const {existsSync, readFileSync} = require("fs");
 const {blogs, like} =db
+const fs = require('fs');
 /**
  * @swagger
  * /user/blogs/all:
@@ -397,12 +398,27 @@ const sortBlogs = async (req, res) => {
             order: order.length ? order : [["createdAt", "DESC"]] // Default: newest first
         });
 
+        const updatedBlogsList = await Promise.all(blogsList.map(async (blog) => {
+            const filePath = resolve(__dirname, '..', '..', blog.image);
+
+            let base64Image = null;
+            if (fs.existsSync(filePath)) {
+                const fileData = fs.readFileSync(filePath);
+                base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
+            }
+
+            return {
+                ...blog.toJSON(),
+                image: base64Image
+            };
+        }));
+
         return res.status(200).json({
             success: true,
             currentPage,
             totalPages: Math.ceil(count / pageSize),
             totalBlogs: count,
-            blogs: blogsList
+            blogs: updatedBlogsList
         });
     } catch (e) {
         console.error("Error fetching blogs", e);
