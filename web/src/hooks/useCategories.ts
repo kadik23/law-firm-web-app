@@ -7,7 +7,7 @@ function useCategories() {
     const [loading, setLoading] = useState(true);
   
     useEffect(() => {
-      const fetchBlogs = async () => {
+      const fetchCategories = async () => {
         try {
           const response = await axios.get("/user/categories/all");
           setCategories(response.data);
@@ -23,7 +23,7 @@ function useCategories() {
         }
       };
   
-      fetchBlogs();
+      fetchCategories();
     }, []);
   return { categories, loading }
 }
