@@ -59,4 +59,9 @@ const remove= [
         .isInt().withMessage('id must be a number')
         .notEmpty().withMessage('id is required'),
 ]
-module.exports={like,sort,getById,add,update,remove};
+
+const isLike = [
+    param('blogId')
+        .isInt({ min: 1 }).withMessage('Blog ID must be a positive integer')
+];
+module.exports={like,sort,getById,add,update,remove, isLike};

@@ -375,7 +375,7 @@ function PaymentBoard({ paymentData }: { paymentData: paimentEntity[] }) {
                 >
                   <option value="">Tous les services</option>
                   {Array.from(
-                    new Set(paymentData.map((p) => p.service.title))
+                    new Set(paymentData.map((p) => p.service.name))
                   ).map((title) => (
                     <option key={title} value={title}>
                       {title}
@@ -475,7 +475,7 @@ function PaymentBoard({ paymentData }: { paymentData: paimentEntity[] }) {
               <td className="px-4 py-3 border">{item.paymentDate}</td>
               <td className="px-4 py-3 border">
                 <div className="border rounded-md py-1 px-2">
-                  {item.service.title}
+                  {item.service.name}
                 </div>
               </td>
               <td className="px-4 py-3 border">

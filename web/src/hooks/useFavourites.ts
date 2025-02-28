@@ -1,9 +1,11 @@
+import { useAlert } from "@/contexts/AlertContext";
 import axios from "@/lib/utils/axiosClient";
 import { useState } from "react";
 
 export const useFavorites = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { showAlert } = useAlert();
 
   const getFavorites = async () => {
     setLoading(true);
@@ -38,9 +40,19 @@ export const useFavorites = () => {
     setLoading(true);
     try {
       await axios.post("/user/favorites", { blogId });
+      showAlert(
+        "success",
+        "Blog préféré réussi",
+        "Vous avez lu avec succès ce message important."
+      );
       return true;
     } catch (err) {
       console.error(err);
+      showAlert(
+        "error",
+        "Oh claquement !",
+        "Échec de l'ajout aux favoris"
+      );
       setError("Failed to add to favorites");
       return false;
     } finally {
@@ -52,8 +64,18 @@ export const useFavorites = () => {
     setLoading(true);
     try {
       await axios.delete(`/user/favorites/${blogId}`);
+      showAlert(
+        "success",
+        "Suppression réussie du blog favori",
+        "Vous avez lu avec succès ce message important."
+      );
       return true;
     } catch (err) {
+      showAlert(
+        "error",
+        "Oh claquement !",
+        "Échec de la suppression des favoris"
+      );
       console.error(err);
       setError("Failed to remove from favorites");
       return false;

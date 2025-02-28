@@ -21,7 +21,7 @@ function OurAttorneys() {
       <div className="mt-8 bg-third flex flex-col items-center py-8 p-4 md:p-8">
         <div className=" font-bold text-3xl">Nos Avocats</div>
         <div className="overflow-hidden py-8">
-          {loading && 'Loading...'}
+          {loading && 'Chargement...'}
           {attorneys.length > 0 && !loading ? (
             <motion.div className="flex gap-4 flex-wrap justify-center">
               {attorneys.map((attorney, index) => (

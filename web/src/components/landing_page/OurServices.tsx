@@ -4,9 +4,12 @@ import React from "react";
 import ServiceCard from "../ServiceCard";
 import { motion } from "framer-motion";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
+import { useServices } from "@/hooks/useServices";
 
 function OurServices() {
+  const { services, loading, error } = useServices();
   const serviceItems = Array(6).fill(null);
+
   const {
     currentIndex: currentServiceIndex,
     handlePrev: handlePrevService,
@@ -15,8 +18,18 @@ function OurServices() {
     offset: serviceOffset,
     visibleItems: serviceVisibleItems,
   } = useCarousel(serviceItems.length, 3.5);
+
+  const ServicesLoadingChecker = () => {
+    if (loading)
+      return <h1 className="text-center text-6xl mt-6">Chargement...</h1>;
+    if (error)
+      return <h1 className="text-center text-6xl mt-6">Error: {error}</h1>;
+  };
+  console.log("services loaded", services);
+
   return (
     <section id="services" className="p-4 md:p-8 bg-[#dddddd]/30">
+      {/* services title & description */}
       <div className="">
         <div className=" font-bold text-3xl mb-4 text-center md:text-start">
           Nos Services
@@ -31,9 +44,12 @@ function OurServices() {
           support tailored to the specific needs of votre business.
         </div>
       </div>
+
+      {/* services grid */}
+      {ServicesLoadingChecker()}
       <div className="overflow-hidden py-4">
         <motion.div
-          className="flex gap-4"
+          className="flex gap-8"
           animate={{
             x: `-${
               (currentServiceIndex * serviceOffset) / serviceVisibleItems
@@ -41,22 +57,26 @@ function OurServices() {
           }}
           transition={{ type: "spring", stiffness: 50 }}
         >
-          {serviceItems.map((_, index) => (
+          {services.map((service) => (
             <ServiceCard
-              title="Service Title"
-              key={index}
-              body="Preparation, review, and negotiation of contracts to ensure compliance and protection of business interests. This includes employment contracts, vendor agreements, non-disclosure agreements (NDAs)."
-              image="serviceImg.png"
+              name={service.name}
+              id={service.id as number}
+              key={service.id}
+              description={service.description}
+              coverImage={service.coverImage || "serviceImg.png"}
               isDescription
-              style="items-start text-white bg-primary"
+              style="items-start text-black bg-white h-full"
             />
           ))}
         </motion.div>
       </div>
+
+      {/* carousel indicators */}
       <div className="flex justify-center items-center w-full gap-4 mt-8">
         <button
           onClick={handlePrevService}
           disabled={currentServiceIndex === 0}
+          className="flex items-center"
         >
           <Icon icon="ep:arrow-left" width="24" height="24" className="btn" />
         </button>
@@ -71,7 +91,8 @@ function OurServices() {
         ))}
         <button
           onClick={handleNextService}
-          disabled={currentServiceIndex >= serviceItems.length - 3.5}
+          className="flex items-center"
+          disabled={currentServiceIndex >= serviceItems.length - 4}
         >
           <Icon icon="ep:arrow-right" width="24" height="24" className="btn" />
         </button>
