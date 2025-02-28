@@ -11,20 +11,32 @@ import useCategories from "@/hooks/useCategories";
 
 const Page = () => {
   const { id } = useParams() as { id: string };
-  const { fetchBlog, blog, loading, isFavorited, setisFavorited, isLike, setisLike, setBlog } = useBlog();
+  const {
+    fetchBlog,
+    blog,
+    loading,
+    isFavorited,
+    setisFavorited,
+    isLike,
+    setisLike,
+    setBlog,
+  } = useBlog();
   const {
     blogs,
     blogsLoading,
     getFilteredBlogs,
     selectedCategory,
     setSelectedCategory,
+    currentPage,
+    totalPages,
+    setCurrentPage,
   } = useBlogs();
   const { categories } = useCategories();
   useEffect(() => {
     if (id) {
       fetchBlog(parseInt(id));
     }
-    console.log("isLike: ",isLike)
+    console.log("isLike: ", isLike);
   }, [id]);
 
   if (loading) {
@@ -55,7 +67,7 @@ const Page = () => {
         setisLike={setisLike}
         isLike={isLike}
         setisFavorited={setisFavorited}
-        setBlog= {setBlog}
+        setBlog={setBlog}
       />
       <ReaderFeedback />
       <div className="font-bold text-3xl md:text-4xl text-primary mb-3">
@@ -66,6 +78,9 @@ const Page = () => {
           blogs={blogs}
           selectedCategory={selectedCategory}
           getFilteredBlogs={getFilteredBlogs}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          setCurrentPage={setCurrentPage}
         />
       ) : (
         <>
@@ -73,6 +88,9 @@ const Page = () => {
             blogs={[]}
             selectedCategory={selectedCategory}
             getFilteredBlogs={getFilteredBlogs}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            setCurrentPage={setCurrentPage}
           />
           <p>
             {blogsLoading

@@ -14,10 +14,13 @@ export const BlogsFiltersProvider = ({ children }: { children: ReactNode }) => {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [searchInput, setSearchInput] = useState<string>("");
   const [sort, setSort] = useState<"new" | "best" | null>(null);
-
+  const [totalPages, setTotalPages] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const fetchBlogs = async () => {
     try {
       const response = await axios.get("/user/blogs/all");
+      setTotalPages(response.data.totalPages);
+      setCurrentPage(response.data.currentPage);
       setBlogs(response.data.blogs);
     } catch (err: unknown) {
       if (isAxiosError(err) && err.response?.status === 401) {
@@ -30,9 +33,9 @@ export const BlogsFiltersProvider = ({ children }: { children: ReactNode }) => {
       setBlogsLoading(false);
     }
   };
-  const getFilteredBlogs = async () => {
+  const getFilteredBlogs = async (page: number = 1) => {
     try {
-      const params: Record<string, string> = {};
+      const params: Record<string, string> = { page: page.toString() };
       if (selectedCategory) params.categoryId = selectedCategory.id.toString();
       if (sort) params.sort = sort;
       if (searchInput !== "") params.title = searchInput;
@@ -87,7 +90,11 @@ export const BlogsFiltersProvider = ({ children }: { children: ReactNode }) => {
         searchInput,
         setSearchInput,
         sort,
-        setSort
+        setSort,
+        totalPages,
+        setTotalPages,
+        currentPage,
+        setCurrentPage,
       }}
     >
       {children}
