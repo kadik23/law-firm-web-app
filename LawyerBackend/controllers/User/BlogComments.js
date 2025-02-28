@@ -320,17 +320,14 @@ const likeComment = async (req,res)=> {
  *     summary: Retrieve a list of all comments of a blog
  *     tags:
  *       - Blogs comments
- *     requestBody:
- *         required: true
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               required:
- *                 - id
- *               properties:
- *                 id:
- *                   type: integer
+ *     parameters:
+ *         - in: query
+ *           name: page
+ *           schema:
+ *             type: integer
+ *           description: page number
+ *           required: false
+ *
  *     responses:
  *       200:
  *         description: A list of comments
@@ -344,18 +341,34 @@ const likeComment = async (req,res)=> {
  *         description: Internal Server Error
  */
 
-const getCommentsByBlog= async (req,res)=>{
+const getCommentsByBlog = async (req, res) => {
     try {
-        const {id} = req.params;
+        const { id } = req.params;
+        const page = parseInt(req.query.page) || 1;
+        const pageSize = 6;
+        const offset = (page - 1) * pageSize;
 
-        let commentsList = await comments.findAll({ where: { blogId:id } });
 
-        return res.status(200).send(commentsList);
+        const { count, rows: commentsList } = await comments.findAndCountAll({
+            where: { blogId: id },
+            limit: pageSize,
+            offset: offset,
+            order: [["createdAt", "DESC"]],
+        });
+
+        return res.status(200).json({
+            success: true,
+            currentPage: page,
+            totalPages: Math.ceil(count / pageSize),
+            totalComments: count,
+            comments: commentsList,
+        });
     } catch (e) {
-        console.error('Error fetching comments', e);
-        res.status(500).send('Internal Server Error');
+        console.error("Error fetching comments", e);
+        res.status(500).send("Internal Server Error");
     }
 };
+
 module.exports = {
     addBlogComment,
     updateBlogComment,

@@ -41,7 +41,6 @@ function OurTestimonials() {
                 <AvisCard
                   feedback={testimonial.feedback}
                   user={testimonial.user}
-                  serviceId={testimonial.serviceId}
                   createdAt={testimonial.createdAt}
                   userId={testimonial.userId}
                   key={index}

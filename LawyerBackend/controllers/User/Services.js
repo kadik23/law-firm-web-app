@@ -61,8 +61,27 @@ const getAllServices = async (req, res) => {
       attributes: ['id', 'name', 'description', 'requestedFiles', 'coverImage', 'price', 'createdBy', 'createdAt', 'updatedAt'],
       order: [['createdAt', 'DESC']], // Trier du plus récent au plus ancien
     });
+    if (services) {
+      services = await Promise.all(services.map(async (service) => {
+        const filePath = path.resolve(__dirname, '..', '..', service.coverImage);
 
-    return res.status(200).json(services);
+        let base64Image = null;
+        if (fs.existsSync(filePath)) {
+          const fileData = fs.readFileSync(filePath);
+          base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
+        }
+
+        return {
+          ...service.toJSON(),
+          coverImage: base64Image
+        };
+      }));
+
+      return res.status(200).json(services);
+    }else {
+      return res.status(401).send('Error fetching services');
+    }
+
   } catch (error) {
     console.error('Error fetching services:', error);
     return res.status(500).json({ error: 'Server error: ' + error.message });
@@ -139,11 +158,22 @@ const getOneService = async (req, res) => {
       where: { id },
     });
 
-    if (!service) {
-      return res.status(404).json({ error: 'Service not found' });
-    }
+    if (service) {
 
-    return res.status(200).json(service);
+        const filePath = path.resolve(__dirname, '..', '..', service.coverImage);
+
+        let base64Image = null;
+        if (fs.existsSync(filePath)) {
+          const fileData = fs.readFileSync(filePath);
+          base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
+        }
+
+      return res.status(200).json({
+        ...service.toJSON(),
+        coverImage: base64Image
+      });
+    }else {
+      return res.status(404).json({ error: 'Service not found' });    }
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }

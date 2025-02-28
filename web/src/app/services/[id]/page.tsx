@@ -45,7 +45,6 @@ function Page() {
     comment,
     setComment,
     loading: testimonyLoading,
-    error: testimonyError,
     testimony,
     newTestimonialObject,
   } = useTestimony();
@@ -283,7 +282,6 @@ function Page() {
                   return (
                     <AvisCard
                       user={userObject}
-                      serviceId={testimonial.serviceId}
                       userId={testimonial.userId}
                       feedback={testimonial.feedback}
                       createdAt={testimonial.createdAt}
