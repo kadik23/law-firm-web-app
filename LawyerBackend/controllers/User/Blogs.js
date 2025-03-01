@@ -1,36 +1,93 @@
 require('dotenv').config();
 const db = require('../../models')
+const {resolve} = require("path");
+const {existsSync, readFileSync} = require("fs");
 const {blogs, like} =db
+const fs = require('fs');
 /**
  * @swagger
  * /user/blogs/all:
  *   get:
  *     summary: Retrieve a list of all blogs
- *     description: This endpoint retrieves all blog entries from the database.
+ *     description: This endpoint retrieves all blog entries from the database with optional pagination.
  *     tags:
  *       - Blogs
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Page number for pagination (default is 1)
+ *         required: false
  *     responses:
  *       200:
  *         description: A list of blogs
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Blog'
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 currentPage:
+ *                   type: integer
+ *                   example: 1
+ *                 totalPages:
+ *                   type: integer
+ *                   example: 5
+ *                 totalBlogs:
+ *                   type: integer
+ *                   example: 50
+ *                 blogs:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Blog'
  *       500:
  *         description: Internal Server Error - An error occurred while fetching blogs
  */
 
-const getAllBlogs= async (req,res)=>{
+
+const getAllBlogs = async (req, res) => {
     try {
-        let blogsList = await blogs.findAll();
-        return res.status(200).send(blogsList);
+        const page = parseInt(req.query.page) || 1;
+        const pageSize = 6;
+        const offset = (page - 1) * pageSize;
+
+        const { count, rows: blogsList } = await blogs.findAndCountAll({
+            limit: pageSize,
+            offset: offset,
+        });
+
+        const updatedBlogsList = await Promise.all(blogsList.map(async (blog) => {
+            const filePath = resolve(__dirname, '..', '..', blog.image);
+
+            let base64Image = null;
+            if (fs.existsSync(filePath)) {
+                const fileData = fs.readFileSync(filePath);
+                base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
+            }
+
+            return {
+                ...blog.toJSON(),
+                image: base64Image
+            };
+        }));
+
+        return res.status(200).json({
+            success: true,
+            currentPage: page,
+            totalPages: Math.ceil(count / pageSize),
+            totalBlogs: count,
+            blogs: updatedBlogsList
+        });
+
     } catch (e) {
         console.error('Error fetching blogs', e);
         res.status(500).send('Internal Server Error');
     }
 };
+
 /**
  * @swagger
  * /user/blogs/:id:
@@ -71,7 +128,17 @@ const getBlogById= async (req,res)=>{
         if (!blog) {
             return res.status(404).json({ message: 'Blog not found' });
         }
-        return res.status(200).send(blog);
+        const filePath = resolve(__dirname, '..', '..', blog.image);
+
+        let base64Image = null;
+        if (existsSync(filePath)) {
+            const fileData = readFileSync(filePath);
+            base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
+        }
+        return res.status(200).send({
+            ...blog.toJSON(),
+            image: base64Image
+        });
     } catch (e) {
         console.error('Error fetching blog', e);
         res.status(500).send('Internal Server Error');
@@ -222,7 +289,6 @@ const dislikeBlog= async (req,res)=> {
  *   /user/blogs/sort:
  *     get:
  *       summary: Get filtered and sorted list of blogs
- *
  *       description: Retrieve blogs based on optional filtering and sorting criteria such as category, title, or sort order.
  *       tags:
  *         - Blogs
@@ -246,15 +312,36 @@ const dislikeBlog= async (req,res)=> {
  *             type: string
  *           description: Search blogs by title starting with the provided letters (case insensitive).
  *           required: false
+ *         - in: query
+ *           name: page
+ *           schema:
+ *             type: integer
+ *           description: The page number for pagination.
+ *           required: false
  *       responses:
  *         200:
  *           description: A list of blogs matching the filtering and sorting criteria.
  *           content:
  *             application/json:
  *               schema:
- *                 type: array
- *                 items:
- *                   $ref: '#/components/schemas/Blog'
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: boolean
+ *                     example: true
+ *                   currentPage:
+ *                     type: integer
+ *                     example: 1
+ *                   totalPages:
+ *                     type: integer
+ *                     example: 5
+ *                   totalBlogs:
+ *                     type: integer
+ *                     example: 50
+ *                   blogs:
+ *                     type: array
+ *                     items:
+ *                       $ref: '#/components/schemas/Blog'
  *         500:
  *           description: Internal Server Error
  * components:
@@ -265,55 +352,80 @@ const dislikeBlog= async (req,res)=> {
  *         id:
  *           type: integer
  *           description: Unique identifier for the blog.
+ *           example: 1
  *         title:
  *           type: string
  *           description: Title of the blog.
+ *           example: "Introduction to Next.js"
  *         categoryId:
  *           type: integer
  *           description: The ID of the category this blog belongs to.
+ *           example: 3
  *         likes:
  *           type: integer
  *           description: Number of likes the blog has received.
+ *           example: 150
  *         createdAt:
  *           type: string
  *           format: date-time
  *           description: The date and time the blog was created.
+ *           example: "2024-02-24T12:34:56Z"
  */
-const sortBlogs= async (req,res)=>{
+
+const sortBlogs = async (req, res) => {
     try {
-        const {categoryId,sort,title} = req.query;
+        const { categoryId, sort, title, page } = req.query;
 
-        let blogsList = await blogs.findAll();
+        const pageSize = 6;  // Number of blogs per page
+        const currentPage = parseInt(page) || 1;
+        const offset = (currentPage - 1) * pageSize;
 
-        if(categoryId){
-            blogsList = blogsList.filter(blog => blog.categoryId === Number(categoryId));
 
-        }
-        if (title) {
-            const searchTitle = title.toLowerCase();
-            blogsList = blogsList.filter(blog => blog.title.toLowerCase().startsWith(searchTitle));
-        }
-        if (sort) {
+        let whereCondition = {};
+        if (categoryId) whereCondition.categoryId = categoryId;
+        if (title) whereCondition.title = { [Op.like]: `${title}%` };
 
-            if (sort === "new") {
-                blogsList = blogsList.sort((a, b) => {
-                    const dateA = new Date(a.createdAt);
-                    const dateB = new Date(b.createdAt);
-                    console.log('Date A:', dateA, 'Date B:', dateB);
-                    return dateB - dateA;
-                });
+
+        let order = [];
+        if (sort === "new") order.push(["createdAt", "DESC"]);
+        if (sort === "best") order.push(["likes", "DESC"]);
+
+
+        const { count, rows: blogsList } = await blogs.findAndCountAll({
+            where: whereCondition,
+            limit: pageSize,
+            offset: offset,
+            order: order.length ? order : [["createdAt", "DESC"]] // Default: newest first
+        });
+
+        const updatedBlogsList = await Promise.all(blogsList.map(async (blog) => {
+            const filePath = resolve(__dirname, '..', '..', blog.image);
+
+            let base64Image = null;
+            if (fs.existsSync(filePath)) {
+                const fileData = fs.readFileSync(filePath);
+                base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
             }
-            if (sort === "best") {
-                blogsList = blogsList.sort((a, b) => b.likes - a.likes);
-            }
-        }
 
-        return res.status(200).send(blogsList);
+            return {
+                ...blog.toJSON(),
+                image: base64Image
+            };
+        }));
+
+        return res.status(200).json({
+            success: true,
+            currentPage,
+            totalPages: Math.ceil(count / pageSize),
+            totalBlogs: count,
+            blogs: updatedBlogsList
+        });
     } catch (e) {
-        console.error('Error fetching blogs', e);
-        res.status(500).send('Internal Server Error');
+        console.error("Error fetching blogs", e);
+        res.status(500).send("Internal Server Error");
     }
 };
+
 
 /**
  * @swagger

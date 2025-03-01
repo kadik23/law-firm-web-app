@@ -62,8 +62,8 @@ userRouter.get('/favorites/IsBlogFavorited/:blogId',authMiddleware(["client","ad
 userRouter.delete('/favorites',authMiddleware(["client"]),favoritesController.DeleteAllFavorites);
 
 //Services Routes
-userRouter.get('/services',authMiddleware(["client","admin","attorney"]),servicesController.getAllServices);
-userRouter.get('/services/:id',authMiddleware(["client","admin","attorney"]),servicesSchema.getById,validationErrors,servicesController.getOneService);
+userRouter.get('/services',servicesController.getAllServices);
+userRouter.get('/services/:id',servicesSchema.getById,validationErrors,servicesController.getOneService);
 
 // Testimonials Routes
 userRouter.post('/testimonials', authMiddleware(["client"]),testimonialSchema.add,validationErrors, testimonialsController.CreateTestimonial);

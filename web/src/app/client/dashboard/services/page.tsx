@@ -5,7 +5,7 @@ import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import React, { useEffect, useState } from "react";
 
 function Services() {
-  const serviceItems: serviceEntity[] = [
+  const serviceItems = React.useMemo(() => [
     {
       id: 1,
       name: "Service Title",
@@ -114,7 +114,7 @@ function Services() {
       coverImage: "serviceImg.png",
       description: "Preparation, review.",
     },
-  ];
+  ], []);
   const blogsPerPage = 6;
   const [filteredServices, setFilteredBlogs] = useState<serviceEntity[]>([]);
 
