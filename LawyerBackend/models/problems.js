@@ -19,6 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   });
   Problem.associate = function(models) {
+    Problem.belongsTo(models.services, { foreignKey: "service_id", as: "service" });
     Problem.hasMany(models.Consultation, { foreignKey: "problem_id", as: "consultations" });
   };
   return Problem;

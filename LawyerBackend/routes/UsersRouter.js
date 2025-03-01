@@ -64,6 +64,7 @@ userRouter.delete('/favorites',authMiddleware(["client"]),favoritesController.De
 //Services Routes
 userRouter.get('/services',servicesController.getAllServices);
 userRouter.get('/services/:id',servicesSchema.getById,validationErrors,servicesController.getOneService);
+userRouter.get('/services/problem/:problem_id',servicesSchema.getByProblemId,validationErrors,servicesController.getAllServicesByProblem);
 
 // Testimonials Routes
 userRouter.post('/testimonials', authMiddleware(["client"]),testimonialSchema.add,validationErrors, testimonialsController.CreateTestimonial);
