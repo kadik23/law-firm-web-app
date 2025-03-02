@@ -8,11 +8,11 @@ interface ModalProps {
   isNotStepOne: boolean
 }
 
-const Modal: React.FC<ModalProps> = ({ children, isOpen, onClose, isNotStepOne }) => {
+const CommentModal: React.FC<ModalProps> = ({ children, isOpen, onClose, isNotStepOne }) => {
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 flex justify-center items-start md:items-center bg-black/50 z-50">
-      <div className="bg-[#2C3E50] p-6 rounded-md shadow-lg relative">
+      <div className="bg-[#2C3E50] p-6 rounded-md shadow-lg relative w-full mx-2 md:mx-10 md:w-full">
         <Icon 
           icon="material-symbols:close" 
           width="24" height="24" 
@@ -25,4 +25,4 @@ const Modal: React.FC<ModalProps> = ({ children, isOpen, onClose, isNotStepOne }
   );
 };
 
-export default Modal;
+export default CommentModal;
