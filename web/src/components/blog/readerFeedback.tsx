@@ -85,7 +85,6 @@ const ReaderFeedback = ({ blogId }: { blogId: string }) => {
             // add to the list of comments
             setAllComments((prevComments) => [ ...prevComments, newReply]);
             setCommentReplies(allcomments.filter((comment) => comment.originalCommentId === commentId));
-            setModelIsOpen(true);
         } else {
             // Show replies in the modal
             setCommentReplies(allcomments.filter((comment) => comment.originalCommentId === commentId));
