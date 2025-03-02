@@ -71,7 +71,8 @@ userRouter.post('/service-files/:serviceId',authMiddleware(["client", "admin", "
 userRouter.post('/testimonials', authMiddleware(["client"]),testimonialSchema.add,validationErrors, testimonialsController.CreateTestimonial);
 userRouter.get('/testimonials', testimonialsController.GetAllTestimonials);
 userRouter.get('/testimonials/service/:serviceId',testimonialSchema.getByService,validationErrors, testimonialsController.GetTestimonialsByService);
-
+userRouter.put('/testimonials/:testimonialId', authMiddleware(["client"]), testimonialSchema.update, validationErrors, testimonialsController.UpdateTestimonial);
+userRouter.delete('/testimonials/:testimonialId', authMiddleware(["client"]), testimonialSchema.remove, validationErrors, testimonialsController.DeleteTestimonial);
 // Problems Routes
 userRouter.get('/problems', authMiddleware(["client", "admin", "attorney"]), problemsController.getAllProblems);
 userRouter.get('/problems/:id', authMiddleware(["client", "admin", "attorney"]),problemsSchema.getByID,validationErrors, problemsController.getProblemById);

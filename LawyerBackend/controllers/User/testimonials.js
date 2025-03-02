@@ -133,8 +133,137 @@ const GetTestimonialsByService = async (req, res) => {
   }
 };
 
+
+/**
+ * @swagger
+ * /user/testimonials/{testimonialId}:
+ *   put:
+ *     summary: Update a testimonial
+ *     description: Allows a user to update their testimonial.
+ *     tags:
+ *       - Testimonials
+ *     parameters:
+ *       - in: path
+ *         name: testimonialId
+ *         required: true
+ *         description: The ID of the testimonial to update.
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               feedback:
+ *                 type: string
+ *                 description: The updated feedback.
+ *                 example: "Amazing service!"
+ *     responses:
+ *       200:
+ *         description: Testimonial updated successfully.
+ *       400:
+ *         description: Feedback is required.
+ *       403:
+ *         description: Unauthorized access.
+ *       404:
+ *         description: Testimonial not found.
+ *       500:
+ *         description: Internal server error.
+ */
+const UpdateTestimonial = async (req, res) => {
+  try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ message: "Unauthorized: User ID is missing." });
+    }
+
+    const { testimonialId } = req.params;
+    const { feedback } = req.body;
+    const userId = req.user.id;
+
+    if (!feedback) {
+      return res.status(400).json({ message: "Feedback is required." });
+    }
+
+    const testimonial = await testimonials.findByPk(testimonialId);
+
+    if (!testimonial) {
+      return res.status(404).json({ message: "Testimonial not found." });
+    }
+
+    if (testimonial.userId !== userId) {
+      return res.status(403).json({ message: "Unauthorized: You can only update your own testimonial." });
+    }
+
+    testimonial.feedback = feedback;
+    await testimonial.save();
+
+    res.status(200).json({ message: "Testimonial updated successfully.", testimonial });
+
+  } catch (error) {
+    console.error("❌ Error updating testimonial:", error);
+    res.status(500).json({ message: "An error occurred while updating the testimonial.", error: error.message });
+  }
+};
+
+/**
+ * @swagger
+ * /user/testimonials/{testimonialId}:
+ *   delete:
+ *     summary: Delete a testimonial
+ *     description: Allows a user to delete their own testimonial.
+ *     tags:
+ *       - Testimonials
+ *     parameters:
+ *       - in: path
+ *         name: testimonialId
+ *         required: true
+ *         description: The ID of the testimonial to delete.
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Testimonial deleted successfully.
+ *       403:
+ *         description: Unauthorized access.
+ *       404:
+ *         description: Testimonial not found.
+ *       500:
+ *         description: Internal server error.
+ */
+const DeleteTestimonial = async (req, res) => {
+  try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ message: "Unauthorized: User ID is missing." });
+    }
+
+    const { testimonialId } = req.params;
+    const userId = req.user.id;
+
+    const testimonial = await testimonials.findByPk(testimonialId);
+
+    if (!testimonial) {
+      return res.status(404).json({ message: "Testimonial not found." });
+    }
+
+    if (testimonial.userId !== userId) {
+      return res.status(403).json({ message: "Unauthorized: You can only delete your own testimonial." });
+    }
+
+    await testimonial.destroy();
+
+    res.status(200).json({ message: "Testimonial deleted successfully." });
+
+  } catch (error) {
+    console.error("❌ Error deleting testimonial:", error);
+    res.status(500).json({ message: "An error occurred while deleting the testimonial.", error: error.message });
+  }
+};
 module.exports = {
   CreateTestimonial,
   GetAllTestimonials,
-  GetTestimonialsByService
+  GetTestimonialsByService,
+  UpdateTestimonial,
+  DeleteTestimonial
 };
