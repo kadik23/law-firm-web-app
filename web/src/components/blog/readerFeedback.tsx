@@ -12,7 +12,7 @@ import CommentModal from "../CommentModal";
 const ReaderFeedback = ({ blogId }: { blogId: string }) => {
     const { user: AuthUSER } = useAuth();
     const { showAlert } = useAlert();
-    const [showComments, setShowComments] = useState(false);
+    const [showCommentInput, setShowCommentInput] = useState(false);
     const [modelIsOpen, setModelIsOpen] = useState(false);
     const [allcomments, setAllComments] = useState<Comment[]>([]);
     const [commentReplies, setCommentReplies] = useState<Comment[]>([]);
@@ -34,39 +34,65 @@ const ReaderFeedback = ({ blogId }: { blogId: string }) => {
             name: AuthUSER?.name,
             surname: AuthUSER?.surname,
             blogId: parseInt(blogId),
-            body: newCommentBody, // Use the newCommentBody parameter
+            body: newCommentBody,
             likes: 0,
             isAReply: 0,
-            replies: 0,
+            replies: 0, // Initialize replies count to 0
             originalCommentId: null,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
         };
+
+        setShowCommentInput(false);
         setAllComments((prevComments) => [newComment, ...prevComments]);
     };
 
     const handleDeleteComment = (commentId: number) => {
-        const updatedComments = allcomments.filter((comment) => comment.id !== commentId);
-        setAllComments(updatedComments);
+        const deletedComment = allcomments.find((comment) => comment.id === commentId);
+        if (!deletedComment) return;
+    
+        // If the deleted comment is a reply, decrement the parent's replies count
+        if (deletedComment.originalCommentId) {
+            const updatedComments = allcomments.map((comment) => {
+                if (comment.id === deletedComment.originalCommentId) {
+                    return { ...comment, replies: comment.replies - 1 };
+                }
+                return comment;
+            });
+            setModelIsOpen(false);
+            setAllComments(updatedComments.filter((comment) => comment.id !== commentId));
+        } else {
+            // If it's a parent comment, just remove it
+            setAllComments(allcomments.filter((comment) => comment.id !== commentId));
+        }
     };
 
-    const handleLikeComment = (commentId: number) => {
+    const handleLikeComment = (commentId: number, isLike: boolean) => {
         if (!AuthUSER) {
             showAlert("warning", "Avertissement!", "Veuillez vous connecter pour liker un commentaire.");
             return;
-        } 
-        const updatedComments = allcomments.map((comment) => {
-            if (comment.id === commentId) {
-                return { ...comment, likes: comment.likes + 1 };
-            }
-            return comment;
-        });
-        setAllComments(updatedComments);
-    };
+        }
+        if(isLike){
+            const updatedComments = allcomments.map((comment) => {
+                if (comment.id === commentId) {
+                    return { ...comment, likes: comment.likes - 1 };
+                }
+                return comment;
+            });
+            setAllComments(updatedComments);
+        } else {
+            const updatedComments = allcomments.map((comment) => {
+                if (comment.id === commentId) {
+                    return { ...comment, likes: comment.likes + 1 };
+                }
+                return comment;
+            });
+            setAllComments(updatedComments);
+        };
+    }
 
     const handleReplyComment = (commentId: number, replyBody?: string) => {
         if (replyBody) {
-            console.log("ReaerFeedback component: ",replyBody);
             const newReply: Comment = {
                 id: allcomments.length + 1, // Ensure unique ID
                 userId: AuthUSER?.id,
@@ -76,21 +102,30 @@ const ReaderFeedback = ({ blogId }: { blogId: string }) => {
                 body: replyBody,
                 likes: 0,
                 isAReply: 1, // Mark as a reply
-                replies: 0, 
+                replies: 0, // Replies to replies are not supported in this example
                 originalCommentId: commentId, // Link to the parent comment
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
             };
-            
-            // add to the list of comments
-            setAllComments((prevComments) => [ ...prevComments, newReply]);
-            setCommentReplies(allcomments.filter((comment) => comment.originalCommentId === commentId));
+    
+            // Update the parent comment's replies count
+            const updatedComments = allcomments.map((comment) => {
+                if (comment.id === commentId) {
+                    return { ...comment, replies: comment.replies + 1 };
+                }
+                return comment;
+            });
+    
+            // Add the new reply to the comments list
+            setAllComments([...updatedComments, newReply]);
         } else {
             // Show replies in the modal
             setCommentReplies(allcomments.filter((comment) => comment.originalCommentId === commentId));
             setModelIsOpen(true);
         }
     };
+    
+    
 
     const handleEditComment = (commentId: number, newBody: string) => {
         const updatedComments = allcomments.map((comment) => {
@@ -106,60 +141,60 @@ const ReaderFeedback = ({ blogId }: { blogId: string }) => {
         <div className="py-4 mb-8">
             <div className="w-full flex items-center justify-between py-4">
                 <div className="font-bold text-3xl md:text-4xl text-center text-primary">
-                    Avis des lecteurs de ce blog (255)
+                    Avis des lecteurs de ce blog ({allcomments.length})
                 </div>
                 <button
                     className="text-primary border-[1px] border-black font-semibold px-4 py-2 rounded-md flex items-center gap-1"
-                    onClick={() => setShowComments((prev) => !prev)}
+                    onClick={() => setShowCommentInput((prev) => !prev)}
                 >
                     <Icon icon="mdi:comment" width={20} className="text-secondary outline-black" />
                     <span>Commenter</span>
                 </button>
             </div>
-            {showComments && (
-                <div>
-                    {AuthUSER ? (
-                         <CommentInput onSubmit={handleAddComment} onClose={() => setShowComments(false)} />
-                    ) : (
-                        <h1 className="text-center font-semibold text-zinc-400 my-6 text-lg">
-                            Vous devez vous connecter pour commenter ce blog.
-                        </h1>
-                    )}
-                    {allcomments
-                    .slice(0, 3)
-                    .map((comment) => (
-                        <CommentComponent
-                            key={comment.id}
-                            comment={comment}
-                            onDelete={handleDeleteComment}
-                            onEdit={handleEditComment}
-                            onLike={handleLikeComment}
-                            onReply={handleReplyComment}
-                        />
-                    ))}
-                    {/* Voir plus */}
-                    <div className="flex items-center gap-2 text-sm text-white justify-center rounded-md
-                    bg-primary py-2 hover:bg-scondary cursor-pointer">
-                        Voir plus
-                    </div>
-                    {modelIsOpen && (
-                        <CommentModal isOpen={modelIsOpen} onClose={() => setModelIsOpen(false)} isNotStepOne={true}>
-                            {commentReplies.map((reply) => (
-                                <div className="mt-6">
-                                    <CommentComponent
-                                        key={reply.id}
-                                        comment={reply}
-                                        onDelete={handleDeleteComment}
-                                        onEdit={handleEditComment}
-                                        onLike={handleLikeComment}
-                                        onReply={handleReplyComment}
-                                    />
-                                </div>
-                            ))}
-                        </CommentModal>
-                    )}
-                </div>
+            {AuthUSER ? (
+                showCommentInput && (
+                    <CommentInput onSubmit={handleAddComment} onClose={() => setShowCommentInput(false)} />
+                )
+            ) : (
+                <h1 className="text-center font-semibold text-zinc-400 my-6 text-lg">
+                    Vous devez vous connecter pour commenter ce blog.
+                </h1>
             )}
+            <div>
+                {allcomments
+                .slice(0, 3)
+                .map((comment) => (
+                    <CommentComponent
+                        key={comment.id}
+                        comment={comment}
+                        onDelete={handleDeleteComment}
+                        onEdit={handleEditComment}
+                        onLike={handleLikeComment}
+                        onReply={handleReplyComment}
+                    />
+                ))}
+                {/* Voir plus */}
+                <div className="flex items-center gap-2 text-sm text-white justify-center rounded-md
+                bg-primary py-2 hover:bg-scondary cursor-pointer">
+                    Voir plus
+                </div>
+                {modelIsOpen && (
+                    <CommentModal isOpen={modelIsOpen} onClose={() => setModelIsOpen(false)} isNotStepOne={true}>
+                        {commentReplies.map((reply) => (
+                            <div className="mt-6" key={reply.id}>
+                                <CommentComponent
+                                    comment={reply}
+                                    onDelete={handleDeleteComment}
+                                    onEdit={handleEditComment}
+                                    onLike={handleLikeComment}
+                                    onReply={handleReplyComment}
+                                />
+                            </div>
+                        ))}
+                    </CommentModal>
+                )}
+            </div>
+            
             
         </div>
     );

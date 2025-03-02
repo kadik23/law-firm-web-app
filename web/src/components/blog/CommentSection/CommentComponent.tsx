@@ -12,13 +12,14 @@ interface CommentComponentProps {
     comment: Comment;
     onDelete: (commentId: number) => void;
     onEdit: (commentId: number, newBody: string) => void;
-    onLike: (commentId: number) => void;
+    onLike: (commentId: number, isLike: boolean) => void;
     onReply: (commentId: number, replyBody?: string) => void;
 }
 
 const CommentComponent = ({ comment, onDelete, onEdit, onLike, onReply }: CommentComponentProps) => {
     const { user: AuthUSER } = useAuth();
     const [isEditing, setIsEditing] = useState(false);
+    const [isLike, setIsLike] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const {showAlert} = useAlert();
     const [showEmojis, setShowEmojis] = useState(false);
@@ -51,8 +52,18 @@ const CommentComponent = ({ comment, onDelete, onEdit, onLike, onReply }: Commen
         setNewBody((prev) => prev + emoji);
     };
 
+    const handleLikeComment = (commentId: number) => {
+        if (!AuthUSER) {
+            showAlert("warning", "Avertissement!", "Veuillez vous connecter pour liker un commentaire.");
+            return;
+        }
+        
+        onLike(commentId, isLike);
+        setIsLike(!isLike);
+    }
+
     return (
-        <div className={`text-white px-4 pt-4 pb-6 mb-4 ${comment.userId === AuthUSER?.id ? "bg-[#385F7A]" : "bg-primary"}`}>
+        <div className={`text-white px-4 py-6 mb-4 ${comment.userId === AuthUSER?.id ? "bg-[#385F7A]" : "bg-primary"}`}>
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-1">
                     <button className="bg-secondary w-7 h-7 rounded-full p-2 text-sm btn 
@@ -64,7 +75,7 @@ const CommentComponent = ({ comment, onDelete, onEdit, onLike, onReply }: Commen
                     </span>
                 </div>
                 {AuthUSER?.id === comment.userId && (
-                    <div className="hidden md:flex gap-2 items-center mr-4">
+                    <div className="hidden md:flex gap-2 items-center mr-4 md:mr-0">
                         <button className="px-3 py-1 border rounded-md border-white text-sm flex 
                         items-center gap-1 bg-[rgba(217,217,217,0.26)] hover:bg-secondary" 
                         onClick={() => onDelete(comment.id)}>
@@ -121,8 +132,10 @@ const CommentComponent = ({ comment, onDelete, onEdit, onLike, onReply }: Commen
                     <span className="mr-6">
                         {getRelativeTime(comment.createdAt)}
                     </span>
-                    <button onClick={() => onLike(comment.id)} className="flex items-center gap-1 group">
-                        <Icon className="group-hover:bg-scondary" icon="mdi:thumb-up" width={25} />
+                    <button onClick={() => handleLikeComment(comment.id)} className="flex items-center gap-1 group">
+                        <Icon 
+                        className={`group-hover:bg-scondary ${isLike ? (AuthUSER?.id === comment.userId ? "text-primary": "text-secondary") : "text-white" }`} 
+                        icon="mdi:thumb-up" width={25} />
                         <span>{comment.likes}</span>
                     </button>
                 </div>
