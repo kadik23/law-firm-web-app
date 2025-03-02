@@ -3,14 +3,21 @@ module.exports = (sequelize, DataTypes) => {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
+      autoIncrement: true,
+
     },
     service_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    user_id: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     status: {
       type: DataTypes.ENUM('Accepted', 'Pending', 'Refused'),
       allowNull: false,
+      defaultValue: "Pending",
     },
     file_name: {
       type: DataTypes.STRING,
