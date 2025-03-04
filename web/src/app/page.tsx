@@ -10,8 +10,8 @@ const ContactUs = dynamic(() => import("@/components/landing_page/ContactUs"), {
 export default function Home() {
   const directions = [
     { text: "Résoudre mon probèlme", link: "/trouver_ma_solution" },
-    { text: "Enrichir ma culture juridique", link: "/" },
-    { text: "Je veux être informé sur n'importe quelle question", link: "/" },
+    { text: "Enrichir ma culture juridique", link: "/blog" },
+    { text: "Je veux être informé sur n'importe quelle question", link: "/#contact" },
   ];
   return (
     <div className="min-h-screen mt-8">
