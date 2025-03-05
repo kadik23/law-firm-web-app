@@ -5,6 +5,7 @@ const ServiceFilesUploaded = db.service_files_uploaded;
 const User = db.users;
 const path = require('path');
 const fs = require('fs');
+const multer = require('multer');
 
 console.log("RequestService:", RequestService);
 
@@ -216,7 +217,6 @@ const assignClient = async (req, res) => {
       status: status || 'Pending',
       is_paid: typeof is_paid !== 'undefined' ? is_paid : false,
     });
-
     return res.status(201).json(newRequest);
   } catch (error) {
     console.error('Error assigning client to service:', error);
@@ -226,7 +226,7 @@ const assignClient = async (req, res) => {
 
 /**
  * @swagger
- * /user/service-files/{serviceId}:
+ * /user/service-files/{request_service_id}:
  *   delete:
  *     summary: Delete service files uploaded by the current user
  *     description: Deletes all files associated with the specified service ID that were uploaded by the currently authenticated user.
@@ -263,22 +263,22 @@ const assignClient = async (req, res) => {
 
 const deleteServiceFiles = async (req, res) => {
   try {
-    const { serviceId } = req.params;
+    const { request_service_id } = req.params;
     const userId = req.user.id;
 
-    if (!serviceId) {
+    if (!request_service_id) {
       return res.status(400).json({ error: 'Service ID is required' });
     }
 
     const deletedCount = await ServiceFilesUploaded.destroy({ 
-      where: { service_id: serviceId, user_id:userId } 
+      where: { request_service_id } 
     });
 
     if (deletedCount === 0) {
       return res.status(404).json({ message: 'No files found for the specified service ID uploaded by the current user' });
     }
 
-    return res.status(200).json({ message: `Deleted ${deletedCount} files for service ID ${serviceId} uploaded by user ${userId}.` });
+    return res.status(200).json({ message: `Deleted ${deletedCount} files for service ID ${request_service_id} uploaded by user ${userId}.` });
   } catch (error) {
     console.error('Error deleting service files:', error);
     return res.status(500).json({ error: 'Internal server error: ' + error.message });
@@ -286,7 +286,7 @@ const deleteServiceFiles = async (req, res) => {
 };
 /**
  * @swagger
- * /user/service-files/{serviceId}:
+ * /user/service-files/{request_service_id}:
  *   put:
  *     summary: Update a service file uploaded by the current user
  *     description: Updates a file for a specific service uploaded by the currently authenticated user.
@@ -342,9 +342,9 @@ const deleteServiceFiles = async (req, res) => {
 
    const updateServiceFile = async (req, res) => {
     try {
-        const { serviceId } = req.params;
+        const { request_service_id } = req.params;
 
-        if (!serviceId) {
+        if (!request_service_id) {
             return res.status(400).json({ error: "Service ID is required" });
         }
 
@@ -352,7 +352,7 @@ const deleteServiceFiles = async (req, res) => {
             return res.status(400).json({ error: "New file is required" });
         }
 
-        const fileRecord = await ServiceFilesUploaded.findByPk(serviceId);
+        const fileRecord = await ServiceFilesUploaded.findByPk(request_service_id);
         if (!fileRecord) {
             return res.status(404).json({ error: "File record not found" });
         }
@@ -400,7 +400,7 @@ const verifyAllFilesUploaded = async (requestServiceId) => {
 };
 /**
  * @swagger
- * /user/service-files/{serviceId}:
+ * /user/service-files/{request_service_id}:
  *   post:
  *     summary: Upload multiple files for a service request
  *     description: Uploads multiple files and stores their metadata in the database.
@@ -453,36 +453,94 @@ const verifyAllFilesUploaded = async (requestServiceId) => {
  *         description: Internal server error.
  */
 
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
 const uploadServiceFiles = async (req, res) => {
   try {
-    const { serviceId } = req.params;
-    const userId = req.user.id;
+    upload.array('files')(req, res, async (err) => {
+      if (err) {
+        return res.status(400).json({ error: 'Error uploading files: ' + err.message });
+      }
 
-    console.log("Service ID:", serviceId);
-    console.log("Uploaded Files:", req.files);
-
-    if (!serviceId) {
-      return res.status(400).json({ error: "Service ID is required" });
-    }
-
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ error: "At least one file is required" });
-    }
-
-    const uploadedFiles = await Promise.all(
-      req.files.map(async (file) => {
-        return await ServiceFilesUploaded.create({
-          service_id: serviceId,
-          user_id: userId,
-          file_name: file.filename,
-          status: "Pending",
+      const request_service_id = req.params.request_service_id;
+    
+      if (!request_service_id) {
+        return res.status(400).json({ 
+          error: "Request Service ID is required",
+          details: {
+            params: req.params,
+            body: req.body,
+            query: req.query
+          }
         });
-      })
-    );
+      }
 
-    return res.status(201).json({
-      message: "Files uploaded successfully.",
-      files: uploadedFiles,
+      if (!req.files || req.files.length === 0) {
+        return res.status(400).json({ error: "At least one file is required" });
+      }
+
+      const requestService = await RequestService.findByPk(request_service_id);
+      if (!requestService) {
+        return res.status(404).json({ error: "Request Service not found" });
+      }
+
+      const service = await Service.findOne({ where: { id: requestService.serviceId } });
+      if (!service) {
+        return res.status(404).json({ error: "Service not found" });
+      }
+
+      let requestedFilesArray;
+      try {
+        requestedFilesArray = JSON.parse(service.requestedFiles);
+      } catch (jsonError) {
+        if (typeof service.requestedFiles === 'string') {
+          requestedFilesArray = service.requestedFiles.split(',').map(file => file.trim());
+        } else {
+          requestedFilesArray = service.requestedFiles;
+        }
+      }
+      const requiredFilesCount = requestedFilesArray.length;
+
+      if (req.files.length !== requiredFilesCount) {
+        return res.status(400).json({
+          error: `You must upload exactly ${requiredFilesCount} files, but you uploaded ${req.files.length}.`,
+        });
+      }
+
+      const uploadedFiles = await Promise.all(
+        req.files.map(async (file, index) => {
+          const serviceFileUpload = await ServiceFilesUploaded.create({
+            request_service_id,
+            file_name: file.originalname,
+            status: "Pending",
+          });
+
+          const fileExt = path.extname(file.originalname);
+          
+          const newFileName = `requestService_${request_service_id}_file_${serviceFileUpload.id}${fileExt}`;
+          
+          const uploadDir = path.join(__dirname, '../../uploads');
+          if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+          }
+
+          const filePath = path.join(uploadDir, newFileName);
+
+          fs.writeFileSync(filePath, file.buffer);
+
+          await serviceFileUpload.update({
+            file_name: newFileName
+          });
+
+          return serviceFileUpload;
+        })
+      );
+
+      return res.status(201).json({
+        message: "Files uploaded successfully.",
+        files: uploadedFiles.map(file => file.toJSON()),
+      });
     });
   } catch (error) {
     console.error("Error uploading service files:", error);

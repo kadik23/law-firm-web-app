@@ -5,6 +5,14 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       primaryKey: true,
     },
+    clientId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    serviceId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     status: {
       type: DataTypes.ENUM('Completed', 'Pending', 'Canceled'),
       allowNull: false,
@@ -27,7 +35,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     RequestService.hasMany(models.service_files_uploaded, {
-      foreignKey: 'service_id',
+      foreignKey: 'request_service_id',
       as: 'filesUploaded'
     });
   };

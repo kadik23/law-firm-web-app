@@ -63,9 +63,9 @@ userRouter.delete('/favorites',authMiddleware(["client"]),favoritesController.De
 userRouter.get('/services',authMiddleware(["client","admin","attorney"]),servicesController.getAllServices);
 userRouter.get('/services/:id',authMiddleware(["client","admin","attorney"]),servicesSchema.getById,validationErrors,servicesController.getOneService);
 userRouter.post('/services/assign_client',authMiddleware(["client", "admin", "attorney"]),servicesSchema.assignClient,validationErrors,servicesController.assignClient);
-userRouter.delete('/service-files/:serviceId', authMiddleware(["client", "admin", "attorney"]), servicesController.deleteServiceFiles);
-userRouter.put('/service-files/:serviceId',authMiddleware(["client", "admin", "attorney"]),upload.single('file'),servicesController.updateServiceFile);
-userRouter.post('/service-files/:serviceId',authMiddleware(["client", "admin", "attorney"]),upload.array('files', 10),servicesController.uploadServiceFiles);
+userRouter.delete('/service-files/:request_service_id', authMiddleware(["client"]), servicesController.deleteServiceFiles);
+userRouter.put('/service-files/:request_service_id',authMiddleware(["client"]),upload.single('file'),servicesController.updateServiceFile);
+userRouter.post('/service-files/:request_service_id',authMiddleware(["client"]),servicesController.uploadServiceFiles);
 
 // Testimonials Routes
 userRouter.post('/testimonials', authMiddleware(["client"]),testimonialSchema.add,validationErrors, testimonialsController.CreateTestimonial);
