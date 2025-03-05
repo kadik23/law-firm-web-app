@@ -4,6 +4,11 @@ const getByID=[
         .isInt({ min: 0 }).withMessage('id must be a positive integer')
 ]
 
+const getByCategoryID=[
+    param('category_id')
+        .isInt({ min: 0 }).withMessage('category id must be a positive integer')
+]
+
 const add = [
     body("name")
         .notEmpty()
@@ -28,4 +33,4 @@ const remove=[
     param('id')
         .isInt({ min: 0 }).withMessage('id must be a positive integer')
 ]
-module.exports={getByID,add,remove}
+module.exports={getByID,add,remove,getByCategoryID}

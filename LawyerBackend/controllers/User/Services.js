@@ -1,7 +1,13 @@
 const db = require('../../models');
+const Service = db.services;
+const RequestService = db.request_service;
+const ServiceFilesUploaded = db.service_files_uploaded;
+const User = db.users;
 const path = require('path');
 const fs = require('fs');
+
 const Service = db.services;
+const Problem = db.problems;
 
 /**
  * @swagger
@@ -59,10 +65,30 @@ const getAllServices = async (req, res) => {
   try {
     let services = await Service.findAll({
       attributes: ['id', 'name', 'description', 'requestedFiles', 'coverImage', 'price', 'createdBy', 'createdAt', 'updatedAt'],
-      order: [['createdAt', 'DESC']], // Trier du plus récent au plus ancien
+      order: [['createdAt', 'DESC']],
     });
 
-    return res.status(200).json(services);
+    if (services) {
+      services = await Promise.all(services.map(async (service) => {
+        const filePath = path.resolve(__dirname, '..', '..', service.coverImage);
+
+        let base64Image = null;
+        if (fs.existsSync(filePath)) {
+          const fileData = fs.readFileSync(filePath);
+          base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
+        }
+
+        return {
+          ...service.toJSON(),
+          coverImage: base64Image
+        };
+      }));
+
+      return res.status(200).json(services);
+    }else {
+      return res.status(401).send('Error fetching services');
+    }
+
   } catch (error) {
     console.error('Error fetching services:', error);
     return res.status(500).json({ error: 'Server error: ' + error.message });
@@ -130,25 +156,142 @@ const getAllServices = async (req, res) => {
  *       500:
  *         description: Internal server error
  */
-
 const getOneService = async (req, res) => {
   try {
     const { id } = req.params;
+
 
     const service = await Service.findOne({
       where: { id },
     });
 
-    if (!service) {
-      return res.status(404).json({ error: 'Service not found' });
-    }
+    if (service) {
 
-    return res.status(200).json(service);
+        const filePath = path.resolve(__dirname, '..', '..', service.coverImage);
+
+        let base64Image = null;
+        if (fs.existsSync(filePath)) {
+          const fileData = fs.readFileSync(filePath);
+          base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
+        }
+
+      return res.status(200).json({
+        ...service.toJSON(),
+        coverImage: base64Image
+      });
+    }else {
+      return res.status(404).json({ error: 'Service not found' });    }
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
 };
+
+
+const getAllServicesByProblem = async (req, res) => {
+  try {
+    let services = await Service.findAll({
+      include: [
+        {
+          model: Problem,
+          as: 'problems', 
+          where: { id: req.params.problem_id },
+          attributes: [],
+        },
+      ],
+      attributes: ['id', 'name', 'description', 'requestedFiles', 'coverImage', 'price', 'createdBy', 'createdAt', 'updatedAt'],
+      order: [['createdAt', 'DESC']],
+    });
+    if (services) {
+      services = await Promise.all(services.map(async (service) => {
+        const filePath = path.resolve(__dirname, '..', '..', service.coverImage);
+
+        let base64Image = null;
+        if (fs.existsSync(filePath)) {
+          const fileData = fs.readFileSync(filePath);
+          base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
+        }
+
+        return {
+          ...service.toJSON(),
+          coverImage: base64Image
+        };
+      }));
+
+      return res.status(200).json(services);
+    }else {
+      return res.status(401).send('Error fetching services');
+    }
+
+  } catch (error) {
+    console.error('Error fetching services:', error);
+    return res.status(500).json({ error: 'Server error: ' + error.message });
+  }
+};
+
+/**
+ * @swagger
+ * /user/services/{problem_id}:
+ *   get:
+ *     summary: Get a service by problem id
+ *     description: Retrieve a specific service using problem id.
+ *     tags:
+ *       - Services
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The unique identifier of the service
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Service retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   format: uuid
+ *                   example: "123e4567-e89b-12d3-a456-426614174000"
+ *                 name:
+ *                   type: string
+ *                   example: "Premium Service"
+ *                 description:
+ *                   type: string
+ *                   example: "This is a detailed description of the service."
+ *                 requestedFiles:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["file1.png", "file2.pdf"]
+ *                 coverImage:
+ *                   type: string
+ *                   example: "https://example.com/image.jpg"
+ *                 price:
+ *                   type: string
+ *                   example: "199.99"
+ *                 createdBy:
+ *                   type: integer
+ *                   example: 1
+ *                 createdAt:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2025-01-01T12:00:00Z"
+ *                 updatedAt:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2025-01-01T12:00:00Z"
+ *       404:
+ *         description: Service not found
+ *       500:
+ *         description: Internal server error
+ */
+
 module.exports = {
   getAllServices,
-  getOneService
+  getOneService,
+  getAllServicesByProblem
 };

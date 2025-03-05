@@ -19,6 +19,7 @@ const validationErrors=require("../errorHandler/validationErrors")
 const testimonialsController = require("../controllers/User/Testimonials");
 const problemsController = require("../controllers/User/problems.js");
 const consultationController = require("../controllers/User/consultation.js");
+const {upload} = require("../middlewares/FilesMiddleware");
 
 const userRouter = require('express').Router();
 
@@ -35,8 +36,11 @@ userRouter.get('/categories/:name',categoriesSchema.getByName,validationErrors,c
 //Blogs Routes
 userRouter.get('/blogs/all',blogsController.getAllBlogs);
 userRouter.post('/blogs/likeblog',authMiddleware(["client","admin","attorney"]),blogsSchema.like,validationErrors,blogsController.likeBlog);
+userRouter.post('/blogs/dislikeblog',authMiddleware(["client","admin","attorney"]),blogsSchema.like,validationErrors,blogsController.dislikeBlog);
+userRouter.get('/blogs/IsBlogLiked/:blogId',authMiddleware(["client","admin","attorney"]),blogsSchema.isLike,validationErrors,blogsController.IsBlogLiked);
 userRouter.get('/blogs/sort',blogsSchema.sort,validationErrors,blogsController.sortBlogs);
 userRouter.get('/blogs/:id',blogsSchema.getById,validationErrors,blogsController.getBlogById);
+userRouter.get('/blogs/like/count/:id',blogsController.GetLikesCount);
 
 // Attorneys Routes
 userRouter.get('/attorneys', attorneysController.getAllAttorneys);
@@ -59,19 +63,25 @@ userRouter.get('/favorites/IsBlogFavorited/:blogId',authMiddleware(["client","ad
 userRouter.delete('/favorites',authMiddleware(["client"]),favoritesController.DeleteAllFavorites);
 
 //Services Routes
-userRouter.get('/services',authMiddleware(["client","admin","attorney"]),servicesController.getAllServices);
-userRouter.get('/services/:id',authMiddleware(["client","admin","attorney"]),servicesSchema.getById,validationErrors,servicesController.getOneService);
+userRouter.get('/services',servicesController.getAllServices);
+userRouter.get('/services/:id',servicesSchema.getById,validationErrors,servicesController.getOneService);
+userRouter.get('/services/problem/:problem_id',servicesSchema.getByProblemId,validationErrors,servicesController.getAllServicesByProblem);
 
 // Testimonials Routes
 userRouter.post('/testimonials', authMiddleware(["client"]),testimonialSchema.add,validationErrors, testimonialsController.CreateTestimonial);
 userRouter.get('/testimonials', testimonialsController.GetAllTestimonials);
 userRouter.get('/testimonials/service/:serviceId',testimonialSchema.getByService,validationErrors, testimonialsController.GetTestimonialsByService);
-
+userRouter.put('/testimonials/:testimonialId', authMiddleware(["client"]), testimonialSchema.update, validationErrors, testimonialsController.UpdateTestimonial);
+userRouter.delete('/testimonials/:testimonialId', authMiddleware(["client"]), testimonialSchema.remove, validationErrors, testimonialsController.DeleteTestimonial);
 // Problems Routes
-userRouter.get('/problems', authMiddleware(["client", "admin", "attorney"]), problemsController.getAllProblems);
-userRouter.get('/problems/:id', authMiddleware(["client", "admin", "attorney"]),problemsSchema.getByID,validationErrors, problemsController.getProblemById);
+userRouter.get('/problems', problemsController.getAllProblems);
+userRouter.get('/problems/:id',problemsSchema.getByID,validationErrors, problemsController.getProblemById);
+userRouter.get('/problems/category/:category_id',problemsSchema.getByCategoryID,validationErrors, problemsController.getAllProblemsByCategory);
 
 // Consultation Routes
 userRouter.post('/consultations', authMiddleware(["client"]),consultationSchema.add,validationErrors, consultationController.createConsultation);
+
+// Consultation Routes
+userRouter.post('/consultations', authMiddleware(["client"]), consultationController.createConsultation);
 
 module.exports = userRouter;

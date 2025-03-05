@@ -1,7 +1,7 @@
 require("dotenv").config();
 const db = require("../../models");
 const Problem = db.problems;
-
+const Category =db.categories
 
 
 /**
@@ -73,8 +73,27 @@ const getAllProblems = async (req, res) => {
   }
 };
 
+const getAllProblemsByCategory = async (req, res) => {
+  try {
+    const problems = await Problem.findAll({
+      include: [
+        {
+          model: Category,
+          as: 'category', 
+          where: { id: req.params.category_id },
+          attributes: [],
+        },
+      ],
+    });
+    return res.status(200).json(problems);
+  } catch (error) {
+    console.error("Error fetching problems:", error);
+    res.status(500).send("Internal Server Error");
+  }
+};
 
 module.exports = {
   getProblemById,
   getAllProblems,
+  getAllProblemsByCategory
 };

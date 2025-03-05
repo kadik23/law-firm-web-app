@@ -52,6 +52,7 @@ module.exports = (sequelize, DataTypes) => {
       onUpdate: 'CASCADE',
     });
     Service.hasMany(models.testimonials, { foreignKey: "serviceId", as: "testimonials" });
+    Service.hasMany(models.problems, { foreignKey: "service_id", as: "problems" });
   };
 
   return Service;

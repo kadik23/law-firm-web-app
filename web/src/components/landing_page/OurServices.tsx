@@ -5,11 +5,9 @@ import ServiceCard from "../ServiceCard";
 import { motion } from "framer-motion";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import { useServices } from "@/hooks/useServices";
-import Link from "next/link";
 
 function OurServices() {
   const { services, loading, error } = useServices();
-  const serviceItems = Array(6).fill(null);
 
   const {
     currentIndex: currentServiceIndex,
@@ -18,7 +16,7 @@ function OurServices() {
     handleIndicatorClick: handleServiceIndicatorClick,
     offset: serviceOffset,
     visibleItems: serviceVisibleItems,
-  } = useCarousel(serviceItems.length, 3.5);
+  } = useCarousel(services.length, 3.5);
 
   const ServicesLoadingChecker = () => {
     if (loading)
@@ -81,7 +79,7 @@ function OurServices() {
         >
           <Icon icon="ep:arrow-left" width="24" height="24" className="btn" />
         </button>
-        {serviceItems.map((_, index) => (
+        {services.map((_, index) => (
           <div
             key={index}
             onClick={() => handleServiceIndicatorClick(index)}
@@ -93,7 +91,7 @@ function OurServices() {
         <button
           onClick={handleNextService}
           className="flex items-center"
-          disabled={currentServiceIndex >= serviceItems.length - 4}
+          disabled={currentServiceIndex >= services.length - 4}
         >
           <Icon icon="ep:arrow-right" width="24" height="24" className="btn" />
         </button>
