@@ -63,7 +63,7 @@ const CommentComponent = ({ comment, onDelete, onEdit, onLike, onReply }: Commen
     }
 
     return (
-        <div className={`text-white px-4 py-6 mb-4 ${comment.userId === AuthUSER?.id ? "bg-[#385F7A]" : "bg-primary"}`}>
+        <div className={`text-white p-4 rounded-md mb-4 ${comment.userId === AuthUSER?.id ? "bg-[#385F7A]" : "bg-primary"}`}>
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-1">
                     <button className="bg-secondary w-7 h-7 rounded-full p-2 text-sm btn 
@@ -76,16 +76,16 @@ const CommentComponent = ({ comment, onDelete, onEdit, onLike, onReply }: Commen
                 </div>
                 {AuthUSER?.id === comment.userId && (
                     <div className="hidden md:flex gap-2 items-center mr-4 md:mr-0">
-                        <button className="px-3 py-1 border rounded-md border-white text-sm flex 
-                        items-center gap-1 bg-[rgba(217,217,217,0.26)] hover:bg-secondary" 
+                        <button className="px-3 py-1 hover:border rounded-md hover:border-white text-sm flex 
+                        items-center gap-1 hover:bg-secondary" 
                         onClick={() => onDelete(comment.id)}>
-                            <Icon icon="mdi:trash-can" width={25} />
+                            <Icon icon="mdi:trash-can" width={16} />
                             Supprimer
                         </button>
-                        <button className="px-3 py-1 border rounded-md border-white text-sm flex 
-                        items-center gap-1 bg-[rgba(217,217,217,0.26)] hover:bg-secondary" 
+                        <button className="px-3 py-1 hover:border rounded-md hover:border-white text-sm flex 
+                        items-center gap-1 hover:bg-secondary" 
                         onClick={() => setIsEditing(!isEditing)}>
-                            <Icon icon="mdi:pencil" width={25} />
+                            <Icon icon="mdi:pencil" width={16} />
                             Modify
                         </button>
                     </div>
@@ -125,9 +125,9 @@ const CommentComponent = ({ comment, onDelete, onEdit, onLike, onReply }: Commen
                     </div>
                 </div>
             ) : (
-                <div>{comment.body}</div>
+                <div className="text-sm">{comment.body}</div>
             )}
-            <div className="flex flex-col md:flex-row items-center justify-between my-4">
+            <div className="flex flex-col md:flex-row items-center justify-between my-4 text-xs">
                 <div className="self-start my-3 md:my-0 flex items-center gap-3">
                     <span className="mr-6">
                         {getRelativeTime(comment.createdAt)}
@@ -150,8 +150,8 @@ const CommentComponent = ({ comment, onDelete, onEdit, onLike, onReply }: Commen
                             gap-3 text-sm"
                             onClick={() => setShowReplyInput((prev) => !prev)}
                         >
-                            <Icon icon="lucide:message-circle" width={15} />
                             Répondre
+                            <Icon icon="lucide:message-circle" width={15} />
                         </button>
                     )}
                 </div>
