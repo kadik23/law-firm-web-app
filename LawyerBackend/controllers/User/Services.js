@@ -1,12 +1,8 @@
 const db = require('../../models');
 const Service = db.services;
-const RequestService = db.request_service;
-const ServiceFilesUploaded = db.service_files_uploaded;
-const User = db.users;
 const path = require('path');
 const fs = require('fs');
 
-const Service = db.services;
 const Problem = db.problems;
 
 /**
