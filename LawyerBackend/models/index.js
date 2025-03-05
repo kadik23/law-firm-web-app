@@ -39,6 +39,7 @@ db.attorneys = require('./Attorneys.js')(sequelize, DataTypes);
 db.files = require('./Files.js')(sequelize, DataTypes);
 db.categories = require('./Categories.js')(sequelize, DataTypes);
 db.blogs = require('./Blogs.js')(sequelize, DataTypes);
+db.like = require('./Like.js')(sequelize, DataTypes);
 db.favorites = require('./Favorites.js')(sequelize, DataTypes);
 db.blogcomments = require('./BlogComments.js')(sequelize, DataTypes);
 db.services = require('./Services.js')(sequelize, DataTypes);
@@ -83,6 +84,20 @@ db.blogs.belongsToMany(db.users, {
 db.users.belongsToMany(db.blogs, {
   through: db.favorites,
   as: 'FavoriteBlogs',
+  foreignKey: 'userId',
+  otherKey: 'blogId',
+});
+
+db.blogs.belongsToMany(db.users, {
+  through: db.like,
+  as: 'LikedBy',
+  foreignKey: 'blogId',
+  otherKey: 'userId',
+});
+
+db.users.belongsToMany(db.blogs, {
+  through: db.like,
+  as: 'LikeBlogs',
   foreignKey: 'userId',
   otherKey: 'blogId',
 });
@@ -152,6 +167,7 @@ console.log(db.services);  // Ensure it's not undefined
 console.log(db.blogs.associations);
 console.log(db.users.associations);
 console.log(db.favorites.associations);
+console.log(db.like.associations);
 console.log("Loaded Models:", Object.keys(db));
 console.log("Testimonial Associations:", db.testimonials?.associations);
 

@@ -11,6 +11,9 @@ const Blogs = () => {
     getFilteredBlogs,
     selectedCategory,
     setSelectedCategory,
+    currentPage,
+    totalPages,
+    setCurrentPage
   } = useBlogs();
   const { categories } = useCategories();
 
@@ -26,6 +29,9 @@ const Blogs = () => {
           blogs={blogs}
           selectedCategory={selectedCategory}
           getFilteredBlogs={getFilteredBlogs}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          setCurrentPage={setCurrentPage}
         />
       ) : (
         <>
@@ -33,10 +39,13 @@ const Blogs = () => {
             blogs={[]}
             selectedCategory={selectedCategory}
             getFilteredBlogs={getFilteredBlogs}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            setCurrentPage={setCurrentPage}
           />
           <p>
             {blogsLoading
-              ? "Loading..."
+              ? "Chargement..."
               : "Aucun blog disponible pour le moment."}
           </p>
         </>

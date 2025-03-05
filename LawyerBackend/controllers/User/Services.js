@@ -6,7 +6,8 @@ const User = db.users;
 const path = require('path');
 const fs = require('fs');
 
-console.log("RequestService:", RequestService);
+const Service = db.services;
+const Problem = db.problems;
 
 /**
  * @swagger
@@ -66,7 +67,28 @@ const getAllServices = async (req, res) => {
       attributes: ['id', 'name', 'description', 'requestedFiles', 'coverImage', 'price', 'createdBy', 'createdAt', 'updatedAt'],
       order: [['createdAt', 'DESC']],
     });
-    return res.status(200).json(services);
+
+    if (services) {
+      services = await Promise.all(services.map(async (service) => {
+        const filePath = path.resolve(__dirname, '..', '..', service.coverImage);
+
+        let base64Image = null;
+        if (fs.existsSync(filePath)) {
+          const fileData = fs.readFileSync(filePath);
+          base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
+        }
+
+        return {
+          ...service.toJSON(),
+          coverImage: base64Image
+        };
+      }));
+
+      return res.status(200).json(services);
+    }else {
+      return res.status(401).send('Error fetching services');
+    }
+
   } catch (error) {
     console.error('Error fetching services:', error);
     return res.status(500).json({ error: 'Server error: ' + error.message });
@@ -137,364 +159,139 @@ const getAllServices = async (req, res) => {
 const getOneService = async (req, res) => {
   try {
     const { id } = req.params;
-    const service = await Service.findOne({ where: { id } });
-    if (!service) {
-      return res.status(404).json({ error: 'Service not found' });
-    }
-    return res.status(200).json(service);
+
+
+    const service = await Service.findOne({
+      where: { id },
+    });
+
+    if (service) {
+
+        const filePath = path.resolve(__dirname, '..', '..', service.coverImage);
+
+        let base64Image = null;
+        if (fs.existsSync(filePath)) {
+          const fileData = fs.readFileSync(filePath);
+          base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
+        }
+
+      return res.status(200).json({
+        ...service.toJSON(),
+        coverImage: base64Image
+      });
+    }else {
+      return res.status(404).json({ error: 'Service not found' });    }
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
 };
 
+
+const getAllServicesByProblem = async (req, res) => {
+  try {
+    let services = await Service.findAll({
+      include: [
+        {
+          model: Problem,
+          as: 'problems', 
+          where: { id: req.params.problem_id },
+          attributes: [],
+        },
+      ],
+      attributes: ['id', 'name', 'description', 'requestedFiles', 'coverImage', 'price', 'createdBy', 'createdAt', 'updatedAt'],
+      order: [['createdAt', 'DESC']],
+    });
+    if (services) {
+      services = await Promise.all(services.map(async (service) => {
+        const filePath = path.resolve(__dirname, '..', '..', service.coverImage);
+
+        let base64Image = null;
+        if (fs.existsSync(filePath)) {
+          const fileData = fs.readFileSync(filePath);
+          base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
+        }
+
+        return {
+          ...service.toJSON(),
+          coverImage: base64Image
+        };
+      }));
+
+      return res.status(200).json(services);
+    }else {
+      return res.status(401).send('Error fetching services');
+    }
+
+  } catch (error) {
+    console.error('Error fetching services:', error);
+    return res.status(500).json({ error: 'Server error: ' + error.message });
+  }
+};
+
 /**
  * @swagger
- * /user/services/assign_client:
- *   post:
- *     summary: Assign a client to a service
- *     description: Creates a new service request by assigning a client to a service.
+ * /user/services/{problem_id}:
+ *   get:
+ *     summary: Get a service by problem id
+ *     description: Retrieve a specific service using problem id.
  *     tags:
  *       - Services
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - clientId
- *               - serviceId
- *             properties:
- *               clientId:
- *                 type: number
- *                 example: 1
- *               serviceId:
- *                 type: number
- *                 example: 2
- *               status:
- *                 type: string
- *                 enum: [Completed, Pending, Canceled]
- *                 example: Pending
- *               is_paid:
- *                 type: boolean
- *                 example: false
- *     responses:
- *       201:
- *         description: Client successfully assigned to service.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *       400:
- *         description: Bad request - missing or invalid data.
- *       404:
- *         description: Client or Service not found.
- *       500:
- *         description: Internal server error.
- */
-const assignClient = async (req, res) => {
-  try {
-    const { clientId, serviceId, status, is_paid } = req.body;
-
-    if (!clientId || !serviceId) {
-      return res.status(400).json({ error: 'clientId and serviceId are required.' });
-    }
-
-    const client = await User.findByPk(clientId);
-    if (!client) {
-      return res.status(404).json({ error: 'Client not found.' });
-    }
-
-    const service = await Service.findByPk(serviceId);
-    if (!service) {
-      return res.status(404).json({ error: 'Service not found.' });
-    }
-
-    const newRequest = await RequestService.create({
-      clientId,
-      serviceId,
-      status: status || 'Pending',
-      is_paid: typeof is_paid !== 'undefined' ? is_paid : false,
-    });
-
-    return res.status(201).json(newRequest);
-  } catch (error) {
-    console.error('Error assigning client to service:', error);
-    return res.status(500).json({ error: 'Internal server error: ' + error.message });
-  }
-};
-
-/**
- * @swagger
- * /user/service-files/{serviceId}:
- *   delete:
- *     summary: Delete service files uploaded by the current user
- *     description: Deletes all files associated with the specified service ID that were uploaded by the currently authenticated user.
- *     tags:
- *       - Service Files
  *     parameters:
  *       - in: path
- *         name: serviceId
+ *         name: id
  *         required: true
- *         description: The ID of the service whose files should be deleted.
+ *         description: The unique identifier of the service
  *         schema:
  *           type: string
- *     security:
- *       - bearerAuth: []
+ *           format: uuid
  *     responses:
  *       200:
- *         description: Service files deleted successfully.
+ *         description: Service retrieved successfully
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 message:
+ *                 id:
  *                   type: string
- *                   example: "Deleted X files for service ID {serviceId} uploaded by user {userId}."
- *       400:
- *         description: Service ID is required.
- *       404:
- *         description: No files found for the specified service ID uploaded by the current user.
- *       500:
- *         description: Internal server error.
- */
-
-
-const deleteServiceFiles = async (req, res) => {
-  try {
-    const { serviceId } = req.params;
-    const userId = req.user.id;
-
-    if (!serviceId) {
-      return res.status(400).json({ error: 'Service ID is required' });
-    }
-
-    const deletedCount = await ServiceFilesUploaded.destroy({ 
-      where: { service_id: serviceId, user_id:userId } 
-    });
-
-    if (deletedCount === 0) {
-      return res.status(404).json({ message: 'No files found for the specified service ID uploaded by the current user' });
-    }
-
-    return res.status(200).json({ message: `Deleted ${deletedCount} files for service ID ${serviceId} uploaded by user ${userId}.` });
-  } catch (error) {
-    console.error('Error deleting service files:', error);
-    return res.status(500).json({ error: 'Internal server error: ' + error.message });
-  }
-};
-/**
- * @swagger
- * /user/service-files/{serviceId}:
- *   put:
- *     summary: Update a service file uploaded by the current user
- *     description: Updates a file for a specific service uploaded by the currently authenticated user.
- *     tags:
- *       - Service Files
- *     parameters:
- *       - in: path
- *         name: serviceId
- *         required: true
- *         description: The ID of the service whose file should be updated.
- *         schema:
- *           type: string
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             properties:
- *               file:   # ✅ Ensure this matches your Multer middleware
- *                 type: string
- *                 format: binary
- *     responses:
- *       200:
- *         description: File updated successfully.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
+ *                   format: uuid
+ *                   example: "123e4567-e89b-12d3-a456-426614174000"
+ *                 name:
  *                   type: string
- *                   example: "File updated successfully"
- *                 file:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: string
- *                     service_id:
- *                       type: string
- *                     file_name:
- *                       type: string
- *       400:
- *         description: Service ID or new file is missing.
- *       404:
- *         description: No file found for the specified service ID uploaded by the current user.
- *       500:
- *         description: Internal server error.
- */
-
-
-   const updateServiceFile = async (req, res) => {
-    try {
-        const { serviceId } = req.params;
-
-        if (!serviceId) {
-            return res.status(400).json({ error: "Service ID is required" });
-        }
-
-        if (!req.file) {
-            return res.status(400).json({ error: "New file is required" });
-        }
-
-        const fileRecord = await ServiceFilesUploaded.findByPk(serviceId);
-        if (!fileRecord) {
-            return res.status(404).json({ error: "File record not found" });
-        }
-        const oldFilePath = path.join(__dirname, "../../uploads", fileRecord.file_name);
-        if (fs.existsSync(oldFilePath)) {
-            fs.unlinkSync(oldFilePath);
-        }
-
-        fileRecord.file_name = req.file.filename;
-        await fileRecord.save();
-
-        const allFilesUploaded = await verifyAllFilesUploaded(fileRecord.service_id);
-
-        return res.status(200).json({
-            message: "File updated successfully",
-            file: fileRecord,
-            allFilesUploaded
-        });
-
-    } catch (error) {
-        console.error("Error updating service file:", error);
-        return res.status(500).json({ error: "Internal server error: " + error.message });
-    }
-};
-
-/**
- * Helper function to verify if all expected files for a service request have been uploaded.
- */
-const verifyAllFilesUploaded = async (requestServiceId) => {
-    const requestService = await RequestService.findByPk(requestServiceId);
-    if (!requestService || !requestService.requestedFiles) return false;
-
-    let expectedFiles;
-    try {
-        expectedFiles = JSON.parse(requestService.requestedFiles);
-    } catch (err) {
-        return false;
-    }
-
-    const uploadedFiles = await ServiceFilesUploaded.findAll({
-        where: { service_id: requestServiceId }
-    });
-
-    return uploadedFiles.length === expectedFiles.length;
-};
-/**
- * @swagger
- * /user/service-files/{serviceId}:
- *   post:
- *     summary: Upload multiple files for a service request
- *     description: Uploads multiple files and stores their metadata in the database.
- *     tags:
- *       - Service Files
- *     parameters:
- *       - in: path
- *         name: serviceId
- *         required: true
- *         description: The ID of the service to which files are uploaded.
- *         schema:
- *           type: string
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             properties:
- *               files:
- *                 type: array
- *                 items:
+ *                   example: "Premium Service"
+ *                 description:
  *                   type: string
- *                   format: binary
- *     responses:
- *       201:
- *         description: Files uploaded successfully.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Files uploaded successfully."
- *                 files:
+ *                   example: "This is a detailed description of the service."
+ *                 requestedFiles:
  *                   type: array
  *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: string
- *                       file_name:
- *                         type: string
- *                       service_id:
- *                         type: string
- *       400:
- *         description: Service ID or files missing.
+ *                     type: string
+ *                   example: ["file1.png", "file2.pdf"]
+ *                 coverImage:
+ *                   type: string
+ *                   example: "https://example.com/image.jpg"
+ *                 price:
+ *                   type: string
+ *                   example: "199.99"
+ *                 createdBy:
+ *                   type: integer
+ *                   example: 1
+ *                 createdAt:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2025-01-01T12:00:00Z"
+ *                 updatedAt:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2025-01-01T12:00:00Z"
+ *       404:
+ *         description: Service not found
  *       500:
- *         description: Internal server error.
+ *         description: Internal server error
  */
-
-const uploadServiceFiles = async (req, res) => {
-  try {
-    const { serviceId } = req.params;
-    const userId = req.user.id;
-
-    console.log("Service ID:", serviceId);
-    console.log("Uploaded Files:", req.files);
-
-    if (!serviceId) {
-      return res.status(400).json({ error: "Service ID is required" });
-    }
-
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ error: "At least one file is required" });
-    }
-
-    const uploadedFiles = await Promise.all(
-      req.files.map(async (file) => {
-        return await ServiceFilesUploaded.create({
-          service_id: serviceId,
-          user_id: userId,
-          file_name: file.filename,
-          status: "Pending",
-        });
-      })
-    );
-
-    return res.status(201).json({
-      message: "Files uploaded successfully.",
-      files: uploadedFiles,
-    });
-  } catch (error) {
-    console.error("Error uploading service files:", error);
-    return res.status(500).json({ error: "Internal server error: " + error.message });
-  }
-};
 
 module.exports = {
   getAllServices,
   getOneService,
-  assignClient,
-  deleteServiceFiles,
-  updateServiceFile,
-  uploadServiceFiles
+  getAllServicesByProblem
 };

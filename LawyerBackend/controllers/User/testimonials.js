@@ -260,6 +260,32 @@ const DeleteTestimonial = async (req, res) => {
     res.status(500).json({ message: "An error occurred while deleting the testimonial.", error: error.message });
   }
 };
+/**
+ * @swagger
+ * /user/testimonials/{id}:
+ *   get:
+ *     summary: Retrieve all testimonials by service id
+ *     description: Fetch all testimonials with pagination by service id.
+ *     tags:
+ *       - Testimonials
+ *     parameters:
+ *       - name: limit
+ *         in: query
+ *         schema:
+ *           type: integer
+ *           example: 10
+ *       - name: offset
+ *         in: query
+ *         schema:
+ *           type: integer
+ *           example: 0
+ *     responses:
+ *       200:
+ *         description: List of testimonials of service
+ *       500:
+ *         description: Internal Server Error
+ */
+
 module.exports = {
   CreateTestimonial,
   GetAllTestimonials,

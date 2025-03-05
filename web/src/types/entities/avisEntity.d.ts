@@ -1,7 +1,10 @@
-interface avisEntity{
-    id?: string;
+interface avisEntity {
+feedback: string;
+createdAt: string;
+serviceId?: number;
+user: {
     name: string;
-    image: string;
-    avis: string;
-    creationDate?: Date;
+}
+userId: number;
+image?: string;
 }

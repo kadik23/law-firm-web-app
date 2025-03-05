@@ -69,7 +69,7 @@ function usePayments(paymentData: paimentEntity[]) {
 
     if (activeFilters.service && filterValues.service) {
       result = result.filter(
-        (paiment) => paiment.service.title === filterValues.service
+        (paiment) => paiment.service.name === filterValues.service
       );
     }
 
