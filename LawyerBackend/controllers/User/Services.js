@@ -1,6 +1,11 @@
 const db = require('../../models');
+const Service = db.services;
+const RequestService = db.request_service;
+const ServiceFilesUploaded = db.service_files_uploaded;
+const User = db.users;
 const path = require('path');
 const fs = require('fs');
+
 const Service = db.services;
 const Problem = db.problems;
 
@@ -60,8 +65,9 @@ const getAllServices = async (req, res) => {
   try {
     let services = await Service.findAll({
       attributes: ['id', 'name', 'description', 'requestedFiles', 'coverImage', 'price', 'createdBy', 'createdAt', 'updatedAt'],
-      order: [['createdAt', 'DESC']], // Trier du plus récent au plus ancien
+      order: [['createdAt', 'DESC']],
     });
+
     if (services) {
       services = await Promise.all(services.map(async (service) => {
         const filePath = path.resolve(__dirname, '..', '..', service.coverImage);
@@ -150,10 +156,10 @@ const getAllServices = async (req, res) => {
  *       500:
  *         description: Internal server error
  */
-
 const getOneService = async (req, res) => {
   try {
     const { id } = req.params;
+
 
     const service = await Service.findOne({
       where: { id },
@@ -179,6 +185,7 @@ const getOneService = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
 
 const getAllServicesByProblem = async (req, res) => {
   try {
