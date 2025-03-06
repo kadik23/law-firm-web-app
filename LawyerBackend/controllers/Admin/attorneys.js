@@ -64,11 +64,6 @@ const Attorney = db.attorneys;
  *                 linkedin_url:
  *                   type: string
  *                   example: "https://www.linkedin.com/in/johndoe"
- *                 certificats:
- *                   type: array
- *                   items:
- *                     type: string
- *                   example: ["Certificate A", "Certificate B"]
  *                 date_membership:
  *                   type: string
  *                   format: date
@@ -116,7 +111,6 @@ const createAttorney = async (req, res) => {
     age,
     sex,
     linkedin_url,
-    certificats,
     date_membership,
     pays,
     terms_accepted,
@@ -155,7 +149,6 @@ const createAttorney = async (req, res) => {
       user_id: newUser.id,
       status,
       linkedin_url,
-      certificats: certificats || null,
       date_membership: date_membership ? new Date(date_membership) : new Date(),
       picture_path: uploadedFile.path
     });
@@ -168,7 +161,72 @@ const createAttorney = async (req, res) => {
     return res.status(500).send('Failed to create attorney');
   }
 };
-
+/**
+ * @swagger
+ * paths:
+ *   /admin/attorney/delete:
+ *     delete:
+ *       summary: Delete multiple attorneys
+ *       description: Deletes attorneys and their associated users, as well as any uploaded files.
+ *       tags:
+ *         - Attorneys
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ids:
+ *                   type: array
+ *                   items:
+ *                     type: integer
+ *                   example: [1, 2, 3]
+ *               required:
+ *                 - ids
+ *       responses:
+ *         200:
+ *           description: Attorneys and associated users deleted successfully
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   message:
+ *                     type: string
+ *                     example: Attorneys and associated users deleted successfully
+ *         400:
+ *           description: Invalid request (e.g., missing or incorrect attorney IDs)
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   error:
+ *                     type: string
+ *                     example: Invalid attorney IDs
+ *         404:
+ *           description: No attorneys found with the given IDs
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   error:
+ *                     type: string
+ *                     example: No attorneys found
+ *         500:
+ *           description: Internal server error
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   error:
+ *                     type: string
+ *                     example: Failed to delete attorneys
+ *
+ */
 
 const deleteAttorneys = async (req, res) => {
   try {

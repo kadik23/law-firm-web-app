@@ -38,10 +38,6 @@ const add = [
         .optional()
         .isURL().withMessage('Invalid LinkedIn URL'),
 
-    body('certificats')
-        .optional()
-        .isString().withMessage('Certificats must be a string'),
-
     body('date_membership')
         .notEmpty().withMessage('Date_membership is required')
         .isISO8601().withMessage('Invalid date format (must be YYYY-MM-DD)'),
@@ -59,4 +55,10 @@ const add = [
         .isString().withMessage('Status must be a string')
 ];
 
-module.exports = { add };
+const remove=[
+body('ids')
+    .notEmpty()
+    .isArray({ min: 0 })
+    .withMessage("ids must be a non-empty array.")
+]
+module.exports = { add, remove };

@@ -18,10 +18,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true
     },
-    certificats: {
-      type: DataTypes.STRING,
-      allowNull: true
-    },
     date_membership: {
       type: DataTypes.DATE,
       allowNull: false
@@ -58,9 +54,6 @@ module.exports = (sequelize, DataTypes) => {
 *        linkedin_url:
 *          type: string
 *          example: "https://linkedin.com/in/attorney"
-*        certificats:
-*          type: string
-*          example: "Certificate of Law"
 *        date_membership:
 *          type: string
 *          format: date-time
