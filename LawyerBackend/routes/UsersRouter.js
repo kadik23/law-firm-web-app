@@ -44,6 +44,7 @@ userRouter.get('/blogs/like/count/:id',blogsController.GetLikesCount);
 
 // Attorneys Routes
 userRouter.get('/attorneys', attorneysController.getAllAttorneys);
+userRouter.post('/attorney/update', attorneysController.updateAttorney);
 
 //Comments Routes
 userRouter.post('/blogs/addcomment',authMiddleware(["client","admin","attorney"]),commentsSchema.add,validationErrors, blogCommentsController.addBlogComment);
