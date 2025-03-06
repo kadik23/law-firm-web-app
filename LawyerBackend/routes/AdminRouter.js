@@ -22,6 +22,7 @@ adminRouter.post('/contactus',contactSchema.add,validationErrors ,contactformCon
 
 adminRouter.post('/categories/add',authMiddleware(["admin"]),categoriesSchema.add,validationErrors,categoriesController.addCategory);
 adminRouter.post('/attorney/add',authMiddleware(["admin"]),attroneySchema.add,validationErrors,attorneysController.createAttorney);
+adminRouter.delete('/attorney/delete',authMiddleware(["admin"]),attorneysController.deleteAttorneys);
 adminRouter.delete('/categories/delete',authMiddleware(["admin"]),categoriesSchema.remove,validationErrors,categoriesController.deleteCategory);
 
 

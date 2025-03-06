@@ -2,7 +2,8 @@ const db = require('../../models');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const {upload} = require("../../middlewares/FilesMiddleware");
-const {path} = require("express/lib/view");
+const fs = require('fs');
+const path = require('path');
 
 const User = db.users;
 const Attorney = db.attorneys;
@@ -168,6 +169,50 @@ const createAttorney = async (req, res) => {
   }
 };
 
+
+const deleteAttorneys = async (req, res) => {
+  try {
+    const { ids } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).send({ error: 'Invalid attorney IDs' });
+    }
+
+
+    const attorneys = await Attorney.findAll({ where: { id: ids } });
+    if (attorneys.length === 0) {
+      return res.status(404).send({ error: 'No attorneys found' });
+    }
+
+
+    const userIds = attorneys.map(attorney => attorney.user_id);
+    const filePaths = attorneys.map(attorney => attorney.picture_path).filter(path => path);
+
+
+    filePaths.forEach(filePath => {
+      const resolvedPath = path.resolve(filePath);
+      fs.unlink(resolvedPath, (err) => {
+        if (err && err.code !== 'ENOENT') {
+          console.error('Error deleting file:', err);
+        }
+      });
+    });
+
+
+    await Attorney.destroy({ where: { id: ids } });
+
+
+    await User.destroy({ where: { id: userIds } });
+
+    return res.status(200).send({ message: 'Attorneys and associated users deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting attorneys:', error);
+    return res.status(500).send({ error: 'Failed to delete attorneys' });
+  }
+};
+
+module.exports = { deleteAttorneys };
+
 module.exports = {
-  createAttorney
+  createAttorney,
+  deleteAttorneys
 };
