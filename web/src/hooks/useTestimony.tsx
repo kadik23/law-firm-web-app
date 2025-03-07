@@ -40,6 +40,60 @@ export const useTestimony = () => {
     }
   };
 
+  const updateMyTestimonial = async (testimonial_id: number) => {
+    try {
+      setLoading(true);
+      const response = await axios.put(`/user/testimonials/${testimonial_id}`, {
+        feedback: comment,
+      });
+      if (response.status == 201) {
+        showAlert(
+          "success",
+          "Commentaire mis à jour avec succès",
+          response.data.message
+        );
+        console.log(response.data.testimonial)
+        setNewTestimonialObject(response.data.testimonial);
+        setComment("")
+      }
+    } catch (err) {
+      setError("Vous n'avez pas mise a jour");
+      showAlert(
+        "error",
+        "vous n'avez pas ",
+        err as string
+      );
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteMyTestimonial = async (testimonial_id: number) => {
+    try {
+      setLoading(true);
+      const response = await axios.delete(`/user/testimonials/${testimonial_id}`);
+      if (response.status == 200) {
+        showAlert(
+          "success",
+          "Commente supprimé avec succès",
+          response.data.message
+        );
+        console.log(response.data.testimonial)
+      }
+    } catch (err) {
+      setError("Vous n'avez pas supprimer commentaire");
+      showAlert(
+        "error",
+        "vous n'avez pas ",
+        err as string
+      );
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     comment,
     setComment,
@@ -48,5 +102,7 @@ export const useTestimony = () => {
     testimony,
     newTestimonialObject,
     setNewTestimonialObject,
+    updateMyTestimonial,
+    deleteMyTestimonial
   };
 };
