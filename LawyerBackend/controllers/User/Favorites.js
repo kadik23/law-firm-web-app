@@ -2,6 +2,8 @@ require("dotenv").config();
 const db = require("../../models");
 const { users, blogs, favorites } = db;
 const { Op } = require("sequelize");
+const {resolve} = require("path");
+const fs = require("fs");
 /**
  * @swagger
  * /user/favorites:
@@ -132,13 +134,13 @@ const GetAllFavoriteBlogs = async (req, res) => {
   const { limit = 10, offset = 0 } = req.query;
 
   try {
-    const favoriteBlogs = await users.findOne({
+    let favBlogs = await users.findOne({
       where: { id: userId },
       include: [
         {
           model: blogs,
           as: "FavoriteBlogs",
-          attributes: ["id", "title", "body", "createdAt"],
+          attributes: ["id", "title", "body","image","likes", "createdAt"],
           through: { attributes: [] },
         },
       ],
@@ -146,15 +148,28 @@ const GetAllFavoriteBlogs = async (req, res) => {
       offset: parseInt(offset),
     });
 
-    if (!favoriteBlogs) {
+    if (!favBlogs) {
       return res
         .status(404)
         .json({ message: "User not found or no favorite blogs" });
     }
+    favBlogs.FavoriteBlogs = await Promise.all(favBlogs.FavoriteBlogs.map( async (blog) => {
+      const filePath = resolve(__dirname, '..', '..', blog.image);
 
+      let base64Image = null;
+      if (fs.existsSync(filePath)) {
+        const fileData = fs.readFileSync(filePath);
+        base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
+      }
+
+      return {
+        ...blog.toJSON(),
+        image: base64Image
+      };
+    }));
     res.status(200).json({
-      total: favoriteBlogs.FavoriteBlogs.length,
-      favorites: favoriteBlogs.FavoriteBlogs,
+      total: favBlogs.FavoriteBlogs.length,
+      favorites: favBlogs.FavoriteBlogs,
     });
   } catch (error) {
     console.error("Error retrieving favorite blogs:", error);
@@ -389,9 +404,23 @@ const SearchFavoriteBlogs = async (req, res) => {
       limit: parseInt(limit, 10),
       offset: parseInt(offset, 10),
     });
+    let favoriteBlogs=rows.map((favorite) => favorite.blog).filter(Boolean)
+    favoriteBlogs = await Promise.all(favoriteBlogs.map(async (blog) => {
+      const filePath = resolve(__dirname, '..', '..', blog.image);
 
+      let base64Image = null;
+      if (fs.existsSync(filePath)) {
+        const fileData = fs.readFileSync(filePath);
+        base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
+      }
+
+      return {
+        ...blog.toJSON(),
+        image: base64Image
+      };
+    }));
     res.status(200).json({
-      data: rows.map((favorite) => favorite.blog).filter(Boolean),
+      data: favoriteBlogs,
       pagination: {
         currentPage: parseInt(page, 10),
         totalPages: Math.ceil(count / limit),

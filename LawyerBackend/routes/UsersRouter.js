@@ -81,7 +81,5 @@ userRouter.get('/problems/category/:category_id',problemsSchema.getByCategoryID,
 // Consultation Routes
 userRouter.post('/consultations', authMiddleware(["client"]),consultationSchema.add,validationErrors, consultationController.createConsultation);
 
-// Consultation Routes
-userRouter.post('/consultations', authMiddleware(["client"]), consultationController.createConsultation);
 
 module.exports = userRouter;

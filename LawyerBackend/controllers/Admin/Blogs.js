@@ -3,11 +3,13 @@ const db = require('../../models')
 const {upload} = require("../../middlewares/FilesMiddleware");
 const blogs=db.blogs
 const fs = require('fs');
-const uploadFiles = upload.fields([
-    { name: 'image', maxCount: 1 },
-]);
+const {body: bd ,validationResult} = require("express-validator");
 
-// Delete old files if new files are provided
+
+const uploadFile = upload.single("image");
+
+
+
 const deleteFile = (filePath) => {
     if (filePath && fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
@@ -62,29 +64,51 @@ const deleteFile = (filePath) => {
  *           description: "Internal Server Error"
  */
 
-const addBlog = async (req,res)=> {
+const addBlog = async (req, res) => {
     try {
-        uploadFiles(req, res, async (err) => {
+        uploadFile(req, res, async (err) => {
             if (err) {
                 return res.status(400).send('Error uploading files: ' + err.message);
             }
 
-            const {title, body, readingDuration, categoryId} = req.body;
-            const {image} = req.files;
 
-            const imagePath = image ? image[0].path : null;
+            await Promise.all([
+                bd('title')
+                    .isString().withMessage('Title must be a string')
+                    .isLength({ max: 20 })
+                    .notEmpty().withMessage('Title is required').run(req),
+                bd('body')
+                    .isString().withMessage('Body must be a string')
+                    .notEmpty().withMessage('Body is required').run(req),
+                bd('readingDuration')
+                    .isInt().withMessage('readingDuration must be a number')
+                    .notEmpty().withMessage('readingDuration is required').run(req),
+                bd('categoryId')
+                    .isInt().withMessage('categoryId must be a number')
+                    .notEmpty().withMessage('categoryId is required').run(req)
+            ]);
+
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ errors: errors.array() });
+            }
+            if (!req.file) {
+                return res.status(400).json({ error: "Image is required." });
+            }
+            const { title, body, readingDuration, categoryId } = req.body;
+
+            const imagePath = req.file.path;
             let newBlog = await blogs.create({
-                title,likes:0, body, readingDuration, image: imagePath, categoryId, userId: 3, accepted: true, 
+                title, likes: 0, body, readingDuration, image: imagePath, categoryId, userId: req.user.id, accepted: true,
             });
 
             if (!newBlog) {
                 return res.status(401).send('Error creating blog');
             } else {
-                return res.status(200).send(newBlog);
+                return res.status(200).send('Blog created successfully');
             }
         });
-    }
-    catch (e) {
+    } catch (e) {
         console.error('Error creating blog', e);
         res.status(500).send('Internal Server Error');
     }
@@ -203,11 +227,38 @@ const deleteBlog= async (req,res)=>{
 
 const updateBlog= async (req,res)=>{
     try {
-        uploadFiles(req, res, async (err) => {
+        uploadFile(req, res, async (err) => {
             if (err) {
                 return res.status(400).send('Error uploading files: ' + err.message);
             }
+            await Promise.all([
+                bd('id')
+                    .isInt().withMessage('id must be a number')
+                    .notEmpty().withMessage('id is required').run(req),
+                bd('title')
+                    .optional()
+                    .isString().withMessage('Title must be a string')
+                    .isLength({ max: 20 })
+                    .run(req),
+                bd('body')
+                    .optional()
+                    .isString().withMessage('Body must be a string')
+                    .run(req),
+                bd('readingDuration')
+                    .optional()
+                    .isInt().withMessage('readingDuration must be a number')
+                    .run(req),
+                bd('categoryId')
+                    .optional()
+                    .isInt().withMessage('categoryId must be a number')
+                    .run(req)
+            ]);
 
+
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ errors: errors.array() });
+            }
             const { id, title, body, categoryId } = req.body;
             const image = req.files?.image;
 
@@ -219,7 +270,6 @@ const updateBlog= async (req,res)=>{
 
                 if (image) {
                     deleteFile(blog.image);
-                    console.log("exe")
                 }
 
                 const imagePath = image ? image[0].path : blog.image;
