@@ -23,6 +23,8 @@ function ServiceCard({
     <div className="max-w-full lg:max-w-[calc(100%/4)] md:max-w-[calc(100%/2)] w-full flex-shrink-0 h-full shadow-lg rounded-md bg-white">
       <Image
         src={`${coverImage}`}
+        className="rounded-md object-cover h-full"
+        title={name}
         alt="service"
         layout="responsive"
         width={125}

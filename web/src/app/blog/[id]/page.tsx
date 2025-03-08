@@ -69,7 +69,7 @@ const Page = () => {
         setisFavorited={setisFavorited}
         setBlog={setBlog}
       />
-      <ReaderFeedback />
+      <ReaderFeedback blogId={id} />
       <div className="font-bold text-3xl md:text-4xl text-primary mb-3">
         D{"'"} autres blogs
       </div>
