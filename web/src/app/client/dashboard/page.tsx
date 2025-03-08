@@ -3,13 +3,10 @@ import ConsultationForm from "@/components/dashboard/consultationForm/Consultati
 import RecentPayment from "@/components/dashboard/RecentPayment";
 import Statistics from "@/components/dashboard/statistics";
 import Modal from "@/components/Modal";
-import { useAlert } from "@/contexts/AlertContext";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import { useState } from "react";
 
 const Dashboard = () => {
-
-  const {showAlert} = useAlert();
   const [showConsultationForm, setShowConsultationForm] = useState(false);
   
   const handleReservationForm = () => {

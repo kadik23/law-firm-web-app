@@ -79,13 +79,13 @@ const CommentComponent = ({ comment, onDelete, onEdit, onLike, onReply }: Commen
                         <button className="px-3 py-1 border rounded-md border-white text-sm flex 
                         items-center gap-1 bg-[rgba(217,217,217,0.26)] hover:bg-secondary" 
                         onClick={() => onDelete(comment.id)}>
-                            <Icon icon="mdi:trash-can" width={25} />
+                            <Icon icon="mdi:trash-can" width={20} />
                             Supprimer
                         </button>
                         <button className="px-3 py-1 border rounded-md border-white text-sm flex 
                         items-center gap-1 bg-[rgba(217,217,217,0.26)] hover:bg-secondary" 
                         onClick={() => setIsEditing(!isEditing)}>
-                            <Icon icon="mdi:pencil" width={25} />
+                            <Icon icon="mdi:pencil" width={20} />
                             Modify
                         </button>
                     </div>
@@ -105,7 +105,7 @@ const CommentComponent = ({ comment, onDelete, onEdit, onLike, onReply }: Commen
                                 <div>
                                     <Icon
                                         icon="lucide:smile"
-                                        width={24}
+                                        width={18}
                                         onClick={() => setShowEmojis((prev) => !prev)}
                                         className="cursor-pointer text-primary hover:text-white 
                                         hover:bg-primary p-2 rounded-full transition"
@@ -132,22 +132,26 @@ const CommentComponent = ({ comment, onDelete, onEdit, onLike, onReply }: Commen
                     <span className="mr-6">
                         {getRelativeTime(comment.createdAt)}
                     </span>
-                    <button onClick={() => handleLikeComment(comment.id)} className="flex items-center gap-1 group">
+                    <button 
+                        onClick={() => handleLikeComment(comment.id)} 
+                        className="flex items-center gap-1 group">
                         <Icon 
                         className={`group-hover:bg-scondary ${isLike ? (AuthUSER?.id === comment.userId ? "text-primary": "text-secondary") : "text-white" }`} 
-                        icon="mdi:thumb-up" width={25} />
+                        icon="mdi:thumb-up" width={20} />
                         <span>{comment.likes}</span>
                     </button>
                 </div>
                 <div className="w-full md:w-fit text-sm flex flex-row-reverse my-2 md:my-0 md:flex-row 
                 items-center gap-3">
-                    <button onClick={() => onReply(comment.id)}>
-                        Voir les réponses ({comment.replies})
-                    </button>
+                    {comment.replies > 0 && (
+                        <button onClick={() => onReply(comment.id)}>
+                            Voir les réponses ({comment.replies})
+                        </button>
+                    )}
                     {AuthUSER && (
                         <button
-                            className="mr-auto md:mr-0 py-1 px-2 border rounded-md flex items-center
-                            gap-3 text-sm"
+                            className={`${comment.replies > 0 ? "" : "self-end"} mr-auto md:mr-0 py-1 px-2 border rounded-md flex items-center
+                            gap-3 text-sm`}
                             onClick={() => setShowReplyInput((prev) => !prev)}
                         >
                             <Icon icon="lucide:message-circle" width={15} />
@@ -172,7 +176,7 @@ const CommentComponent = ({ comment, onDelete, onEdit, onLike, onReply }: Commen
                                 <div>
                                     <Icon
                                         icon="lucide:smile"
-                                        width={24}
+                                        width={18}
                                         onClick={() => setShowEmojis((prev) => !prev)}
                                         className="cursor-pointer text-primary hover:text-white hover:bg-primary p-2 
                                         rounded-full transition"
@@ -196,12 +200,12 @@ const CommentComponent = ({ comment, onDelete, onEdit, onLike, onReply }: Commen
                 <div className="w-full flex md:hidden gap-2 items-center mr-4">
                     <button className="w-full px-3 py-1 border rounded-md border-white text-sm flex items-center 
                     justify-center gap-1 bg-[rgba(217,217,217,0.26)] hover:bg-secondary" onClick={() => onDelete(comment.id)}>
-                        <Icon icon="mdi:trash-can" width={25} />
+                        <Icon icon="mdi:trash-can" width={20} />
                         Supprimer
                     </button>
                     <button className="w-full px-3 py-1 border rounded-md border-white text-sm flex items-center 
                     justify-center gap-1 bg-[rgba(217,217,217,0.26)] hover:bg-secondary" onClick={() => setIsEditing(!isEditing)}>
-                        <Icon icon="mdi:pencil" width={25} />
+                        <Icon icon="mdi:pencil" width={20} />
                         Modify
                     </button>
                 </div>

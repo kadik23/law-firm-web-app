@@ -1,8 +1,8 @@
 import { useState } from "react";
-import TextInput from "./textInput";
 import SelectInput from "./SelectInput";
 import DateTimeInput from "./DateTimeInput";
 import RadioGroup from "./RadioGroup";
+import TextInput from "./TextInput";
 
 const ConsultationForm: React.FC = () => {
   const [formData, setFormData] = useState({
