@@ -260,7 +260,7 @@ const updateBlog= async (req,res)=>{
                 return res.status(400).json({ errors: errors.array() });
             }
             const { id, title, body, categoryId } = req.body;
-            const image = req.files?.image;
+            const image = req.file;
 
 
                 const blog = await blogs.findByPk(id);
@@ -272,8 +272,7 @@ const updateBlog= async (req,res)=>{
                     deleteFile(blog.image);
                 }
 
-                const imagePath = image ? image[0].path : blog.image;
-
+                const imagePath = image ? image.path : blog.image;
 
                 const updatedBlog = await blogs.update(
                     { title, body, categoryId, image: imagePath },
