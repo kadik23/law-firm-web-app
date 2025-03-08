@@ -57,6 +57,13 @@ module.exports = (sequelize, DataTypes) => {
       throw new Error("Consultation model is not defined!");
     }
     User.hasMany(models.Consultation, { foreignKey: "client_id", as: "consultations" });
+    User.belongsToMany(models.services, {
+      through: 'request_service',
+      foreignKey: 'clientId',
+      otherKey: 'serviceId',
+      as: 'requestedServices'
+    });
+
   };
   return User;
 };

@@ -19,7 +19,7 @@ import { useAlert } from "@/contexts/AlertContext";
 function Page() {
   const { id } = useParams();
   const serviceId = id ? Number(id) : undefined;
-
+  const [idEdit, setIdEdit] = useState<number | null>(null);
   const { user: AuthUSER } = useAuth();
   const {
     testimonials,
@@ -47,6 +47,8 @@ function Page() {
     loading: testimonyLoading,
     testimony,
     newTestimonialObject,
+    updateMyTestimonial,
+    deleteMyTestimonial,
   } = useTestimony();
 
   const addEmoji = (emoji: string) => {
@@ -73,8 +75,15 @@ function Page() {
   } = useCarousel(testimonials.length, 3.5);
   const { showAlert } = useAlert();
 
-  const toggleComment = () => {
+  const toggleComment = (id: number | null) => {
     if (AuthUSER) {
+      if (id) {
+        setComment(
+          testimonials.find((testimonial) => testimonial.id === id)?.feedback ||
+            ""
+        );
+        setIdEdit(id);
+      }
       setShowCommentInput(!showCommentInput);
     } else {
       showAlert(
@@ -115,6 +124,15 @@ function Page() {
       } as avisEntity,
     ]);
   }, [newTestimonialObject]);
+
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteMyTestimonial(id);
+      setTestimonials((prev) => prev.filter((t) => t.id !== id));
+    } catch (error) {
+      console.error("Error deleting testimonial:", error);
+    }
+  };
 
   const ServicesLoadingChecker = () => {
     if (servicesLoading)
@@ -232,7 +250,7 @@ function Page() {
                 {/* Envoyer Button */}
                 <button
                   disabled={testimonialsLoading}
-                  onClick={() => {
+                  onClick={async () => {
                     if (comment == "")
                       showAlert(
                         "warning",
@@ -240,7 +258,15 @@ function Page() {
                         "Veuillez remplir le champ d'entrée."
                       );
                     else {
-                      testimony(serviceId as number);
+                      if (idEdit) {
+                        await updateMyTestimonial(idEdit);
+                        testimonials.find(
+                          (testimonial) => testimonial.id === idEdit
+                        )!.feedback = comment;
+                        setIdEdit(null);
+                      } else {
+                        testimony(serviceId as number);
+                      }
                       setShowCommentInput(false);
                     }
                   }}
@@ -257,7 +283,10 @@ function Page() {
               Avis de nos clients ({CommentCount})
             </div>
             <button
-              onClick={toggleComment}
+              onClick={() => {
+                toggleComment(null);
+                setComment("");
+              }}
               className="text-primary border-[1px] border-black font-semibold px-4 py-2 rounded-md
                         flex items-center gap-1 hover:bg-secondary hover:text-white hover:border-none"
             >
@@ -281,7 +310,10 @@ function Page() {
                   const userObject = { name: testimonial.user.name };
                   return (
                     <AvisCard
+                      handleDelete={handleDelete}
+                      toggleComment={toggleComment}
                       user={userObject}
+                      id={testimonial.id}
                       userId={testimonial.userId}
                       feedback={testimonial.feedback}
                       createdAt={testimonial.createdAt}

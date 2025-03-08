@@ -19,6 +19,7 @@ const validationErrors=require("../errorHandler/validationErrors")
 const testimonialsController = require("../controllers/User/Testimonials");
 const problemsController = require("../controllers/User/problems.js");
 const consultationController = require("../controllers/User/consultation.js");
+const {upload} = require("../middlewares/FilesMiddleware");
 
 const userRouter = require('express').Router();
 
@@ -70,7 +71,8 @@ userRouter.get('/services/problem/:problem_id',servicesSchema.getByProblemId,val
 userRouter.post('/testimonials', authMiddleware(["client"]),testimonialSchema.add,validationErrors, testimonialsController.CreateTestimonial);
 userRouter.get('/testimonials', testimonialsController.GetAllTestimonials);
 userRouter.get('/testimonials/service/:serviceId',testimonialSchema.getByService,validationErrors, testimonialsController.GetTestimonialsByService);
-
+userRouter.put('/testimonials/:testimonialId', authMiddleware(["client"]), testimonialSchema.update, validationErrors, testimonialsController.UpdateTestimonial);
+userRouter.delete('/testimonials/:testimonialId', authMiddleware(["client"]), testimonialSchema.remove, validationErrors, testimonialsController.DeleteTestimonial);
 // Problems Routes
 userRouter.get('/problems', problemsController.getAllProblems);
 userRouter.get('/problems/:id',problemsSchema.getByID,validationErrors, problemsController.getProblemById);
@@ -78,5 +80,8 @@ userRouter.get('/problems/category/:category_id',problemsSchema.getByCategoryID,
 
 // Consultation Routes
 userRouter.post('/consultations', authMiddleware(["client"]),consultationSchema.add,validationErrors, consultationController.createConsultation);
+
+// Consultation Routes
+userRouter.post('/consultations', authMiddleware(["client"]), consultationController.createConsultation);
 
 module.exports = userRouter;

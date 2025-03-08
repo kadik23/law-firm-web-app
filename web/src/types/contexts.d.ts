@@ -24,4 +24,5 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   logout: () => Promise<void>;
+  fetchUser: () => Promise<void>;
 }

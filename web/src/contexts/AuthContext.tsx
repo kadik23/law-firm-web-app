@@ -13,26 +13,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const { showAlert } = useAlert();
+  const fetchUser = async () => {
+    try {
+      const response = await axios.get("/user/current", {
+        withCredentials: true,
+      });
+      setUser(response.data);
+    } catch (err: unknown) {
+      if (isAxiosError(err) && err.response?.status === 401) {
+        console.warn("User not authenticated");
+      } else {
+        console.error("An unexpected error occurred:", err);
+      }
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await axios.get("/user/current", {
-          withCredentials: true,
-        });
-        setUser(response.data);
-      } catch (err: unknown) {
-        if (isAxiosError(err) && err.response?.status === 401) {
-          console.warn("User not authenticated");
-        } else {
-          console.error("An unexpected error occurred:", err);
-        }
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchUser();
   }, []);
 
@@ -53,7 +52,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, logout }}>
+    <AuthContext.Provider value={{ user, loading, logout, fetchUser }}>
       {children}
     </AuthContext.Provider>
   );

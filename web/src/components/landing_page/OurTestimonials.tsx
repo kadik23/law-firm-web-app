@@ -39,6 +39,9 @@ function OurTestimonials() {
             ? "Chargement..."
             : testimonials.map((testimonial, index) => (
                 <AvisCard
+                  toggleComment={null}
+                  handleDelete={null}
+                  id={testimonial.id}
                   feedback={testimonial.feedback}
                   user={testimonial.user}
                   createdAt={testimonial.createdAt}
