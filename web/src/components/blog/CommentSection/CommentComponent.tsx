@@ -12,13 +12,14 @@ interface CommentComponentProps {
     comment: Comment;
     onDelete: (commentId: number) => void;
     onEdit: (commentId: number, newBody: string) => void;
-    onLike: (commentId: number) => void;
+    onLike: (commentId: number, isLike: boolean) => void;
     onReply: (commentId: number, replyBody?: string) => void;
 }
 
 const CommentComponent = ({ comment, onDelete, onEdit, onLike, onReply }: CommentComponentProps) => {
     const { user: AuthUSER } = useAuth();
     const [isEditing, setIsEditing] = useState(false);
+    const [isLike, setIsLike] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const {showAlert} = useAlert();
     const [showEmojis, setShowEmojis] = useState(false);
@@ -51,8 +52,18 @@ const CommentComponent = ({ comment, onDelete, onEdit, onLike, onReply }: Commen
         setNewBody((prev) => prev + emoji);
     };
 
+    const handleLikeComment = (commentId: number) => {
+        if (!AuthUSER) {
+            showAlert("warning", "Avertissement!", "Veuillez vous connecter pour liker un commentaire.");
+            return;
+        }
+        
+        onLike(commentId, isLike);
+        setIsLike(!isLike);
+    }
+
     return (
-        <div className={`text-white px-4 pt-4 pb-6 mb-4 ${comment.userId === AuthUSER?.id ? "bg-[#385F7A]" : "bg-primary"}`}>
+        <div className={`text-white px-4 py-6 mb-4 rounded-lg ${comment.userId === AuthUSER?.id ? "bg-[#385F7A]" : "bg-primary"}`}>
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-1">
                     <button className="bg-secondary w-7 h-7 rounded-full p-2 text-sm btn 
@@ -64,18 +75,18 @@ const CommentComponent = ({ comment, onDelete, onEdit, onLike, onReply }: Commen
                     </span>
                 </div>
                 {AuthUSER?.id === comment.userId && (
-                    <div className="hidden md:flex gap-2 items-center mr-4">
-                        <button className="px-3 py-1 border rounded-md border-white text-sm flex 
-                        items-center gap-1 bg-[rgba(217,217,217,0.26)] hover:bg-secondary" 
+                    <div className="hidden md:flex gap-2 items-center mr-4 md:mr-0">
+                        <button className="px-3 py-1 rounded-md text-sm flex 
+                        items-center gap-1 hover:bg-secondary" 
                         onClick={() => onDelete(comment.id)}>
-                            <Icon icon="mdi:trash-can" width={25} />
+                            <Icon icon="mdi:trash-can" width={20} />
                             Supprimer
                         </button>
-                        <button className="px-3 py-1 border rounded-md border-white text-sm flex 
-                        items-center gap-1 bg-[rgba(217,217,217,0.26)] hover:bg-secondary" 
+                        <button className="px-3 py-1 rounded-md text-sm flex 
+                        items-center gap-1 hover:bg-secondary" 
                         onClick={() => setIsEditing(!isEditing)}>
-                            <Icon icon="mdi:pencil" width={25} />
-                            Modify
+                            <Icon icon="mdi:pencil" width={20} />
+                            Modifier
                         </button>
                     </div>
                 )}
@@ -94,7 +105,7 @@ const CommentComponent = ({ comment, onDelete, onEdit, onLike, onReply }: Commen
                                 <div>
                                     <Icon
                                         icon="lucide:smile"
-                                        width={24}
+                                        width={18}
                                         onClick={() => setShowEmojis((prev) => !prev)}
                                         className="cursor-pointer text-primary hover:text-white 
                                         hover:bg-primary p-2 rounded-full transition"
@@ -118,23 +129,29 @@ const CommentComponent = ({ comment, onDelete, onEdit, onLike, onReply }: Commen
             )}
             <div className="flex flex-col md:flex-row items-center justify-between my-4">
                 <div className="self-start my-3 md:my-0 flex items-center gap-3">
-                    <span className="mr-6">
+                    <span className="mr-6 text-xs">
                         {getRelativeTime(comment.createdAt)}
                     </span>
-                    <button onClick={() => onLike(comment.id)} className="flex items-center gap-1 group">
-                        <Icon className="group-hover:bg-scondary" icon="mdi:thumb-up" width={25} />
+                    <button 
+                        onClick={() => handleLikeComment(comment.id)} 
+                        className="flex items-center gap-1 group">
+                        <Icon 
+                        className={`group-hover:bg-scondary ${isLike ? (AuthUSER?.id === comment.userId ? "text-primary": "text-secondary") : "text-white" }`} 
+                        icon="mdi:thumb-up" width={20} />
                         <span>{comment.likes}</span>
                     </button>
                 </div>
                 <div className="w-full md:w-fit text-sm flex flex-row-reverse my-2 md:my-0 md:flex-row 
                 items-center gap-3">
-                    <button onClick={() => onReply(comment.id)}>
-                        Voir les réponses ({comment.replies})
-                    </button>
+                    {comment.replies > 0 && (
+                        <button onClick={() => onReply(comment.id)}>
+                            Voir les réponses ({comment.replies})
+                        </button>
+                    )}
                     {AuthUSER && (
                         <button
-                            className="mr-auto md:mr-0 py-1 px-2 border rounded-md flex items-center
-                            gap-3 text-sm"
+                            className={`${comment.replies > 0 ? "" : "self-end"} mr-auto md:mr-0 py-1 px-2 border rounded-md flex items-center
+                            gap-3 text-sm`}
                             onClick={() => setShowReplyInput((prev) => !prev)}
                         >
                             <Icon icon="lucide:message-circle" width={15} />
@@ -159,7 +176,7 @@ const CommentComponent = ({ comment, onDelete, onEdit, onLike, onReply }: Commen
                                 <div>
                                     <Icon
                                         icon="lucide:smile"
-                                        width={24}
+                                        width={18}
                                         onClick={() => setShowEmojis((prev) => !prev)}
                                         className="cursor-pointer text-primary hover:text-white hover:bg-primary p-2 
                                         rounded-full transition"
@@ -181,14 +198,14 @@ const CommentComponent = ({ comment, onDelete, onEdit, onLike, onReply }: Commen
             )}
             {AuthUSER?.id === comment.userId && (
                 <div className="w-full flex md:hidden gap-2 items-center mr-4">
-                    <button className="w-full px-3 py-1 border rounded-md border-white text-sm flex items-center 
-                    justify-center gap-1 bg-[rgba(217,217,217,0.26)] hover:bg-secondary" onClick={() => onDelete(comment.id)}>
-                        <Icon icon="mdi:trash-can" width={25} />
+                    <button className="w-full px-3 py-1 rounded-md text-sm flex items-center 
+                    justify-center gap-1 hover:bg-secondary" onClick={() => onDelete(comment.id)}>
+                        <Icon icon="mdi:trash-can" width={20} />
                         Supprimer
                     </button>
-                    <button className="w-full px-3 py-1 border rounded-md border-white text-sm flex items-center 
-                    justify-center gap-1 bg-[rgba(217,217,217,0.26)] hover:bg-secondary" onClick={() => setIsEditing(!isEditing)}>
-                        <Icon icon="mdi:pencil" width={25} />
+                    <button className="w-full px-3 py-1 rounded-md text-sm flex items-center 
+                    justify-center gap-1 hover:bg-secondary" onClick={() => setIsEditing(!isEditing)}>
+                        <Icon icon="mdi:pencil" width={20} />
                         Modify
                     </button>
                 </div>

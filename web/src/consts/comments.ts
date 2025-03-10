@@ -1,4 +1,5 @@
-
+import { Comment } from "@/types/entities/comment";
+// consts/comments.ts
 export const commentsData: Comment[] = [
     {
         "id": 1,
@@ -9,7 +10,7 @@ export const commentsData: Comment[] = [
         "body": "Great insights! I really enjoyed this article.",
         "likes": 5,
         "isAReply": 0,
-        "replies": 13,
+        "replies": 1,
         "originalCommentId": null,
         "createdAt": "2025-03-01T10:00:00Z",
         "updatedAt": "2025-03-01T10:15:00Z"
@@ -23,7 +24,7 @@ export const commentsData: Comment[] = [
         "body": "I found the points very relevant to my work. Thanks for sharing!",
         "likes": 3,
         "isAReply": 0,
-        "replies": 1,
+        "replies": 0,
         "originalCommentId": null,
         "createdAt": "2025-03-02T10:05:00Z",
         "updatedAt": "2025-03-01T10:10:00Z"
@@ -37,7 +38,7 @@ export const commentsData: Comment[] = [
         "body": "This helped me understand the topic better. Well written!",
         "likes": 7,
         "isAReply": 0,
-        "replies": 13,
+        "replies": 1,
         "originalCommentId": null,
         "createdAt": "2025-03-01T10:10:00Z",
         "updatedAt": "2025-03-01T10:20:00Z"

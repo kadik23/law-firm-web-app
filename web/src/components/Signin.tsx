@@ -5,6 +5,8 @@ import useLoginForm from "@/hooks/useLoginForm";
 import { DevTool } from "@hookform/devtools";
 import axiosClient from "@/lib/utils/axiosClient";
 import { useAlert } from "@/contexts/AlertContext";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 
 interface SigninProps {
   isModalOpen: boolean;
@@ -15,6 +17,8 @@ function Signin({ isModalOpen, setModalOpen }: SigninProps) {
   const [isDisabled, setIsDisabled] = useState(true);
   const { register, control, handleSubmit, errors, isValid } = useLoginForm();
   const { showAlert } = useAlert();
+  const router = useRouter();
+  const { fetchUser } = useAuth();
 
   useEffect(() => {
     setIsDisabled(!isValid);
@@ -38,10 +42,11 @@ function Signin({ isModalOpen, setModalOpen }: SigninProps) {
           "Vous avez lu avec succès ce message important."
         );
         setModalOpen(false);
+        fetchUser()
         setTimeout(
-          () => (window.location.href = `/${response.data.type}/dashboard`),
+          () => (router.push(`/${response.data.type}/dashboard`),
           2100
-        );
+        ));
       } else {
         showAlert(
           "error",

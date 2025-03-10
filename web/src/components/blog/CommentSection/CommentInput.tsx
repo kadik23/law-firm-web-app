@@ -61,7 +61,7 @@ const CommentInput = ({ onSubmit, onClose }: CommentInputProps) => {
                     <div className="relative">
                         <Icon
                             icon="lucide:smile"
-                            width={24}
+                            width={18}
                             onClick={() => setShowEmojis(!showEmojis)}
                             className="cursor-pointer hover:text-white hover:bg-primary p-2 rounded-full transition"
                         />

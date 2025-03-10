@@ -1,10 +1,11 @@
 interface avisEntity {
-feedback: string;
-createdAt: string;
-serviceId?: number;
-user: {
+  id: number;
+  feedback: string;
+  createdAt: string;
+  serviceId?: number;
+  user: {
     name: string;
-}
-userId: number;
-image?: string;
+  };
+  userId: number;
+  image?: string;
 }
