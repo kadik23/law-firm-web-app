@@ -23,7 +23,7 @@ adminRouter.post('/contactus',contactSchema.add,validationErrors ,contactformCon
 adminRouter.post('/categories/add',authMiddleware(["admin"]),categoriesSchema.add,validationErrors,categoriesController.addCategory);
 adminRouter.delete('/categories/delete',authMiddleware(["admin"]),categoriesSchema.remove,validationErrors,categoriesController.deleteCategory);
 
-adminRouter.post('/attorney/add',authMiddleware(["admin"]),attroneySchema.add,validationErrors,attorneysController.createAttorney);
+adminRouter.post('/attorney/add',authMiddleware(["admin"]),attorneysController.createAttorney);
 adminRouter.delete('/attorney/delete',authMiddleware(["admin"]),attroneySchema.remove,validationErrors,attorneysController.deleteAttorneys);
 
 adminRouter.post('/blogs/add',authMiddleware(["admin"]),blogsSchema.add,validationErrors,blogsController.addBlog)

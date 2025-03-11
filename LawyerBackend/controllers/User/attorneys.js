@@ -88,11 +88,6 @@ const getAllAttorneys = async (req, res) => {
  *           in: formData
  *           type: file
  *           description: The attorney's profile picture (optional)
- *         - name: id
- *           in: formData
- *           type: integer
- *           required: true
- *           description: The ID of the attorney to update
  *         - name: first_name
  *           in: formData
  *           type: string
@@ -188,11 +183,10 @@ const updateAttorney = async (req, res) => {
         return res.status(400).send('Error uploading files: ' + err.message);
       }
       await Promise.all([
-        body('id').notEmpty().isInt({ min: 0 }).withMessage('Problem id must be a positive integer').run(req),
+
         body('first_name').optional().isString().withMessage('First name must be a string').run(req),
         body('last_name').optional().isString().withMessage('Last name must be a string').run(req),
         body('email').optional().isEmail().withMessage('Invalid email format').normalizeEmail().run(req),
-        body('password').optional().isLength({ min: 8 }).withMessage('Password must be at least 8 characters long').run(req),
         body('phone_number').optional().isMobilePhone().withMessage('Invalid phone number format').run(req),
         body('city').optional().isString().withMessage('City must be a string').run(req),
         body('age').optional().isInt({ min: 18 }).withMessage('Age must be a valid number and at least 18').run(req),
@@ -207,11 +201,9 @@ const updateAttorney = async (req, res) => {
         return res.status(400).json({ errors: errors.array() });
       }
       const {
-        id,
         first_name,
         last_name,
         email,
-        password,
         phone_number,
         city,
         age,
@@ -222,13 +214,13 @@ const updateAttorney = async (req, res) => {
       } = req.body;
 
       // Find attorney
-      const attorney = await attorneys.findOne({ where: { id: id } });
+      const attorney = await attorneys.findOne({ where: { user_id: req.user.id } });
       if (!attorney) {
         return res.status(404).send({ error: 'Attorney not found' });
       }
 
       // Find associated user
-      const user = await User.findOne({ where: { id: attorney.user_id } });
+      const user = await User.findOne({ where: { id:req.user.id } });
       if (!user) {
         return res.status(404).send({ error: 'Associated user not found' });
       }
@@ -262,11 +254,7 @@ const updateAttorney = async (req, res) => {
         ville: ville || user.ville
       };
 
-      // Hash new password if provided
-      if (password) {
-        const salt = await bcrypt.genSalt(10);
-        updatedUserData.password = await bcrypt.hash(password, salt);
-      }
+
 
       await User.update(updatedUserData, { where: { id: user.id } });
 
@@ -276,7 +264,7 @@ const updateAttorney = async (req, res) => {
             linkedin_url: linkedin_url || attorney.linkedin_url,
             picture_path: picturePath
           },
-          { where: { id: id } }
+          { where: { id: attorney.id } }
       );
 
       return res.status(200).send({ message: 'Attorney information updated successfully' });
