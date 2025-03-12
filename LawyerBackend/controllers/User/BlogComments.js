@@ -2,7 +2,7 @@ require('dotenv').config();
 const db = require('../../models')
 const comments=db.blogcomments
 const Blog=db.blogs
-
+User = db.users;
 /**
  * @swagger
  * paths:
@@ -354,6 +354,12 @@ const getCommentsByBlog = async (req, res) => {
             limit: pageSize,
             offset: offset,
             order: [["createdAt", "DESC"]],
+            include: [
+                {
+                    model: User,
+                    attributes: ["id", "name", "surname"],
+                },
+            ],
         });
 
         return res.status(200).json({
