@@ -19,6 +19,7 @@ const validationErrors=require("../errorHandler/validationErrors")
 const testimonialsController = require("../controllers/User/Testimonials");
 const problemsController = require("../controllers/User/problems.js");
 const consultationController = require("../controllers/User/consultation.js");
+const notifController = require("../controllers/User/NotificationTest");
 const {upload} = require("../middlewares/FilesMiddleware");
 
 const userRouter = require('express').Router();
@@ -80,6 +81,8 @@ userRouter.get('/problems/category/:category_id',problemsSchema.getByCategoryID,
 
 // Consultation Routes
 userRouter.post('/consultations', authMiddleware(["client"]),consultationSchema.add,validationErrors, consultationController.createConsultation);
+//Notification
+userRouter.post('/send-notification', authMiddleware(["admin"]),notifController.sendNotification);
 
 
 module.exports = userRouter;
