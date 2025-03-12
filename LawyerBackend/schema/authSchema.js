@@ -67,5 +67,5 @@ const signIn = [
     body('password')
         .isString().withMessage('Password must be a string')
         .notEmpty().withMessage('Password is required')
-        .isLength({ min: 8 }).withMessage('Password must be at least 8 characters long')
+       // .isLength({ min: 8 }).withMessage('Password must be at least 8 characters long')
 ];module.exports = { signup,uploadFiles,signIn };
