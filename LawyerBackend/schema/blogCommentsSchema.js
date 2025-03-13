@@ -33,4 +33,9 @@ const getByBlog=[
     param('id')
         .isInt({ min: 0 }).withMessage('Blog ID must be a positive integer')
 ]
-module.exports={add,remove,update,reply,like,getByBlog};
+
+const getByComment=[
+    param('commentId')
+        .isInt({ min: 0 }).withMessage('Comment ID must be a positive integer')
+]
+module.exports={add,remove,update,reply,like,getByBlog, getByComment};

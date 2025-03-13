@@ -54,6 +54,7 @@ userRouter.put('/blogs/updatecomment',authMiddleware(["client","admin","attorney
 userRouter.post('/blogs/replycomment',authMiddleware(["client","admin","attorney"]),commentsSchema.reply,validationErrors, blogCommentsController.replyComment);
 userRouter.post('/blogs/likecomment',authMiddleware(["client","admin","attorney"]),commentsSchema.like,validationErrors, blogCommentsController.likeComment);
 userRouter.get('/blogs/commentsByBlog/:id',commentsSchema.getByBlog,validationErrors,blogCommentsController.getCommentsByBlog);
+userRouter.get('/blogs/repliesCommentsByComment/:commentId',commentsSchema.getByComment,validationErrors,blogCommentsController.getRepliesByComment);
 
 //Favorite Routes
 userRouter.post('/favorites',authMiddleware(["client"]),favoriteSchema.add,validationErrors,favoritesController.CreateFavoriteBlog);

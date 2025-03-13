@@ -3,6 +3,8 @@ const db = require('../../models')
 const comments=db.blogcomments
 const Blog=db.blogs
 User = db.users;
+const { Op, literal } = require("sequelize");
+
 /**
  * @swagger
  * paths:
@@ -345,12 +347,12 @@ const getCommentsByBlog = async (req, res) => {
     try {
         const { id } = req.params;
         const page = parseInt(req.query.page) || 1;
-        const pageSize = 6;
+        const pageSize = 4;
         const offset = (page - 1) * pageSize;
 
 
         const { count, rows: commentsList } = await comments.findAndCountAll({
-            where: { blogId: id },
+            where: { blogId: id, isAReply: false },
             limit: pageSize,
             offset: offset,
             order: [["createdAt", "DESC"]],
@@ -360,6 +362,18 @@ const getCommentsByBlog = async (req, res) => {
                     attributes: ["id", "name", "surname"],
                 },
             ],
+            attributes: {
+                include: [
+                    [
+                        literal(`(
+                            SELECT COUNT(*)
+                            FROM blog_comments AS replies
+                            WHERE replies.originalCommentId = blog_comments.id
+                        )`),
+                        "replies",
+                    ],
+                ],
+            },
         });
 
         return res.status(200).json({
@@ -375,11 +389,49 @@ const getCommentsByBlog = async (req, res) => {
     }
 };
 
+const getRepliesByComment = async (req, res) => {
+    try {
+        const { commentId } = req.params;
+
+        const replies = await comments.findAll({
+            where: { originalCommentId: commentId, isAReply: true },
+            order: [["createdAt", "DESC"]],
+            include: [
+                {
+                    model: User,
+                    attributes: ["id", "name", "surname"],
+                },
+            ],
+            attributes: {
+                include: [
+                    [
+                        literal(`(
+                            SELECT COUNT(*)
+                            FROM blog_comments AS replies
+                            WHERE replies.originalCommentId = blog_comments.id
+                        )`),
+                        "replies",
+                    ],
+                ],
+            },
+        });
+
+        return res.status(200).json({
+            success: true,
+            replies: replies,
+        });
+    } catch (e) {
+        console.error("Error fetching replies", e);
+        res.status(500).send("Internal Server Error");
+    }
+};
+
 module.exports = {
     addBlogComment,
     updateBlogComment,
     deleteBlogComment,
     replyComment,
     likeComment,
-    getCommentsByBlog
+    getCommentsByBlog,
+    getRepliesByComment
 };

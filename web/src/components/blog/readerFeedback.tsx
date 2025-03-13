@@ -19,13 +19,17 @@ const ReaderFeedback = ({ blogId }: { blogId: string }) => {
     handleEditComment,
     handleCommentInput,
     setModelIsOpen,
+    totalComments,
+    totalPages,
+    currentPage,
+    fetchComments
   } = useReaderFeedback(blogId);
 
   return (
     <div className="py-4 mb-8">
       <div className="w-full flex flex-col md:flex-row gap-2 items-center justify-between py-4">
         <div className="font-semibold md:font-bold text-xl order-2 md:order-1 md:text-4xl text-center text-primary">
-          Avis des lecteurs de ce blog ({allComments.length})
+          Avis des lecteurs de ce blog ({totalComments})
         </div>
         <button
           className="text-primary border-[1px] order-1 md:order-2 border-black font-semibold px-4 py-2 rounded-md flex items-center gap-1"
@@ -46,23 +50,21 @@ const ReaderFeedback = ({ blogId }: { blogId: string }) => {
         />
       )}
       <div>
-        {allComments.map((comment) => {
-          if (!comment.isAReply) {
-            return (
-              <CommentComponent
-                key={comment.id}
-                comment={comment}
-                onDelete={handleDeleteComment}
-                onEdit={handleEditComment}
-                onLike={handleLikeComment}
-                onReply={handleReplyComment}
-              />
-            );
-          }
-        })}
-        <div className="flex items-center gap-2 text-sm text-white justify-center rounded-md bg-primary py-2 hover:bg-scondary cursor-pointer">
-          Voir plus
-        </div>
+        {allComments.map((comment) => (
+          <CommentComponent
+            key={comment.id}
+            comment={comment}
+            onDelete={handleDeleteComment}
+            onEdit={handleEditComment}
+            onLike={handleLikeComment}
+            onReply={handleReplyComment}
+          />
+        ))}
+        {totalComments > 4 && currentPage != totalPages && (
+          <div onClick={fetchComments} className="flex items-center gap-2 text-sm text-white justify-center rounded-md bg-primary py-2 hover:bg-scondary cursor-pointer">
+            Voir plus
+          </div>
+        )}
         {modelIsOpen && (
           <CommentModal
             isOpen={modelIsOpen}

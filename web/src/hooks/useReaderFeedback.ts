@@ -12,13 +12,21 @@ export const useReaderFeedback = (blogId: string) => {
   const [allComments, setAllComments] = useState<Comment[]>([]);
   const [commentReplies, setCommentReplies] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [repliesLoading, setRepliesLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const [totalComments, setTotalComments] = useState<number>(0);
+  const [totalPages, setTotalPages] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(0);
   const fetchComments = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`/user/blogs/commentsByBlog/${blogId}`);
-      setAllComments(response.data.comments);
+      const response = await axios.get(
+        `/user/blogs/commentsByBlog/${blogId}?page=${currentPage + 1}`
+      );
+      setAllComments((prev) => [...prev, ...response.data.comments]);
+      setTotalComments(response.data.totalComments);
+      setTotalPages(response.data.totalPages);
+      setCurrentPage(response.data.currentPage);
     } catch (err) {
       setError("Failed to fetch testimonials");
       console.error(err);
@@ -44,7 +52,7 @@ export const useReaderFeedback = (blogId: string) => {
     const newComment: Comment = {
       id: allComments.length + 1,
       userId: AuthUSER?.id,
-      user: {name:AuthUSER?.name, surname: AuthUSER?.surname},
+      user: { name: AuthUSER?.name, surname: AuthUSER?.surname },
       blogId: parseInt(blogId),
       body: newCommentBody,
       likes: 0,
@@ -99,12 +107,12 @@ export const useReaderFeedback = (blogId: string) => {
     setAllComments(updatedComments);
   };
 
-  const handleReplyComment = (commentId: number, replyBody?: string) => {
+  const handleReplyComment = async (commentId: number, replyBody?: string) => {
     if (replyBody) {
       const newReply: Comment = {
         id: allComments.length + 1,
         userId: AuthUSER?.id,
-        user: {name:AuthUSER?.name, surname: AuthUSER?.surname},
+        user: { name: AuthUSER?.name, surname: AuthUSER?.surname },
         blogId: parseInt(blogId),
         body: replyBody,
         likes: 0,
@@ -124,10 +132,23 @@ export const useReaderFeedback = (blogId: string) => {
 
       setAllComments([...updatedComments, newReply]);
     } else {
-      setCommentReplies(
-        allComments.filter((comment) => comment.originalCommentId === commentId)
-      );
-      setModelIsOpen(true);
+      try {
+        setRepliesLoading(true);
+        const response = await axios.get(
+          `/user/blogs/repliesCommentsByComment/${commentId}`
+        );
+
+        setCommentReplies(response.data.replies);
+        // setTotalComments(response.data.totalComments);
+        // setTotalPages(response.data.totalPages);
+        // setCurrentPage(response.data.currentPage);
+      } catch (err) {
+        setError("Failed to fetch testimonials");
+        console.error(err);
+      } finally {
+        setRepliesLoading(false);
+        setModelIsOpen(true);
+      }
     }
   };
 
@@ -166,6 +187,11 @@ export const useReaderFeedback = (blogId: string) => {
     handleCommentInput,
     setModelIsOpen,
     loading,
-    error
+    error,
+    totalComments,
+    totalPages,
+    currentPage,
+    repliesLoading,
+    fetchComments,
   };
 };
