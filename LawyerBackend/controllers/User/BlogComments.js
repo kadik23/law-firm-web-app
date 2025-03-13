@@ -57,7 +57,17 @@ const addBlogComment = async (req,res)=> {
             if (!newBlogComment) {
                 return res.status(401).send('Error creating blog comment');
             } else {
-                return res.status(200).send(newBlogComment);
+                const commentWithUser = await comments.findOne({
+                    where: { id: newBlogComment.id },
+                    include: [
+                      {
+                        model: User,
+                        attributes: ["id", "name", "surname"],
+                      },
+                    ],
+                  });
+              
+                  return res.status(200).send(commentWithUser);
             }
 
     }
@@ -108,8 +118,8 @@ const addBlogComment = async (req,res)=> {
 
 const deleteBlogComment= async (req,res)=>{
     try {
-        const {id} = req.body;
-        let comment = await comments.findByPk(id);
+        const {commentId} = req.params;
+        let comment = await comments.findByPk(commentId);
 
         if (!comment) {
             return res.status(404).json("Comment not found");
@@ -167,8 +177,9 @@ const deleteBlogComment= async (req,res)=>{
 
 const updateBlogComment= async (req,res)=>{
     try {
-        const {id ,body} = req.body;
-        let comment = await comments.findByPk(id);
+        const {body} = req.body;
+        const {commentId} = req.params;
+        let comment = await comments.findByPk(commentId);
 
         if (!comment) {
             return res.status(404).json("comment not found");
@@ -180,7 +191,7 @@ const updateBlogComment= async (req,res)=>{
 
         const updatedComments = await comment.update(
             { body:body },
-            { where: { id:id } }
+            { where: { id:commentId } }
         );
         if (!updatedComments) {
             return res.status(404).send('Error updating comment');

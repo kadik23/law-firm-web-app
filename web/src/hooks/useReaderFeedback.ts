@@ -12,6 +12,7 @@ export const useReaderFeedback = (blogId: string) => {
   const [allComments, setAllComments] = useState<Comment[]>([]);
   const [commentReplies, setCommentReplies] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [commentLoading, setCommentLoading] = useState(false);
   const [repliesLoading, setRepliesLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalComments, setTotalComments] = useState<number>(0);
@@ -39,7 +40,7 @@ export const useReaderFeedback = (blogId: string) => {
     fetchComments();
   }, [blogId]);
 
-  const handleAddComment = (newCommentBody: string) => {
+  const handleAddComment = async (newCommentBody: string) => {
     if (newCommentBody.trim() === "") {
       showAlert(
         "warning",
@@ -48,26 +49,34 @@ export const useReaderFeedback = (blogId: string) => {
       );
       return;
     }
-
-    const newComment: Comment = {
-      id: allComments.length + 1,
-      userId: AuthUSER?.id,
-      user: { name: AuthUSER?.name, surname: AuthUSER?.surname },
-      blogId: parseInt(blogId),
-      body: newCommentBody,
-      likes: 0,
-      isAReply: 0,
-      replies: 0,
-      originalCommentId: null,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+    try {
+      setCommentLoading(true);
+      const response = await axios.post(`/user/blogs/addcomment`, {
+        body: newCommentBody,
+        blogId: blogId,
+      });
+      setAllComments((prevComments) => [
+        ...prevComments,
+        { ...response.data, replies: 0 },
+      ]);
+      setTotalComments(totalComments + 1);
+      showAlert(
+        "success",
+        "Commenter réussie",
+        `Commenter réussie ${response.data.id}`
+      );
+    } catch (err) {
+      setError("Failed to add comment");
+      showAlert("error", "vous n'avez pas commenté", err as string);
+      console.error(err);
+    } finally {
+      setCommentLoading(false);
+    }
 
     setShowCommentInput(false);
-    setAllComments((prevComments) => [newComment, ...prevComments]);
   };
 
-  const handleDeleteComment = (commentId: number) => {
+  const handleDeleteComment = async (commentId: number) => {
     const deletedComment = allComments.find(
       (comment) => comment.id === commentId
     );
@@ -85,7 +94,28 @@ export const useReaderFeedback = (blogId: string) => {
         updatedComments.filter((comment) => comment.id !== commentId)
       );
     } else {
-      setAllComments(allComments.filter((comment) => comment.id !== commentId));
+      try {
+        setCommentLoading(true);
+        const response = await axios.delete(
+          `/user/blogs/deletecomment/${commentId}`
+        );
+
+        setAllComments(
+          allComments.filter((comment) => comment.id !== commentId)
+        );
+        setTotalComments(totalComments - 1);
+        showAlert(
+          "success",
+          "Commente supprimé avec succès",
+          response.data.message
+        );
+      } catch (err) {
+        setError("Failed to delete comment");
+        showAlert("error", "vous n'avez pas commenté", err as string);
+        console.error(err);
+      } finally {
+        setCommentLoading(false);
+      }
     }
   };
 
@@ -139,9 +169,6 @@ export const useReaderFeedback = (blogId: string) => {
         );
 
         setCommentReplies(response.data.replies);
-        // setTotalComments(response.data.totalComments);
-        // setTotalPages(response.data.totalPages);
-        // setCurrentPage(response.data.currentPage);
       } catch (err) {
         setError("Failed to fetch testimonials");
         console.error(err);
@@ -152,14 +179,35 @@ export const useReaderFeedback = (blogId: string) => {
     }
   };
 
-  const handleEditComment = (commentId: number, newBody: string) => {
-    const updatedComments = allComments.map((comment) => {
-      if (comment.id === commentId) {
-        return { ...comment, body: newBody };
-      }
-      return comment;
-    });
-    setAllComments(updatedComments);
+  const handleEditComment = async (commentId: number, newBody: string) => {
+    try {
+      setCommentLoading(true);
+      const response = await axios.put(
+        `/user/blogs/updatecomment/${commentId}`,
+        {
+          id: commentId,
+          body: newBody,
+        }
+      );
+      const updatedComments = allComments.map((comment) => {
+        if (comment.id === commentId) {
+          return { ...comment, body: newBody };
+        }
+        return comment;
+      });
+      setAllComments(updatedComments);
+      showAlert(
+        "success",
+        "Commentaire mis à jour avec succès",
+        response.data.message
+      );
+    } catch (err) {
+      setError("Failed to delete comment");
+      showAlert("error", "Vous n'avez pas mise a jour", err as string);
+      console.error(err);
+    } finally {
+      setCommentLoading(false);
+    }
   };
 
   const handleCommentInput = () => {
@@ -193,5 +241,6 @@ export const useReaderFeedback = (blogId: string) => {
     currentPage,
     repliesLoading,
     fetchComments,
+    commentLoading,
   };
 };

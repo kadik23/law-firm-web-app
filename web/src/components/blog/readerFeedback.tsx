@@ -22,7 +22,10 @@ const ReaderFeedback = ({ blogId }: { blogId: string }) => {
     totalComments,
     totalPages,
     currentPage,
-    fetchComments
+    fetchComments,
+    loading,
+    repliesLoading,
+    commentLoading,
   } = useReaderFeedback(blogId);
 
   return (
@@ -45,14 +48,16 @@ const ReaderFeedback = ({ blogId }: { blogId: string }) => {
       </div>
       {showCommentInput && (
         <CommentInput
+          commentLoading={commentLoading}
           onSubmit={handleAddComment}
           onClose={() => handleCommentInput()}
         />
       )}
       <div>
-        {allComments.map((comment) => (
+        {loading && <div>Chargement...</div>}
+        {allComments.map((comment, index) => (
           <CommentComponent
-            key={comment.id}
+            key={index}
             comment={comment}
             onDelete={handleDeleteComment}
             onEdit={handleEditComment}
@@ -61,7 +66,10 @@ const ReaderFeedback = ({ blogId }: { blogId: string }) => {
           />
         ))}
         {totalComments > 4 && currentPage != totalPages && (
-          <div onClick={fetchComments} className="flex items-center gap-2 text-sm text-white justify-center rounded-md bg-primary py-2 hover:bg-scondary cursor-pointer">
+          <div
+            onClick={fetchComments}
+            className="flex items-center gap-2 text-sm text-white justify-center rounded-md bg-primary py-2 hover:bg-scondary cursor-pointer"
+          >
             Voir plus
           </div>
         )}
@@ -71,9 +79,11 @@ const ReaderFeedback = ({ blogId }: { blogId: string }) => {
             onClose={() => setModelIsOpen(false)}
             isNotStepOne={true}
           >
-            {commentReplies.map((reply) => (
+            {repliesLoading && <div>Chargement...</div>}
+            {commentReplies.map((reply, index) => (
               <div className="mt-6" key={reply.id}>
                 <CommentComponent
+                  key={index}
                   comment={reply}
                   onDelete={handleDeleteComment}
                   onEdit={handleEditComment}

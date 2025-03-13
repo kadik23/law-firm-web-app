@@ -8,14 +8,14 @@ const add = [
         .isInt({ min: 0 }).withMessage('Blog ID must be a positive integer')
 ];
 const remove = [
-    body('id')
+    param('commentId')
         .isInt().withMessage("Comment s ID is required")
 ];
 const update = [
     body('body')
         .isString().withMessage('body must be a string')
         .isLength({ min: 1 }).withMessage('body cannot be empty'),
-    body('id')
+    param('commentId')
         .isInt({ min: 0 }).withMessage('ID must be a positive integer')
 ];
 const reply = [
