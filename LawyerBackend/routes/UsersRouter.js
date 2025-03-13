@@ -19,6 +19,7 @@ const validationErrors=require("../errorHandler/validationErrors")
 const testimonialsController = require("../controllers/User/Testimonials");
 const problemsController = require("../controllers/User/problems.js");
 const consultationController = require("../controllers/User/consultation.js");
+const notifController = require("../controllers/User/NotificationTest");
 const {upload} = require("../middlewares/FilesMiddleware");
 
 const userRouter = require('express').Router();
@@ -44,6 +45,7 @@ userRouter.get('/blogs/like/count/:id',blogsController.GetLikesCount);
 
 // Attorneys Routes
 userRouter.get('/attorneys', attorneysController.getAllAttorneys);
+userRouter.put('/attorney/update',authMiddleware(["attorney"]), attorneysController.updateAttorney);
 
 //Comments Routes
 userRouter.post('/blogs/addcomment',authMiddleware(["client","admin","attorney"]),commentsSchema.add,validationErrors, blogCommentsController.addBlogComment);
@@ -80,6 +82,8 @@ userRouter.get('/problems/category/:category_id',problemsSchema.getByCategoryID,
 
 // Consultation Routes
 userRouter.post('/consultations', authMiddleware(["client"]),consultationSchema.add,validationErrors, consultationController.createConsultation);
+//Notification
+userRouter.post('/send-notification', authMiddleware(["admin"]),notifController.sendNotification);
 
 
 module.exports = userRouter;
