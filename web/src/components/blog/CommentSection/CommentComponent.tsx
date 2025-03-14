@@ -68,10 +68,10 @@ const CommentComponent = ({ comment, onDelete, onEdit, onLike, onReply }: Commen
                 <div className="flex items-center gap-1">
                     <button className="bg-secondary w-7 h-7 rounded-full p-2 text-sm btn 
                     font-semibold text-white flex items-center justify-center">
-                        {comment.name?.charAt(0)}
+                        {comment.user.name?.charAt(0)}
                     </button>
                     <span className="font-semibold">
-                        {comment.name + " " + comment.surname}
+                        {comment.user.name + " " + comment.user.surname}
                     </span>
                 </div>
                 {AuthUSER?.id === comment.userId && (

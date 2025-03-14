@@ -26,7 +26,7 @@ const BlogCard = ({blog, signIn}:{blog:Blog,signIn?:boolean}) => {
                 <h3 className="text-sm font-semibold text-gray-900">{blog.title}</h3>
                 <p className="text-sm text-gray-500 text-justify mb-4">{useTruncateText(blog.body, 180)}</p>
                 <div className="flex justify-between items-center gap-2">
-                    <Link href={`/blog/${blog.id}`} className="text-sm flex gap-1 items-center">
+                    <Link href={`/blog/${blog.id}`} className="text-sm flex gap-1 items-center hover:text-textColor">
                         Read post
                         <Icon
                             icon="mdi:arrow"

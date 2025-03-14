@@ -2,6 +2,8 @@ require('dotenv').config();
 const db = require('../../models')
 const comments=db.blogcomments
 const Blog=db.blogs
+User = db.users;
+const { Op, literal } = require("sequelize");
 
 /**
  * @swagger
@@ -55,7 +57,17 @@ const addBlogComment = async (req,res)=> {
             if (!newBlogComment) {
                 return res.status(401).send('Error creating blog comment');
             } else {
-                return res.status(200).send(newBlogComment);
+                const commentWithUser = await comments.findOne({
+                    where: { id: newBlogComment.id },
+                    include: [
+                      {
+                        model: User,
+                        attributes: ["id", "name", "surname"],
+                      },
+                    ],
+                  });
+              
+                  return res.status(200).send(commentWithUser);
             }
 
     }
@@ -106,8 +118,8 @@ const addBlogComment = async (req,res)=> {
 
 const deleteBlogComment= async (req,res)=>{
     try {
-        const {id} = req.body;
-        let comment = await comments.findByPk(id);
+        const {commentId} = req.params;
+        let comment = await comments.findByPk(commentId);
 
         if (!comment) {
             return res.status(404).json("Comment not found");
@@ -165,8 +177,9 @@ const deleteBlogComment= async (req,res)=>{
 
 const updateBlogComment= async (req,res)=>{
     try {
-        const {id ,body} = req.body;
-        let comment = await comments.findByPk(id);
+        const {body} = req.body;
+        const {commentId} = req.params;
+        let comment = await comments.findByPk(commentId);
 
         if (!comment) {
             return res.status(404).json("comment not found");
@@ -178,7 +191,7 @@ const updateBlogComment= async (req,res)=>{
 
         const updatedComments = await comment.update(
             { body:body },
-            { where: { id:id } }
+            { where: { id:commentId } }
         );
         if (!updatedComments) {
             return res.status(404).send('Error updating comment');
@@ -345,15 +358,33 @@ const getCommentsByBlog = async (req, res) => {
     try {
         const { id } = req.params;
         const page = parseInt(req.query.page) || 1;
-        const pageSize = 6;
+        const pageSize = 4;
         const offset = (page - 1) * pageSize;
 
 
         const { count, rows: commentsList } = await comments.findAndCountAll({
-            where: { blogId: id },
+            where: { blogId: id, isAReply: false },
             limit: pageSize,
             offset: offset,
             order: [["createdAt", "DESC"]],
+            include: [
+                {
+                    model: User,
+                    attributes: ["id", "name", "surname"],
+                },
+            ],
+            attributes: {
+                include: [
+                    [
+                        literal(`(
+                            SELECT COUNT(*)
+                            FROM blog_comments AS replies
+                            WHERE replies.originalCommentId = blog_comments.id
+                        )`),
+                        "replies",
+                    ],
+                ],
+            },
         });
 
         return res.status(200).json({
@@ -369,11 +400,49 @@ const getCommentsByBlog = async (req, res) => {
     }
 };
 
+const getRepliesByComment = async (req, res) => {
+    try {
+        const { commentId } = req.params;
+
+        const replies = await comments.findAll({
+            where: { originalCommentId: commentId, isAReply: true },
+            order: [["createdAt", "DESC"]],
+            include: [
+                {
+                    model: User,
+                    attributes: ["id", "name", "surname"],
+                },
+            ],
+            attributes: {
+                include: [
+                    [
+                        literal(`(
+                            SELECT COUNT(*)
+                            FROM blog_comments AS replies
+                            WHERE replies.originalCommentId = blog_comments.id
+                        )`),
+                        "replies",
+                    ],
+                ],
+            },
+        });
+
+        return res.status(200).json({
+            success: true,
+            replies: replies,
+        });
+    } catch (e) {
+        console.error("Error fetching replies", e);
+        res.status(500).send("Internal Server Error");
+    }
+};
+
 module.exports = {
     addBlogComment,
     updateBlogComment,
     deleteBlogComment,
     replyComment,
     likeComment,
-    getCommentsByBlog
+    getCommentsByBlog,
+    getRepliesByComment
 };
