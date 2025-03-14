@@ -139,28 +139,40 @@ export const useReaderFeedback = (blogId: string) => {
 
   const handleReplyComment = async (commentId: number, replyBody?: string) => {
     if (replyBody) {
-      const newReply: Comment = {
-        id: allComments.length + 1,
-        userId: AuthUSER?.id,
-        user: { name: AuthUSER?.name, surname: AuthUSER?.surname },
-        blogId: parseInt(blogId),
-        body: replyBody,
-        likes: 0,
-        isAReply: 1,
-        replies: 0,
-        originalCommentId: commentId,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-
-      const updatedComments = allComments.map((comment) => {
-        if (comment.id === commentId) {
-          return { ...comment, replies: comment.replies + 1 };
-        }
-        return comment;
-      });
-
-      setAllComments([...updatedComments, newReply]);
+      try {
+        setCommentLoading(true);
+        const response = await axios.post(`/user/blogs/replycomment`, {
+          body: replyBody,
+          originalCommentId: commentId,
+        });
+        setAllComments((prevComments) =>
+          prevComments.map((comment) => {
+            if (comment.id === commentId) {
+              return { ...comment, replies: comment.replies + 1 };
+            }
+            return comment;
+          })
+        );
+        setCommentReplies((prevReplies) =>
+          prevReplies.map((reply) => {
+            if (reply.id === commentId) {
+              return { ...reply, replies: reply.replies + 1 };
+            }
+            return reply;
+          })
+        );
+        showAlert(
+          "success",
+          "Répondre réussie",
+          `Répondre réussie ${response.data.id}`
+        );
+      } catch (err) {
+        setError("Failed to reply comment");
+        showAlert("error", "vous n'avez pas commenté", err as string);
+        console.error(err);
+      } finally {
+        setCommentLoading(false);
+      }
     } else {
       try {
         setRepliesLoading(true);

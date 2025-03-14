@@ -11,7 +11,7 @@ interface ModalProps {
 const CommentModal: React.FC<ModalProps> = ({ children, isOpen, onClose, isNotStepOne }) => {
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 flex justify-center items-start md:items-center bg-black/50 z-50">
+    <div className="fixed inset-0 flex justify-center overflow-y-scroll items-start md:items-center bg-black/50 z-50">
       <div className="bg-[#2C3E50] p-6 rounded-md shadow-lg relative w-full mx-2 md:mx-10 md:w-full">
         <Icon 
           icon="material-symbols:close" 
