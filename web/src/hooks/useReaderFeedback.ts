@@ -77,22 +77,42 @@ export const useReaderFeedback = (blogId: string) => {
   };
 
   const handleDeleteComment = async (commentId: number) => {
-    const deletedComment = allComments.find(
-      (comment) => comment.id === commentId
-    );
+    const deletedComment =
+      allComments.find((comment) => comment.id === commentId) ||
+      commentReplies.find((comment) => comment.id === commentId);
     if (!deletedComment) return;
 
     if (deletedComment.originalCommentId) {
-      const updatedComments = allComments.map((comment) => {
-        if (comment.id === deletedComment.originalCommentId) {
-          return { ...comment, replies: comment.replies - 1 };
-        }
-        return comment;
-      });
-      setModelIsOpen(false);
-      setAllComments(
-        updatedComments.filter((comment) => comment.id !== commentId)
-      );
+      try {
+        setCommentLoading(true);
+        const response = await axios.delete(
+          `/user/blogs/deletecomment/${commentId}`
+        );
+
+        const updatedComments = allComments.map((comment) => {
+          if (comment.id === deletedComment.originalCommentId) {
+            return { ...comment, replies: comment.replies - 1 };
+          }
+          return comment;
+        });
+        setAllComments(
+          updatedComments.filter((comment) => comment.id !== commentId)
+        );
+        setCommentReplies(
+          commentReplies.filter((comment) => comment.id !== commentId)
+        );
+        showAlert(
+          "success",
+          "Commente supprimé avec succès",
+          response.data.message
+        );
+      } catch (err) {
+        setError("Failed to delete comment");
+        showAlert("error", "vous n'avez pas commenté", err as string);
+        console.error(err);
+      } finally {
+        setCommentLoading(false);
+      }
     } else {
       try {
         setCommentLoading(true);
@@ -207,7 +227,14 @@ export const useReaderFeedback = (blogId: string) => {
         }
         return comment;
       });
+      const updatedRepliesComments = commentReplies.map((comment) => {
+        if (comment.id === commentId) {
+          return { ...comment, body: newBody };
+        }
+        return comment;
+      });
       setAllComments(updatedComments);
+      setCommentReplies(updatedRepliesComments);
       showAlert(
         "success",
         "Commentaire mis à jour avec succès",
