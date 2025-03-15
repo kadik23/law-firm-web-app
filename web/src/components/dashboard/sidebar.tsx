@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import classNames from "classnames";
+import Notification from "../../../public/icons/notification.svg";
 import {
   DashboardIcon,
   AccountIcon,
@@ -22,6 +23,7 @@ const Sidebar = () => {
         { Icon: PaymentsIcon, alt: "Payments", path: "/client/dashboard/payments" },
         { Icon: ServiceIcon, alt: "Services", path: "/client/dashboard/services" },
         { Icon: BlogsIcon, alt: "Vos blogs", path: "/client/dashboard/vos-blogs" },
+        { Icon: Notification, alt: "Notifications", path: "/client/dashboard/notifications" },
     ];
 
     return (
