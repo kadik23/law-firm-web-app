@@ -1,5 +1,5 @@
 // components/CommentInput.tsx
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import { useAuth } from "@/hooks/useAuth";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -8,9 +8,10 @@ import { EmojiPicker } from "@/components/EmojiPicker";
 interface CommentInputProps {
     onSubmit: (comment: string) => void;
     onClose: () => void;
+    commentLoading: boolean;
 }
 
-const CommentInput = ({ onSubmit, onClose }: CommentInputProps) => {
+const CommentInput = ({ onSubmit, onClose, commentLoading }: CommentInputProps) => {
     const { user: AuthUSER } = useAuth();
     const [comment, setComment] = useState("");
     const [showEmojis, setShowEmojis] = useState(false);
@@ -20,12 +21,18 @@ const CommentInput = ({ onSubmit, onClose }: CommentInputProps) => {
         if (comment.trim() === "") {
             return; // Prevent submission if the comment is empty
         }
-        setSubmitting(true);
         console.log("CommentInput: ", comment);
         onSubmit(comment); // Pass the comment to the parent component
         setComment(""); // Reset the comment state after submission
-        setSubmitting(false);
     };
+
+    useEffect(() => {
+        if (commentLoading) {
+            setSubmitting(true);
+        } else {
+            setSubmitting(false);
+        }
+    }, [commentLoading]);
 
     const addEmoji = (emoji: string) => {
         setShowEmojis(false);
