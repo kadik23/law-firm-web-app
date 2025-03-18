@@ -28,9 +28,10 @@ const getById = [
 ];
 
 const remove= [
-    body('id')
-        .isInt().withMessage('id must be a number')
-        .notEmpty().withMessage('id is required'),
+    body('ids')
+    .isArray({ min: 1 }).withMessage('ids must be an array with at least one ID')
+    .custom((ids) => ids.every(id => typeof id === 'number'))
+    .withMessage('All ids must be numbers')
 ]
 
 const isLike = [
