@@ -26,7 +26,7 @@ const FilterControls = ({
 }: FilterControlsProps) => {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
-  const postTimeOptions = ["option 1", "option 2", "option 3"];
+  const postTimeOptions = ["Tous", "Aujourde'hui", "7 dernier jours", "30 dernier jours", "cette annee (2025)", "cette annee (2024)"];
   const notificationTypeOptions = ["Tous", "Commentaires", "Consultations", "Documents"];
   const consultationTypes = ["Tous", "Acceptée", "Refusée"];
 
@@ -35,8 +35,8 @@ const FilterControls = ({
   };
 
   return (
-    <div className="flex items-center justify-between mb-6">
-      <div className="flex items-center gap-2">
+    <div className="flex flex-col md:flex-row items-center justify-between mb-6">
+      <div className="flex items-center gap-2 mb-4 md:mb-0 w-full md:w-auto">
         <Dropdown
           options={postTimeOptions}
           value={postTimeValue}
@@ -60,8 +60,12 @@ const FilterControls = ({
           }}
         />
       </div>
-      {(notificationTypeValue === "Tous" || notificationTypeValue === "Consultations") && (
-        <div className="flex items-center gap-2">
+      {(
+        notificationTypeValue === "Tous" || 
+        notificationTypeValue === "Consultations" || 
+        notificationTypeValue === "Notifications"
+      ) && (
+        <div className="flex items-center gap-2 w-full md:w-auto">
           <Dropdown
             options={postTimeOptions}
             value={consultationTimeValue}
