@@ -1,7 +1,10 @@
 import { type ReactNode } from 'react';
+import Image from "next/image";
 
 interface IconProps {
   className?: string;
+  active?: boolean;
+  Hover?: boolean;
 }
 
 export const DashboardIcon = ({ className }: IconProps): ReactNode => (
@@ -35,6 +38,16 @@ export const BlogsIcon = ({ className }: IconProps): ReactNode => (
   <svg width="26" height="22" viewBox="0 0 26 22" className={className} xmlns="http://www.w3.org/2000/svg">
     <path d="M20.5833 2.76367H19.5V1.01367H17.3333V2.76367H8.66667V1.01367H6.5V2.76367H5.41667C4.225 2.76367 3.25 3.55117 3.25 4.51367V16.7637C3.25 17.7262 4.225 18.5137 5.41667 18.5137H20.5833C21.775 18.5137 22.75 17.7262 22.75 16.7637V4.51367C22.75 3.55117 21.775 2.76367 20.5833 2.76367ZM20.5833 16.7637H5.41667V8.01367H20.5833V16.7637ZM5.41667 6.26367V4.51367H20.5833V6.26367H5.41667ZM11.44 15.4162L17.8642 10.2274L16.7158 9.29992L11.44 13.5612L9.15417 11.7149L8.00583 12.6424L11.44 15.4162Z" fill="currentColor"/>
   </svg>
+);
+
+export const NotificationIcon = ({ className, active, Hover }: IconProps): ReactNode => (
+  <Image 
+    src={`/icons/notification${(active || Hover) ? "" : "-white"}.svg`}
+    alt="notification"
+    width={18}
+    height={22}
+    className={className}
+  />
 );
 
 export const LogoutIcon = ({ className }: IconProps): ReactNode => (
