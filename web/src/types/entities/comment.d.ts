@@ -1,3 +1,4 @@
+// types/entities/Comment.ts
 export interface Comment {
     id: number;
     userId?: number;
