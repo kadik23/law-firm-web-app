@@ -39,13 +39,14 @@ db.attorneys = require('./Attorneys.js')(sequelize, DataTypes);
 db.files = require('./Files.js')(sequelize, DataTypes);
 db.categories = require('./Categories.js')(sequelize, DataTypes);
 db.blogs = require('./Blogs.js')(sequelize, DataTypes);
-db.like = require('./Like.js')(sequelize, DataTypes);
+db.like = require('./BlogsLikes.js')(sequelize, DataTypes);
 db.favorites = require('./Favorites.js')(sequelize, DataTypes);
 db.blogcomments = require('./BlogComments.js')(sequelize, DataTypes);
 db.services = require('./Services.js')(sequelize, DataTypes);
 db.testimonials = require("./Testimonials")(sequelize, DataTypes);
 db.problems = require("./problems.js")(sequelize, DataTypes);
 db.Consultation = require("./Consultation")(sequelize, DataTypes);
+db.commentsLikes = require("./CommentsLikes")(sequelize, DataTypes);
 db.request_service = require('./request_service.js')(sequelize, DataTypes);
 db.service_files_uploaded = require('./service_files_uploaded.js')(sequelize, DataTypes);
 
@@ -145,7 +146,12 @@ db.users.hasMany(db.testimonials, {
   foreignKey: 'userId',
   as: 'userTestimonials',
 });
-
+db.blogcomments.hasMany(db.commentsLikes, {
+    foreignKey: 'comment',
+    as: 'blogComment',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+});
 Object.keys(db).forEach((modelName) => {
   if (db[modelName].associate) {
     db[modelName].associate(db);

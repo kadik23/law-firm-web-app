@@ -1,7 +1,9 @@
 require('dotenv').config();
 const db = require('../../models')
+const {Sequelize} = require("sequelize");
 const comments=db.blogcomments
 const Blog=db.blogs
+const likes=db.commentsLikes
 
 /**
  * @swagger
@@ -294,17 +296,15 @@ const likeComment = async (req,res)=> {
         if (!comment) {
             return res.status(404).json("comment not found");
         }
+        let like = await likes.findOne({userId:req.user.id});
 
+        if (!like) {
+            await likes.create({userId:req.user.id,commentId:comment.id})
+            return res.status(200).send('Like comment');
 
-        const updatedComments = await comment.update(
-            { likes: comment.likes+1 },
-            { where: { id } }
-        );
-
-        if (!updatedComments) {
-            return res.status(404).send('Error updating comment');
-        } else {
-            return res.status(200).send('Comment updated successfully');
+        }else {
+            await like.destroy()
+            return res.status(200).send('Unlike comment');
         }
 
     }
@@ -349,12 +349,25 @@ const getCommentsByBlog = async (req, res) => {
         const offset = (page - 1) * pageSize;
 
 
-        const { count, rows: commentsList } = await comments.findAndCountAll({
+        const { count, rows: commentsList } = await db.blogcomments.findAndCountAll({
             where: { blogId: id },
             limit: pageSize,
             offset: offset,
             order: [["createdAt", "DESC"]],
+            include: [
+                {
+                    model: db.commentsLikes,  // Ensure this references the correct model
+                    as: "blogComment",  // Use the alias EXACTLY as defined in the association
+                    attributes: [
+                        [Sequelize.fn("COUNT", Sequelize.col("blogComment.comment")), "likesCount"]
+                    ],
+                },
+            ],
+            group: ["commentsLikes.commentId"],
+            subQuery: false,
         });
+
+
 
         return res.status(200).json({
             success: true,
