@@ -19,6 +19,7 @@ const validationErrors=require("../errorHandler/validationErrors")
 const testimonialsController = require("../controllers/User/Testimonials");
 const problemsController = require("../controllers/User/problems.js");
 const consultationController = require("../controllers/User/consultation.js");
+const notifController = require("../controllers/User/NotificationTest");
 const {upload} = require("../middlewares/FilesMiddleware");
 
 const userRouter = require('express').Router();
@@ -44,14 +45,16 @@ userRouter.get('/blogs/like/count/:id',blogsController.GetLikesCount);
 
 // Attorneys Routes
 userRouter.get('/attorneys', attorneysController.getAllAttorneys);
+userRouter.put('/attorney/update',authMiddleware(["attorney"]), attorneysController.updateAttorney);
 
 //Comments Routes
 userRouter.post('/blogs/addcomment',authMiddleware(["client","admin","attorney"]),commentsSchema.add,validationErrors, blogCommentsController.addBlogComment);
-userRouter.delete('/blogs/deletecomment',authMiddleware(["client","admin","attorney"]),commentsSchema.remove,validationErrors, blogCommentsController.deleteBlogComment);
-userRouter.put('/blogs/updatecomment',authMiddleware(["client","admin","attorney"]),commentsSchema.update,validationErrors, blogCommentsController.updateBlogComment);
+userRouter.delete('/blogs/deletecomment/:commentId',authMiddleware(["client","admin","attorney"]),commentsSchema.remove,validationErrors, blogCommentsController.deleteBlogComment);
+userRouter.put('/blogs/updatecomment/:commentId',authMiddleware(["client","admin","attorney"]),commentsSchema.update,validationErrors, blogCommentsController.updateBlogComment);
 userRouter.post('/blogs/replycomment',authMiddleware(["client","admin","attorney"]),commentsSchema.reply,validationErrors, blogCommentsController.replyComment);
 userRouter.post('/blogs/likecomment',authMiddleware(["client","admin","attorney"]),commentsSchema.like,validationErrors, blogCommentsController.likeComment);
 userRouter.get('/blogs/commentsByBlog/:id',commentsSchema.getByBlog,validationErrors,blogCommentsController.getCommentsByBlog);
+userRouter.get('/blogs/repliesCommentsByComment/:commentId',commentsSchema.getByComment,validationErrors,blogCommentsController.getRepliesByComment);
 
 //Favorite Routes
 userRouter.post('/favorites',authMiddleware(["client"]),favoriteSchema.add,validationErrors,favoritesController.CreateFavoriteBlog);
@@ -80,6 +83,8 @@ userRouter.get('/problems/category/:category_id',problemsSchema.getByCategoryID,
 
 // Consultation Routes
 userRouter.post('/consultations', authMiddleware(["client"]),consultationSchema.add,validationErrors, consultationController.createConsultation);
+//Notification
+userRouter.post('/send-notification', authMiddleware(["admin"]),notifController.sendNotification);
 
 
 module.exports = userRouter;

@@ -2,8 +2,11 @@
 export interface Comment {
     id: number;
     userId?: number;
-    name?: string;
-    surname?: string;
+    user: {
+        id?: number;
+        name?: string;
+        surname?: string;
+    };
     blogId: number;
     body: string;
     likes: number;
