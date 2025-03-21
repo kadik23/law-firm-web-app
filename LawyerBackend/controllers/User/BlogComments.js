@@ -354,26 +354,37 @@ const getCommentsByBlog = async (req, res) => {
             limit: pageSize,
             offset: offset,
             order: [["createdAt", "DESC"]],
+            attributes: [
+                "id",
+                "body",
+                "userId",
+                "blogId",
+                "createdAt",
+                "isAReply",
+                "originalCommentId",
+                "updatedAt",
+                [Sequelize.fn("COUNT", Sequelize.col("commentLikes.commentId")), "likesCount"]
+            ],
             include: [
                 {
-                    model: db.commentsLikes,  // Ensure this references the correct model
-                    as: "blogComment",  // Use the alias EXACTLY as defined in the association
-                    attributes: [
-                        [Sequelize.fn("COUNT", Sequelize.col("blogComment.comment")), "likesCount"]
-                    ],
+                    model: db.commentsLikes,
+                    as: "commentLikes",
+                    attributes: [],
                 },
             ],
-            group: ["commentsLikes.commentId"],
+            group: ["blog_comments.id"],
             subQuery: false,
         });
+
+
 
 
 
         return res.status(200).json({
             success: true,
             currentPage: page,
-            totalPages: Math.ceil(count / pageSize),
-            totalComments: count,
+            totalPages: Math.ceil((count.length || 0) / pageSize),
+            totalComments: count.length || 0,
             comments: commentsList,
         });
     } catch (e) {

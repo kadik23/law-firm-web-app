@@ -147,8 +147,8 @@ db.users.hasMany(db.testimonials, {
   as: 'userTestimonials',
 });
 db.blogcomments.hasMany(db.commentsLikes, {
-    foreignKey: 'comment',
-    as: 'blogComment',
+    foreignKey: 'commentId',
+    as: 'commentLikes',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
 });
