@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const {upload} = require("../../middlewares/FilesMiddleware");
 const {body, validationResult} = require("express-validator");
+const bcrypt = require("bcrypt");
 const attorneys = db.attorneys;
 const User = db.users;
 
@@ -183,17 +184,41 @@ const updateAttorney = async (req, res) => {
         return res.status(400).send('Error uploading files: ' + err.message);
       }
       await Promise.all([
-
         body('first_name').optional().isString().withMessage('First name must be a string').run(req),
         body('last_name').optional().isString().withMessage('Last name must be a string').run(req),
         body('email').optional().isEmail().withMessage('Invalid email format').normalizeEmail().run(req),
         body('phone_number').optional().isMobilePhone().withMessage('Invalid phone number format').run(req),
         body('city').optional().isString().withMessage('City must be a string').run(req),
         body('age').optional().isInt({ min: 18 }).withMessage('Age must be a valid number and at least 18').run(req),
-        body('sex').optional().isIn(['Homme','Femme']).withMessage('Sex must be "Homme" or "Femme"').run(req),
+        body('sex').optional().isIn(['Homme', 'Femme']).withMessage('Sex must be "Homme" or "Femme"').run(req),
         body('linkedin_url').optional().isURL().withMessage('Invalid LinkedIn URL').run(req),
         body('pays').optional().isString().withMessage('Pays must be a string').run(req),
+
+
+        body('password')
+            .optional()
+            .isLength({ min: 8 })
+            .withMessage('Password must be at least 8 characters long')
+            .custom((value, { req }) => {
+              if (value && !req.body.old_password) {
+                throw new Error('Old password is required when updating the password');
+              }
+              return true;
+            })
+            .run(req),
+
+
+        body('old_password')
+            .optional()
+            .custom((value, { req }) => {
+              if (req.body.password && !value) {
+                throw new Error('Old password is required when updating the password');
+              }
+              return true;
+            })
+            .run(req),
       ]);
+
 
 
       const errors = validationResult(req);
@@ -211,6 +236,8 @@ const updateAttorney = async (req, res) => {
         pays,
         ville,
         linkedin_url,
+          password,
+          old_password
       } = req.body;
 
       // Find attorney
@@ -240,18 +267,29 @@ const updateAttorney = async (req, res) => {
         }
         picturePath = uploadedFile.path;
       }
+      let hashedPassword= undefined
+if(password && old_password){
+  const isMatch = await bcrypt.compare(old_password, user.password);
 
+  if (!isMatch) {
+    return res.status(401).send('Invalid old password.');
+  }
+  const salt = await bcrypt.genSalt(10)
+  hashedPassword = await bcrypt.hash(password, salt)
+}
       // Update user info
       const updatedUserData = {
         name: first_name || user.name,
         surname: last_name || user.surname,
         email: email || user.email,
+
         phone_number: phone_number || user.phone_number,
         city: city || user.city,
         age: age || user.age,
         sex: sex || user.sex,
         pays: pays || user.pays,
-        ville: ville || user.ville
+        ville: ville || user.ville,
+        password: hashedPassword || user.password
       };
 
 
