@@ -353,10 +353,10 @@ const deleteServiceFiles = async (req, res) => {
 
 const updateServiceFile = async (req, res) => {
   try {
-      const { request_service_id } = req.params;
+      const { uploaded_file_id } = req.params;
 
-      if (!request_service_id) {
-          return res.status(400).json({ error: "Service ID is required" });
+      if (!uploaded_file_id) {
+          return res.status(400).json({ error: "Upload Service ID is required" });
       }
 
       if (!req.files || req.files.length === 0) {
@@ -364,7 +364,7 @@ const updateServiceFile = async (req, res) => {
       }
 
       const fileRecords = await ServiceFilesUploaded.findAll({
-        where: { request_service_id },
+        where: { id: uploaded_file_id },
         order: [["createdAt", "ASC"]],
     });
     
@@ -379,7 +379,7 @@ const updateServiceFile = async (req, res) => {
           filesToProcess.map(async (file, index) => {
               const fileRecord = fileRecords[index];
               const fileExt = path.extname(file.originalname);
-              const newFileName = `requestService_${request_service_id}_file_${fileRecord.id}${fileExt}`;
+              const newFileName = `requestService_${fileRecords[0].id}_file_${uploaded_file_id}${fileExt}`;
               const newFilePath = path.join(__dirname, "../../uploads", newFileName);
 
               const oldFilePath = path.join(__dirname, "../../uploads", fileRecord.file_name);
@@ -394,7 +394,7 @@ const updateServiceFile = async (req, res) => {
           })
       );
 
-      const allFilesUploaded = await verifyAllFilesUploaded(request_service_id);
+      const allFilesUploaded = await verifyAllFilesUploaded(fileRecords[0].request_service_id);
 
       return res.status(200).json({
           message: "Files updated successfully",
