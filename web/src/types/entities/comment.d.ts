@@ -13,7 +13,7 @@ export interface Comment {
     };
     blogId: number;
     body: string;
-    likes: number;
+    likesCount: number;
     isAReply: number; 
     replies: number;
     originalCommentId: number | null; 

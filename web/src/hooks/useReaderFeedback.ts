@@ -150,7 +150,7 @@ export const useReaderFeedback = (blogId: string) => {
     }
     const updatedComments = allComments.map((comment) => {
       if (comment.id === commentId) {
-        return { ...comment, likes: comment.likes + (isLike ? -1 : 1) };
+        return { ...comment, likesCount: comment.likesCount + (isLike ? -1 : 1) };
       }
       return comment;
     });
