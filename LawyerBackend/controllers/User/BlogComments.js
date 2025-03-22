@@ -309,8 +309,7 @@ const likeComment = async (req,res)=> {
         if (!comment) {
             return res.status(404).json("comment not found");
         }
-        let like = await likes.findOne({userId:req.user.id});
-
+        let like = await likes.findOne({ where: { userId: req.user.id, commentId: id } });
         if (!like) {
             await likes.create({userId:req.user.id,commentId:comment.id})
             return res.status(200).send('Like comment');
@@ -364,7 +363,7 @@ const getCommentsByBlog = async (req, res) => {
 
 
         const { count, rows: commentsList } = await db.blogcomments.findAndCountAll({
-            where: { blogId: id },
+            where: { blogId: id, isAReply: false },
             limit: pageSize,
             offset: offset,
             order: [["createdAt", "DESC"]],
@@ -380,6 +379,10 @@ const getCommentsByBlog = async (req, res) => {
                 [Sequelize.fn("COUNT", Sequelize.col("commentLikes.commentId")), "likesCount"]
             ],
             include: [
+                {
+                    model: User,
+                    attributes: ["id", "name", "surname"],
+                },
                 {
                     model: db.commentsLikes,
                     as: "commentLikes",
