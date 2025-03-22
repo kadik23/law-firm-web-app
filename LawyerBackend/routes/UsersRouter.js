@@ -66,8 +66,13 @@ userRouter.get('/favorites/IsBlogFavorited/:blogId',authMiddleware(["client","ad
 userRouter.delete('/favorites',authMiddleware(["client"]),favoritesController.DeleteAllFavorites);
 
 //Services Routes
-userRouter.get('/services',servicesController.getAllServices);
-userRouter.get('/services/:id',servicesSchema.getById,validationErrors,servicesController.getOneService);
+userRouter.get('/services',authMiddleware(["client","admin","attorney"]),servicesController.getAllServices);
+userRouter.get('/services/:id',authMiddleware(["client","admin","attorney"]),servicesSchema.getById,validationErrors,servicesController.getOneService);
+userRouter.post('/services/assign_client',authMiddleware(["client", "admin", "attorney"]),servicesSchema.assignClient,validationErrors,servicesController.assignClient);
+userRouter.delete('/service-files/:request_service_id', authMiddleware(["client"]), servicesController.deleteServiceFiles);
+userRouter.put('/service-files/:uploaded_file_id',authMiddleware(["client"]),upload.array('file', 5),servicesController.updateServiceFile);
+userRouter.post('/service-files/:request_service_id',authMiddleware(["client"]),servicesController.uploadServiceFiles);
+userRouter.get('/service-files/:request_service_id', authMiddleware(["client"]), servicesController.getServiceFiles);
 userRouter.get('/services/problem/:problem_id',servicesSchema.getByProblemId,validationErrors,servicesController.getAllServicesByProblem);
 
 // Testimonials Routes
@@ -86,5 +91,8 @@ userRouter.post('/consultations', authMiddleware(["client"]),consultationSchema.
 //Notification
 userRouter.post('/send-notification', authMiddleware(["admin"]),notifController.sendNotification);
 
+
+// Consultation Routes
+userRouter.post('/consultations', authMiddleware(["client"]), consultationController.createConsultation);
 
 module.exports = userRouter;

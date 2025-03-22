@@ -6,12 +6,8 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
 
     },
-    service_id: {
+    request_service_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    user_id: {
-      type: DataTypes.STRING,
       allowNull: false,
     },
     status: {
@@ -27,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
 
   ServiceFilesUploaded.associate = (models) => {
     ServiceFilesUploaded.belongsTo(models.request_service, {
-      foreignKey: 'service_id',
+      foreignKey: 'request_service_id',
       as: 'requestService'
     });
   };
