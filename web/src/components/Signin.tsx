@@ -4,6 +4,9 @@ import Modal from "./Modal";
 import useLoginForm from "@/hooks/useLoginForm";
 import { DevTool } from "@hookform/devtools";
 import axiosClient from "@/lib/utils/axiosClient";
+import { useAlert } from "@/contexts/AlertContext";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 
 interface SigninProps {
   isModalOpen: boolean;
@@ -12,36 +15,51 @@ interface SigninProps {
 
 function Signin({ isModalOpen, setModalOpen }: SigninProps) {
   const [isDisabled, setIsDisabled] = useState(true);
-  const {
-    register,
-    control,
-    handleSubmit,
-    errors,
-    isValid,
-  } = useLoginForm(); 
+  const { register, control, handleSubmit, errors, isValid } = useLoginForm();
+  const { showAlert } = useAlert();
+  const router = useRouter();
+  const { fetchUser } = useAuth();
 
   useEffect(() => {
-    setIsDisabled(!isValid); 
-  }, [isValid]); 
+    setIsDisabled(!isValid);
+  }, [isValid]);
 
   const onSubmit = async (data: SigninformType) => {
     try {
       console.log("Submitting:", data);
-      const response = await axiosClient.post("/user/signin", {
+      const response = await axiosClient.post(
+        "/user/signin",
+        {
           email: data.email,
           password: data.password,
         },
         { withCredentials: true }
       );
       if (response.status === 200) {
-        alert("Success sign in"); 
-        setModalOpen(false)   
-        window.location.href = `/${response.data.type}/dashboard`;
+        showAlert(
+          "success",
+          "Connexion réussie",
+          "Vous avez lu avec succès ce message important."
+        );
+        setModalOpen(false);
+        fetchUser()
+        setTimeout(
+          () => (router.push(`/${response.data.type}/dashboard`),
+          2100
+        ));
       } else {
-        alert("Failed to sign in");
+        showAlert(
+          "error",
+          "Oh claquement !",
+          "Modifiez quelques éléments et réessayez de soumettre."
+        );
       }
     } catch (err) {
-      alert("Failed to sign in");
+      showAlert(
+        "error",
+        "Oh claquement !",
+        "Modifiez quelques éléments et réessayez de soumettre."
+      );
       console.error("Error signing in:", err);
     }
   };
@@ -56,7 +74,9 @@ function Signin({ isModalOpen, setModalOpen }: SigninProps) {
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col items-start gap-4"
       >
-        {process.env.NODE_ENV === "development" && <DevTool control={control} />}
+        {process.env.NODE_ENV === "development" && (
+          <DevTool control={control} />
+        )}
         <div className="text-xl">Re-bienvenue</div>
         <div>Entrer vos informations svp !</div>
         <div className="flex gap-16"></div>

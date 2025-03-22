@@ -21,15 +21,17 @@ const adminRouter = require('express').Router()
 adminRouter.post('/contactus',contactSchema.add,validationErrors ,contactformController.contactForm);
 
 adminRouter.post('/categories/add',authMiddleware(["admin"]),categoriesSchema.add,validationErrors,categoriesController.addCategory);
-adminRouter.post('/attorney/add',authMiddleware(["admin"]),attroneySchema.add,validationErrors,attorneysController.createAttorney);
 adminRouter.delete('/categories/delete',authMiddleware(["admin"]),categoriesSchema.remove,validationErrors,categoriesController.deleteCategory);
 
+adminRouter.post('/attorney/add',authMiddleware(["admin"]),attorneysController.createAttorney);
+adminRouter.delete('/attorney/delete',authMiddleware(["admin"]),attroneySchema.remove,validationErrors,attorneysController.deleteAttorneys);
 
-adminRouter.post('/blogs/add',authMiddleware(["admin"]),blogsSchema.add,validationErrors,blogsController.addBlog)
-adminRouter.put('/blogs/update',authMiddleware(["admin"]),blogsSchema.update,validationErrors,blogsController.updateBlog)
+adminRouter.post('/blogs/add',authMiddleware(["admin"]),blogsController.addBlog)
+adminRouter.put('/blogs/update',authMiddleware(["admin"]),blogsController.updateBlog)
 adminRouter.delete('/blogs/delete',authMiddleware(["admin"]),blogsSchema.remove,validationErrors,blogsController.deleteBlog)
 
-adminRouter.post('/services/create',authMiddleware(["admin"]),servicesSchema.add,validationErrors,servicesController.createService)
+adminRouter.post('/services/create',authMiddleware(["admin"]),servicesController.createService)
+adminRouter.delete('/services/delete',authMiddleware(["admin"]),servicesSchema.remove,validationErrors,servicesController.deleteServices)
 
 adminRouter.post('/problems', authMiddleware(["admin"]),problemsSchema.add,validationErrors, problemsController.createProblem);
 

@@ -55,4 +55,17 @@ const assignClient = [
     .isBoolean().withMessage("is_paid must be a boolean value"),
 ];
 
-module.exports = { getById, add, assignClient };
+const getByProblemId=[
+    param('problem_id')
+        .notEmpty()
+        .isInt({ min: 0 }).withMessage('Problem id must be a positive integer')
+]
+
+const remove=[
+    body("ids")
+        .notEmpty()
+        .isArray({ min: 0 })
+        .withMessage("ids must be a non-empty array.")
+]
+
+module.exports={getById,remove,getByProblemId, add, assignClient}

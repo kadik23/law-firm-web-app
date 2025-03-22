@@ -3,11 +3,13 @@ const db = require('../../models')
 const {upload} = require("../../middlewares/FilesMiddleware");
 const blogs=db.blogs
 const fs = require('fs');
-const uploadFiles = upload.fields([
-    { name: 'image', maxCount: 1 },
-]);
+const {body: bd ,validationResult} = require("express-validator");
+const { Op } = require("sequelize");
 
-// Delete old files if new files are provided
+const uploadFile = upload.single("image");
+
+
+
 const deleteFile = (filePath) => {
     if (filePath && fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
@@ -62,29 +64,51 @@ const deleteFile = (filePath) => {
  *           description: "Internal Server Error"
  */
 
-const addBlog = async (req,res)=> {
+const addBlog = async (req, res) => {
     try {
-        uploadFiles(req, res, async (err) => {
+        uploadFile(req, res, async (err) => {
             if (err) {
                 return res.status(400).send('Error uploading files: ' + err.message);
             }
 
-            const {title, body, readingDuration, categoryId} = req.body;
-            const {image} = req.files;
 
-            const imagePath = image ? image[0].path : null;
+            await Promise.all([
+                bd('title')
+                    .isString().withMessage('Title must be a string')
+                    .isLength({ max: 20 })
+                    .notEmpty().withMessage('Title is required').run(req),
+                bd('body')
+                    .isString().withMessage('Body must be a string')
+                    .notEmpty().withMessage('Body is required').run(req),
+                bd('readingDuration')
+                    .isInt().withMessage('readingDuration must be a number')
+                    .notEmpty().withMessage('readingDuration is required').run(req),
+                bd('categoryId')
+                    .isInt().withMessage('categoryId must be a number')
+                    .notEmpty().withMessage('categoryId is required').run(req)
+            ]);
+
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ errors: errors.array() });
+            }
+            if (!req.file) {
+                return res.status(400).json({ error: "Image is required." });
+            }
+            const { title, body, readingDuration, categoryId } = req.body;
+
+            const imagePath = req.file.path;
             let newBlog = await blogs.create({
-                title,likes:0, body, readingDuration, image: imagePath, categoryId, userId: 3, accepted: true, 
+                title, likes: 0, body, readingDuration, image: imagePath, categoryId, userId: req.user.id, accepted: true,
             });
 
             if (!newBlog) {
                 return res.status(401).send('Error creating blog');
             } else {
-                return res.status(200).send(newBlog);
+                return res.status(200).send('Blog created successfully');
             }
         });
-    }
-    catch (e) {
+    } catch (e) {
         console.error('Error creating blog', e);
         res.status(500).send('Internal Server Error');
     }
@@ -94,8 +118,8 @@ const addBlog = async (req,res)=> {
  * paths:
  *   /admin/blogs/delete:
  *     delete:
- *       summary: "Delete a blog"
- *       description: "Delete an existing blog post by its ID."
+ *       summary: "Delete one or multiple blogs"
+ *       description: "Delete one or multiple blog posts by providing an array of IDs."
  *       tags:
  *         - Blogs
  *       security:
@@ -107,44 +131,65 @@ const addBlog = async (req,res)=> {
  *             schema:
  *               type: object
  *               properties:
- *                 id:
- *                   type: integer
- *                   example: 1
+ *                 ids:
+ *                   type: array
+ *                   items:
+ *                     type: integer
+ *                   example: [1, 2, 3]
+ *               required:
+ *                 - ids
  *       responses:
  *         '200':
- *           description: "Blog deleted successfully"
+ *           description: "Blogs deleted successfully"
  *           content:
  *             application/json:
  *               schema:
- *                 $ref: '#/components/schemas/Blog'
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: boolean
+ *                     example: true
+ *                   message:
+ *                     type: string
+ *                     example: "3 blogs deleted"
  *         '401':
  *           description: "Unauthorized - Missing or Invalid Token"
  *         '403':
  *           description: "Forbidden - User is not an admin"
  *         '404':
- *           description: "Blog not found"
+ *           description: "One or more blogs not found"
  *         '500':
  *           description: "Internal Server Error"
  */
 
-
-const deleteBlog= async (req,res)=>{
+const deleteBlog = async (req, res) => {
     try {
-        const {id} = req.body;
-        let blog = await blogs.findByPk(id);
-
-        if (!blog) {
-            return res.status(404).json("Blog not found");
-        }
-            deleteFile(blog.image);
-
-        await blog.destroy();
-        return res.status(200).send(blog);
-    } catch (e) {
-        console.error('Error deleting blog', e);
-        res.status(500).send('Internal Server Error');
+      const { ids } = req.body;
+  
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ success: false, message: "Invalid request, provide an array of IDs" });
+      }
+  
+      const blogsToDelete = await blogs.findAll({ where: { id: { [Op.in]: ids } } });
+  
+      if (blogsToDelete.length === 0) {
+        return res.status(404).json({ success: false, message: "No matching blogs found" });
+      }
+  
+      // Delete associated images
+      blogsToDelete.forEach(blog => {
+        if (blog.image) deleteFile(blog.image);
+      });
+  
+      // Delete blogs from the database
+      const result = await blogs.destroy({ where: { id: { [Op.in]: ids } } });
+  
+      return res.status(200).json({ success: true, message: `${result} blogs deleted` });
+    } catch (error) {
+      console.error("Error deleting blogs:", error);
+      return res.status(500).json({ success: false, message: "Internal Server Error", error: error.message });
     }
-};
+  };
 
 /**
  * @swagger
@@ -203,13 +248,40 @@ const deleteBlog= async (req,res)=>{
 
 const updateBlog= async (req,res)=>{
     try {
-        uploadFiles(req, res, async (err) => {
+        uploadFile(req, res, async (err) => {
             if (err) {
                 return res.status(400).send('Error uploading files: ' + err.message);
             }
+            await Promise.all([
+                bd('id')
+                    .isInt().withMessage('id must be a number')
+                    .notEmpty().withMessage('id is required').run(req),
+                bd('title')
+                    .optional()
+                    .isString().withMessage('Title must be a string')
+                    .isLength({ max: 20 })
+                    .run(req),
+                bd('body')
+                    .optional()
+                    .isString().withMessage('Body must be a string')
+                    .run(req),
+                bd('readingDuration')
+                    .optional()
+                    .isInt().withMessage('readingDuration must be a number')
+                    .run(req),
+                bd('categoryId')
+                    .optional()
+                    .isInt().withMessage('categoryId must be a number')
+                    .run(req)
+            ]);
 
+
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ errors: errors.array() });
+            }
             const { id, title, body, categoryId } = req.body;
-            const image = req.files?.image;
+            const image = req.file;
 
 
                 const blog = await blogs.findByPk(id);
@@ -219,11 +291,9 @@ const updateBlog= async (req,res)=>{
 
                 if (image) {
                     deleteFile(blog.image);
-                    console.log("exe")
                 }
 
-                const imagePath = image ? image[0].path : blog.image;
-
+                const imagePath = image ? image.path : blog.image;
 
                 const updatedBlog = await blogs.update(
                     { title, body, categoryId, image: imagePath },

@@ -1,16 +1,30 @@
 import React from "react";
 import Image from "next/image";
+import useTruncateText from "@/hooks/useTruncateText";
+import Link from "next/link";
 
 type ServiceCardProps = serviceEntity & {
   isDescription: boolean;
-  style: string
+  style: string;
+  coverImage: string;
+  id: number;
 };
 
-function ServiceCard({ title, body, image, isDescription, style }: ServiceCardProps) {
+function ServiceCard({
+  name,
+  description,
+  coverImage,
+  id,
+  isDescription,
+  style,
+}: ServiceCardProps) {
+  const descriptionTruncated = useTruncateText(description, 100);
   return (
-    <div className="lg:max-w-[calc(100%/3.5)] max-w-full md:max-w-[calc(100%/2)] flex-shrink-0 shadow-lg rounded-md bg-white">
+    <div className="max-w-full lg:max-w-[calc(100%/4)] md:max-w-[calc(100%/2)] w-full flex-shrink-0 h-full shadow-lg rounded-md bg-white">
       <Image
-        src={`/images/${image}`}
+        src={`${coverImage}`}
+        className="rounded-md object-cover h-full"
+        title={name}
         alt="service"
         layout="responsive"
         width={125}
@@ -18,10 +32,12 @@ function ServiceCard({ title, body, image, isDescription, style }: ServiceCardPr
         priority
       />
       <div className={`p-2 flex flex-col justify-center ${style} py-2`}>
-        <div className="font-semibold text-lg">{title}</div>
-        {isDescription && <div>{body}</div>}
+        <div className="font-semibold text-lg text-textColor">{name}</div>
+        {isDescription && <div className="text-xs">{descriptionTruncated}</div>}
         <div className="text-xs font-semibold btn mt-2">
-          <a href="#service">En savoir plus &gt;</a>
+          <Link href={`/services/${id}`} className="text-textColor">
+            En savoir plus &gt;
+          </Link>
         </div>
       </div>
     </div>
