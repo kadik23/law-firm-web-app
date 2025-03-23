@@ -376,7 +376,15 @@ const getCommentsByBlog = async (req, res) => {
                 "isAReply",
                 "originalCommentId",
                 "updatedAt",
-                [Sequelize.fn("COUNT", Sequelize.col("commentLikes.commentId")), "likesCount"]
+                [Sequelize.fn("COUNT", Sequelize.col("commentLikes.commentId")), "likesCount"],
+                [
+                    Sequelize.literal(`(
+                        SELECT COUNT(*)
+                        FROM blog_comments AS replies
+                        WHERE replies.originalCommentId = blog_comments.id
+                    )`),
+                    "replies",
+                ],
             ],
             include: [
                 {
