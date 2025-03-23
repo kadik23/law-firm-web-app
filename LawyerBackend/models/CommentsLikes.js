@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
  *       type: object
  *       required:
  *         - userId
- *         -commentId
+ *         - commentId
  *       properties:
  *         userId:
  *           type: integer

@@ -1,6 +1,5 @@
 const db = require('../../models');
 const { upload } = require('../../middlewares/FilesMiddleware');
-const path = require('path');
 const fs = require('fs');
 const { Op } = require("sequelize");
 const { body, validationResult } = require("express-validator");
