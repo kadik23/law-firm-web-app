@@ -22,6 +22,7 @@ function Header() {
   const [activeSection, setActiveSection] = useState<null | string>(null);
   const [isSigninModalOpen, setSigninModalOpen] = useState(false);
   const [isSignupModalOpen, setSignupModalOpen] = useState(false);
+  const [iconIsHover, setIconIsHover] = useState(false);
   const router = usePathname();
   const links = [
     { name: "accueil", href: "/#accueil" },
@@ -81,7 +82,7 @@ function Header() {
   ];
 
   return (
-    <div className="flex flex-col w-full fixed top-0 left-0 z-50">
+    <div className="flex flex-col md:w-full w-auto fixed top-0 left-0 z-50">
       <div className="hidden md:flex justify-between items-center w-full bg-[#4A84AA] py-2 px-4 md:px-8">
         <div className="flex items-center text-white font-semibold text-sm">
           <Icon
@@ -149,14 +150,25 @@ function Header() {
         </div>
 
         <div className="flex items-center gap-6">
-          <Link
-            href={"/blog"}
-            className="items-center gap-1 hidden md:flex text-primary hover:text-secondary cursor-pointer"
-          >
-            {/* Heart / Favorite */}
-            <Icon icon="mdi:heart" width={20} />
-            <div className="uppercase font-semibold text-sm">My blogs</div>
-          </Link>
+          {user && (
+            <Link
+              href={"/client/dashboard/notifications"}
+              onMouseEnter={() => setIconIsHover(true)}
+              onMouseLeave={() => setIconIsHover(false)}
+              className="items-center gap-2 hidden md:flex text-primary hover:text-secondary cursor-pointer
+              transition duration-2000 ease-in-out"
+            >
+              {/* notification */}
+              <Image 
+                src={`/icons/notification${iconIsHover ? "" : "-primary"}.svg`}
+                alt="notification"
+                width={20}
+                height={24}
+              />
+              <div className="uppercase font-semibold text-sm">Mes notifs</div>
+            </Link>
+          )}
+          
           {!user && (
             <div
               className={` items-center justify-between gap-4 ${
@@ -275,10 +287,10 @@ function Header() {
               </a>
             ))}
             <Link
-              href={"/blog"}
+              href={"/client/dashboard/notifications"}
               className="flex items-center justify-start gap-2 text-white hover:text-secondary cursor-pointer"
             >
-              <span className="uppercase font-semibold text-sm">My blogs</span>
+              <span className="uppercase font-semibold text-sm">Mes notifs</span>
             </Link>
             <div className="flex flex-col items-center ">
               <div

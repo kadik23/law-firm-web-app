@@ -138,7 +138,7 @@ const CommentComponent = ({ comment, onDelete, onEdit, onLike, onReply }: Commen
                         <Icon 
                         className={`group-hover:bg-scondary ${isLike ? (AuthUSER?.id === comment.userId ? "text-primary": "text-secondary") : "text-white" }`} 
                         icon="mdi:thumb-up" width={20} />
-                        <span>{comment.likes}</span>
+                        <span>{comment.likesCount}</span>
                     </button>
                 </div>
                 <div className="w-full md:w-fit text-sm flex flex-row-reverse my-2 md:my-0 md:flex-row 

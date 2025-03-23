@@ -1,7 +1,9 @@
 require('dotenv').config();
 const db = require('../../models')
+const {Sequelize} = require("sequelize");
 const comments=db.blogcomments
 const Blog=db.blogs
+const likes=db.commentsLikes
 User = db.users;
 const { Op, literal } = require("sequelize");
 
@@ -307,17 +309,14 @@ const likeComment = async (req,res)=> {
         if (!comment) {
             return res.status(404).json("comment not found");
         }
+        let like = await likes.findOne({ where: { userId: req.user.id, commentId: id } });
+        if (!like) {
+            await likes.create({userId:req.user.id,commentId:comment.id})
+            return res.status(200).send('Like comment');
 
-
-        const updatedComments = await comment.update(
-            { likes: comment.likes+1 },
-            { where: { id } }
-        );
-
-        if (!updatedComments) {
-            return res.status(404).send('Error updating comment');
-        } else {
-            return res.status(200).send('Comment updated successfully');
+        }else {
+            await like.destroy()
+            return res.status(200).send('Unlike comment');
         }
 
     }
@@ -362,36 +361,56 @@ const getCommentsByBlog = async (req, res) => {
         const offset = (page - 1) * pageSize;
 
 
-        const { count, rows: commentsList } = await comments.findAndCountAll({
+
+        const { count, rows: commentsList } = await db.blogcomments.findAndCountAll({
             where: { blogId: id, isAReply: false },
             limit: pageSize,
             offset: offset,
             order: [["createdAt", "DESC"]],
+            attributes: [
+                "id",
+                "body",
+                "userId",
+                "blogId",
+                "createdAt",
+                "isAReply",
+                "originalCommentId",
+                "updatedAt",
+                [Sequelize.fn("COUNT", Sequelize.col("commentLikes.commentId")), "likesCount"],
+                [
+                    Sequelize.literal(`(
+                        SELECT COUNT(*)
+                        FROM blog_comments AS replies
+                        WHERE replies.originalCommentId = blog_comments.id
+                    )`),
+                    "replies",
+                ],
+            ],
             include: [
                 {
                     model: User,
                     attributes: ["id", "name", "surname"],
                 },
+                {
+                    model: db.commentsLikes,
+                    as: "commentLikes",
+                    attributes: [],
+                },
             ],
-            attributes: {
-                include: [
-                    [
-                        literal(`(
-                            SELECT COUNT(*)
-                            FROM blog_comments AS replies
-                            WHERE replies.originalCommentId = blog_comments.id
-                        )`),
-                        "replies",
-                    ],
-                ],
-            },
+            group: ["blog_comments.id"],
+            subQuery: false,
+
         });
+
+
+
+
 
         return res.status(200).json({
             success: true,
             currentPage: page,
-            totalPages: Math.ceil(count / pageSize),
-            totalComments: count,
+            totalPages: Math.ceil((count.length || 0) / pageSize),
+            totalComments: count.length || 0,
             comments: commentsList,
         });
     } catch (e) {

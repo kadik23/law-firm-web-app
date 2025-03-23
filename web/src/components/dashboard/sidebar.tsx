@@ -8,13 +8,16 @@ import {
   PaymentsIcon,
   ServiceIcon,
   BlogsIcon,
+  NotificationIcon,
   LogoutIcon
 } from './icons';
 import { useAuth } from "@/hooks/useAuth";
+import { useState } from "react";
 
 const Sidebar = () => {
     const pathname = usePathname() || "";
     const { logout } = useAuth();
+    const [isNotificationHovered, setIsNotificationHovered] = useState(false);
 
     const routes = [
         { Icon: DashboardIcon, alt: "Dashboard", path: "/client/dashboard" },
@@ -22,6 +25,7 @@ const Sidebar = () => {
         { Icon: PaymentsIcon, alt: "Payments", path: "/client/dashboard/payments" },
         { Icon: ServiceIcon, alt: "Services", path: "/client/dashboard/services" },
         { Icon: BlogsIcon, alt: "Vos blogs", path: "/client/dashboard/vos-blogs" },
+        { Icon: NotificationIcon, alt: "Notifications", path: "/client/dashboard/notifications" },
     ];
 
     return (
@@ -42,10 +46,28 @@ const Sidebar = () => {
                             )}
                         >
                             <Link href={path} className="flex items-center gap-3 font-semibold">
-                                <Icon className={classNames({
-                                    "text-textColor": isActive,
-                                    "text-white group-hover:bg-white group-hover:text-textColor": !isActive,
-                                })} />
+                                {alt === "Notifications" ? (
+                                    <div
+                                        onMouseEnter={() => setIsNotificationHovered(true)}
+                                        onMouseLeave={() => setIsNotificationHovered(false)}
+                                    >
+                                        <Icon
+                                            className={classNames({
+                                                "text-textColor": isActive,
+                                                "text-white": !isActive,
+                                            })}
+                                            active={isActive}
+                                            Hover={isNotificationHovered}
+                                        />
+                                    </div>
+                                ) : (
+                                    <Icon
+                                        className={classNames({
+                                            "text-textColor": isActive,
+                                            "text-white group-hover:text-textColor": !isActive,
+                                        })}
+                                    />
+                                )}
                                 <span>{alt}</span>
                             </Link>
                         </li>

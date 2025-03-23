@@ -4,7 +4,7 @@ const {upload} = require("../../middlewares/FilesMiddleware");
 const blogs=db.blogs
 const fs = require('fs');
 const {body: bd ,validationResult} = require("express-validator");
-
+const { Op } = require("sequelize");
 
 const uploadFile = upload.single("image");
 
@@ -118,8 +118,8 @@ const addBlog = async (req, res) => {
  * paths:
  *   /admin/blogs/delete:
  *     delete:
- *       summary: "Delete a blog"
- *       description: "Delete an existing blog post by its ID."
+ *       summary: "Delete one or multiple blogs"
+ *       description: "Delete one or multiple blog posts by providing an array of IDs."
  *       tags:
  *         - Blogs
  *       security:
@@ -131,44 +131,65 @@ const addBlog = async (req, res) => {
  *             schema:
  *               type: object
  *               properties:
- *                 id:
- *                   type: integer
- *                   example: 1
+ *                 ids:
+ *                   type: array
+ *                   items:
+ *                     type: integer
+ *                   example: [1, 2, 3]
+ *               required:
+ *                 - ids
  *       responses:
  *         '200':
- *           description: "Blog deleted successfully"
+ *           description: "Blogs deleted successfully"
  *           content:
  *             application/json:
  *               schema:
- *                 $ref: '#/components/schemas/Blog'
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: boolean
+ *                     example: true
+ *                   message:
+ *                     type: string
+ *                     example: "3 blogs deleted"
  *         '401':
  *           description: "Unauthorized - Missing or Invalid Token"
  *         '403':
  *           description: "Forbidden - User is not an admin"
  *         '404':
- *           description: "Blog not found"
+ *           description: "One or more blogs not found"
  *         '500':
  *           description: "Internal Server Error"
  */
 
-
-const deleteBlog= async (req,res)=>{
+const deleteBlog = async (req, res) => {
     try {
-        const {id} = req.body;
-        let blog = await blogs.findByPk(id);
-
-        if (!blog) {
-            return res.status(404).json("Blog not found");
-        }
-            deleteFile(blog.image);
-
-        await blog.destroy();
-        return res.status(200).send(blog);
-    } catch (e) {
-        console.error('Error deleting blog', e);
-        res.status(500).send('Internal Server Error');
+      const { ids } = req.body;
+  
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ success: false, message: "Invalid request, provide an array of IDs" });
+      }
+  
+      const blogsToDelete = await blogs.findAll({ where: { id: { [Op.in]: ids } } });
+  
+      if (blogsToDelete.length === 0) {
+        return res.status(404).json({ success: false, message: "No matching blogs found" });
+      }
+  
+      // Delete associated images
+      blogsToDelete.forEach(blog => {
+        if (blog.image) deleteFile(blog.image);
+      });
+  
+      // Delete blogs from the database
+      const result = await blogs.destroy({ where: { id: { [Op.in]: ids } } });
+  
+      return res.status(200).json({ success: true, message: `${result} blogs deleted` });
+    } catch (error) {
+      console.error("Error deleting blogs:", error);
+      return res.status(500).json({ success: false, message: "Internal Server Error", error: error.message });
     }
-};
+  };
 
 /**
  * @swagger
