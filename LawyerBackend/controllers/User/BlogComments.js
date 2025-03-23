@@ -426,24 +426,38 @@ const getRepliesByComment = async (req, res) => {
         const replies = await comments.findAll({
             where: { originalCommentId: commentId, isAReply: true },
             order: [["createdAt", "DESC"]],
+            attributes: [
+                "id",
+                "body",
+                "userId",
+                "blogId",
+                "createdAt",
+                "isAReply",
+                "originalCommentId",
+                "updatedAt",
+                [Sequelize.fn("COUNT", Sequelize.col("commentLikes.commentId")), "likesCount"],
+                [
+                    Sequelize.literal(`(
+                        SELECT COUNT(*)
+                        FROM blog_comments AS replies
+                        WHERE replies.originalCommentId = blog_comments.id
+                    )`),
+                    "replies",
+                ],
+            ],
             include: [
                 {
                     model: User,
                     attributes: ["id", "name", "surname"],
                 },
+                {
+                    model: db.commentsLikes, 
+                    as: "commentLikes",
+                    attributes: [],
+                },
             ],
-            attributes: {
-                include: [
-                    [
-                        literal(`(
-                            SELECT COUNT(*)
-                            FROM blog_comments AS replies
-                            WHERE replies.originalCommentId = blog_comments.id
-                        )`),
-                        "replies",
-                    ],
-                ],
-            },
+            group: ["blog_comments.id"],
+            subQuery: false, 
         });
 
         return res.status(200).json({
@@ -456,6 +470,33 @@ const getRepliesByComment = async (req, res) => {
     }
 };
 
+const IsCommentLiked = async (req, res) => {
+    const userId = req.user.id;
+    const commentId = req.params.commentId;
+  
+    if (!commentId) {
+      return res.status(400).json({ message: "Comment ID is required." });
+    }
+  
+    try {
+      const commentExists = await comments.findByPk(commentId);
+      if (!commentExists) {
+        return res.status(404).json({ message: "Comment not found." });
+      }
+  
+      const likeDb = await likes.findOne({
+        where: { userId, commentId },
+      });
+  
+      res.status(200).json({ isliked: !!likeDb });
+    } catch (error) {
+      console.error("Error checking if Comment is liked:", error);
+      res
+        .status(500)
+        .json({ message: "An error occurred while checking like status." });
+    }
+};
+
 module.exports = {
     addBlogComment,
     updateBlogComment,
@@ -463,5 +504,6 @@ module.exports = {
     replyComment,
     likeComment,
     getCommentsByBlog,
-    getRepliesByComment
+    getRepliesByComment,
+    IsCommentLiked
 };

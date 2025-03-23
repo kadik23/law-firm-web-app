@@ -13,6 +13,7 @@ export interface Comment {
     isAReply: number; 
     replies: number;
     originalCommentId: number | null; 
+    likesCount: number;
     createdAt: string; 
     updatedAt: string; 
 }
