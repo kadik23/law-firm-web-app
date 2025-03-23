@@ -5,6 +5,7 @@ import CommentComponent from "./CommentSection/CommentComponent";
 import CommentInput from "./CommentSection/CommentInput";
 import CommentModal from "../CommentModal";
 import { useReaderFeedback } from "@/hooks/useReaderFeedback";
+import { useEffect } from "react";
 
 const ReaderFeedback = ({ blogId }: { blogId: string }) => {
   const {
@@ -27,6 +28,11 @@ const ReaderFeedback = ({ blogId }: { blogId: string }) => {
     repliesLoading,
     commentLoading,
   } = useReaderFeedback(blogId);
+
+  
+  useEffect(() => {
+    fetchComments();
+  }, [blogId]);
 
   return (
     <div className="py-4 mb-8">
