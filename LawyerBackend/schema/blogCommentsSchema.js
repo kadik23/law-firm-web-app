@@ -29,6 +29,12 @@ const like = [
     body('id')
         .isInt().withMessage("Comment s ID is required")
 ];
+
+const isLike = [
+    param('commentId')
+        .isInt().withMessage("Comment s ID is required")
+];
+
 const getByBlog=[
     param('id')
         .isInt({ min: 0 }).withMessage('Blog ID must be a positive integer')
@@ -38,4 +44,4 @@ const getByComment=[
     param('commentId')
         .isInt({ min: 0 }).withMessage('Comment ID must be a positive integer')
 ]
-module.exports={add,remove,update,reply,like,getByBlog, getByComment};
+module.exports={add,remove,update,reply,like,getByBlog, getByComment, isLike};

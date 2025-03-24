@@ -75,20 +75,13 @@ const BlogInformation = ({
   return (
     <div className="w-full flex md:flex-col flex-col-reverse mb-8">
       <div
-        className="pb-4 my-4 w-full flex md:flex-row flex-col gap-3 justify-between items-center
+        className="pb-4 my-4 w-full flex md:flex-row flex-col gap-3 justify-start items-center
           md:border-0 border-b-[1px] border-black"
       >
         <div className="text-sm font-medium text-gray-600">
           {useDateFormatter(blog.createdAt)}. {blog.readingDuration} minutes de
           lecture
         </div>
-        <button
-          className="text-primary border-[1px] border-black font-semibold px-4 py-2 rounded-md
-                      flex items-center gap-1 hover:bg-primary hover:text-white"
-        >
-          <Icon icon="mdi:share" width={20} />
-          <span className="md:flex hidden">Partager</span>
-        </button>
       </div>
 
       <div className="w-full">

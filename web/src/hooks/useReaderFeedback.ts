@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAlert } from "@/contexts/AlertContext";
 import { useAuth } from "@/hooks/useAuth";
 import { Comment } from "@/types/entities/comment";
@@ -18,6 +18,7 @@ export const useReaderFeedback = (blogId: string) => {
   const [totalComments, setTotalComments] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(0);
+  const [isLike, setIsLike] = useState(false);
   const fetchComments = async () => {
     try {
       setLoading(true);
@@ -35,10 +36,6 @@ export const useReaderFeedback = (blogId: string) => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchComments();
-  }, [blogId]);
 
   const handleAddComment = async (newCommentBody: string) => {
     if (newCommentBody.trim() === "") {
@@ -139,22 +136,62 @@ export const useReaderFeedback = (blogId: string) => {
     }
   };
 
-  const handleLikeComment = (commentId: number, isLike: boolean) => {
+  const handleLikeComment = async (commentId: number, isLike: boolean) => {
     if (!AuthUSER) {
       showAlert(
         "warning",
         "Avertissement!",
-        "Veuillez vous connecter pour liker un commentaire."
+        "Veuillez vous connecter pour ajouter un commentaire."
       );
       return;
     }
-    const updatedComments = allComments.map((comment) => {
-      if (comment.id === commentId) {
-        return { ...comment, likesCount: comment.likesCount + (isLike ? -1 : 1) };
+    try {
+      setLoading(true);
+      const response = await axios.post(`/user/blogs/likecomment`, {
+        id: commentId,
+      });
+      if (response.status === 200) {
+        const updatedComments = allComments.map((comment) => {
+          if (comment.id === commentId) {
+            return {
+              ...comment,
+              likesCount: comment.likesCount + (isLike ? -1 : 1),
+            };
+          }
+          return comment;
+        });
+        setAllComments(updatedComments);
+        showAlert("success", "J'aime comment réussie", `${response.data}`);
       }
-      return comment;
-    });
-    setAllComments(updatedComments);
+    } catch (err) {
+      setError("Failed to like comment");
+      showAlert(
+        "warning",
+        "Avertissement!",
+        "Veuillez remplir le champ d'entrée."
+      );
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const checkIsLiked = async (commentId: number) => {
+    if (AuthUSER) {
+      try {
+        setLoading(true);
+        const response = await axios.get(
+          `/user/blogs/IsCommentLiked/${commentId}`
+        );
+        if (response.status === 200) {
+          setIsLike(response.data.isliked);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
   const handleReplyComment = async (commentId: number, replyBody?: string) => {
@@ -281,5 +318,8 @@ export const useReaderFeedback = (blogId: string) => {
     repliesLoading,
     fetchComments,
     commentLoading,
+    checkIsLiked,
+    isLike,
+    setIsLike,
   };
 };
