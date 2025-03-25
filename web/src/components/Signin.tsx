@@ -11,9 +11,16 @@ import { useAuth } from "@/hooks/useAuth";
 interface SigninProps {
   isModalOpen: boolean;
   setModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setSignupModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  assignService: (() => void) | undefined;
 }
 
-function Signin({ isModalOpen, setModalOpen }: SigninProps) {
+function Signin({
+  isModalOpen,
+  setModalOpen,
+  setSignupModalOpen,
+  assignService,
+}: SigninProps) {
   const [isDisabled, setIsDisabled] = useState(true);
   const { register, control, handleSubmit, errors, isValid } = useLoginForm();
   const { showAlert } = useAlert();
@@ -42,11 +49,21 @@ function Signin({ isModalOpen, setModalOpen }: SigninProps) {
           "Vous avez lu avec succès ce message important."
         );
         setModalOpen(false);
-        fetchUser()
-        setTimeout(
-          () => (router.push(`/${response.data.type}/dashboard`),
-          2100
-        ));
+        fetchUser();
+        if (assignService) {
+          assignService();
+          if (response.data.type === "client") {
+            setTimeout(
+              () => (
+                router.push(`/${response.data.type}/dashboard/services`), 2100
+              )
+            );
+          }
+        } else {
+          setTimeout(
+            () => (router.push(`/${response.data.type}/dashboard`), 2100)
+          );
+        }
       } else {
         showAlert(
           "error",
@@ -129,7 +146,15 @@ function Signin({ isModalOpen, setModalOpen }: SigninProps) {
       </form>
       <div className="flex gap-2 items-center justify-center mt-4 text-sm font-semibold w-full">
         Vous n{"'"}avez pas encore de compte ?
-        <div className="text-textColor underline">Inscrivez-vous</div>
+        <div
+          className="text-textColor underline cursor-pointer hover:opacity-75"
+          onClick={() => {
+            setModalOpen(false);
+            setSignupModalOpen(true);
+          }}
+        >
+          Inscrivez-vous
+        </div>
       </div>
     </Modal>
   );

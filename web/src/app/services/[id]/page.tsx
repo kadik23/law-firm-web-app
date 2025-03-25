@@ -9,16 +9,21 @@ import AvisCard from "@/components/AvisCard";
 import { useAuth } from "@/hooks/useAuth";
 import { useServices } from "@/hooks/useServices";
 import { useService } from "@/hooks/useService";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useTestimonialsByService } from "@/hooks/useTestimonialsByService";
 import { EmojiPicker } from "@/components/EmojiPicker";
 import { useTestimony } from "@/hooks/useTestimony";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { useAlert } from "@/contexts/AlertContext";
+import Signup from "@/components/Signup";
+import Signin from "@/components/Signin";
+import { useAssignService } from "@/hooks/useAssignService";
 
 function Page() {
   const { id } = useParams();
   const serviceId = id ? Number(id) : undefined;
+  const [isSigninModalOpen, setSigninModalOpen] = useState(false);
+  const [isSignupModalOpen, setSignupModalOpen] = useState(false);
   const [idEdit, setIdEdit] = useState<number | null>(null);
   const { user: AuthUSER } = useAuth();
   const {
@@ -51,6 +56,9 @@ function Page() {
     deleteMyTestimonial,
   } = useTestimony();
 
+  const { assignService } = useAssignService(parseInt(id as string));
+  const router = useRouter();
+  
   const addEmoji = (emoji: string) => {
     setComment((prev) => prev + emoji);
     setShowEmojis(false);
@@ -150,6 +158,20 @@ function Page() {
   return (
     <div>
       <div className="bg-primary lg:h-screen flex flex-col gap-8 justify-center items-center px-4 py-8 md:px-16">
+        <div className="text-white">
+          <Signup
+            isModalOpen={isSignupModalOpen}
+            setModalOpen={setSignupModalOpen}
+            setSingingModalOpen={setSigninModalOpen}
+            assignService={assignService}
+          />
+          <Signin
+            isModalOpen={isSigninModalOpen}
+            setModalOpen={setSigninModalOpen}
+            setSignupModalOpen={setSignupModalOpen}
+            assignService={assignService}
+          />
+        </div>
         {ServiceLoadingChecker()}
         {service && (
           <div className="text-white text-lg md:text-2xl font-semibold">
@@ -191,7 +213,21 @@ function Page() {
                 </div>
               </div>
               <div className="flex flex-col md:flex-row gap-2">
-                <button className="btn text-xs md:text-sm bg-primary text-white py-2 px-4 rounded-md">
+                <button
+                  onClick={() => {
+                    if (AuthUSER) {
+                      assignService();
+                      setTimeout(
+                        () => (
+                          router.push(`/${AuthUSER.type}/dashboard/services`), 2100
+                        )
+                      );
+                    } else {
+                      setSignupModalOpen(true);
+                    }
+                  }}
+                  className="btn text-xs md:text-sm bg-primary text-white py-2 px-4 rounded-md"
+                >
                   Commencer votre dossier
                 </button>
                 <button className="btn text-xs md:text-sm bg-primary text-white py-2 px-4 rounded-md">

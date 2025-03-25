@@ -234,7 +234,8 @@ const getOneService = async (req, res) => {
  */
 const assignClient = async (req, res) => {
   try {
-    const { clientId, serviceId, status, is_paid } = req.body;
+    const clientId = req.user.id;
+    const { serviceId, is_paid } = req.body;
 
     if (!clientId || !serviceId) {
       return res.status(400).json({ error: 'clientId and serviceId are required.' });
@@ -253,7 +254,7 @@ const assignClient = async (req, res) => {
     const newRequest = await RequestService.create({
       clientId,
       serviceId,
-      status: status || 'Pending',
+      status: 'Pending',
       is_paid: typeof is_paid !== 'undefined' ? is_paid : false,
     });
     return res.status(201).json(newRequest);

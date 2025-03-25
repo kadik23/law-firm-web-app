@@ -129,11 +129,14 @@ function Header() {
         <Signup
           isModalOpen={isSignupModalOpen}
           setModalOpen={setSignupModalOpen}
-          isUploadFiles={false}
+          setSingingModalOpen={setSigninModalOpen}
+          assignService={undefined}
         />
         <Signin
           isModalOpen={isSigninModalOpen}
           setModalOpen={setSigninModalOpen}
+          setSignupModalOpen={setSignupModalOpen}
+          assignService={undefined}
         />
         <div className="hidden lg:flex items-center justify-between gap-4 cursor-pointer">
           {links.map((link, index) => (

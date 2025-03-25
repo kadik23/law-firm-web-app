@@ -38,10 +38,6 @@ const add = [
 ];
 
 const assignClient = [
-  body("clientId")
-    .notEmpty().withMessage("clientId is required")
-    .isInt({ min: 1 }).withMessage("clientId must be a positive integer"),
-    
   body("serviceId")
     .notEmpty().withMessage("serviceId is required")
     .isInt({ min: 1 }).withMessage("serviceId must be a positive integer"),
