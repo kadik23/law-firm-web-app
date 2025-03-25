@@ -13,7 +13,7 @@ export const DashboardIcon = ({ className }: IconProps): ReactNode => (
     alt="dashboard icon"
     width={18}
     height={22}
-    className={"text-white"}
+    className={className}
   />
 );
 
@@ -23,7 +23,7 @@ export const ServicesIcon = ({ className }: IconProps): ReactNode => (
     alt="services icon"
     width={18}
     height={22}
-    className={"text-white"}
+    className={className}
   />
 );
 
@@ -33,7 +33,7 @@ export const ContactIcon = ({ className }: IconProps): ReactNode => (
     alt="contact icon"
     width={18}
     height={22}
-    className={"text-white"}
+    className={className}
   />
 );
 
@@ -43,7 +43,7 @@ export const SettingsIcon = ({ className }: IconProps): ReactNode => (
     alt="settings icon"
     width={18}
     height={22}
-    className={"text-white"}
+    className={className}
   />
 );
 
@@ -56,13 +56,13 @@ export const AccountIcon = ({ className }: IconProps): ReactNode => (
   </svg>
 );
 
-export const LogoutIcon = ({ className, active, hover }: IconProps): ReactNode => (
+export const LogoutIcon = ({ className }: IconProps): ReactNode => (
   <Image 
     src={`/icons/dashboard/admin/Logout.svg`}
     alt="Logout icon"
     width={18}
     height={22}
-    className={"text-white"}
+    className={className}
   />
 );
 

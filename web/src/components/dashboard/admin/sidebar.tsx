@@ -10,12 +10,10 @@ import {
   AccountIcon,
   LogoutIcon
 } from './icons';
-import { useAuth } from "@/hooks/useAuth";
 import { useState } from "react";
 
 const Sidebar = () => {
     const pathname = usePathname() || "";
-    const { logout } = useAuth();
     const [isNotificationHovered, setIsNotificationHovered] = useState(false);
 
     const topRoutes = [

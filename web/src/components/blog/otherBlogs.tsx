@@ -1,5 +1,4 @@
 "use client";
-import Link from "next/link";
 import BlogCard from "./blogCard";
 import { useState, useEffect } from "react";
 

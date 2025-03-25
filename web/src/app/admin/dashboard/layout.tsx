@@ -1,10 +1,6 @@
 "use client"
 import { Header } from "@/components/dashboard/admin/header";
 import Sidebar from "@/components/dashboard/admin/sidebar";
-import { useAuth } from "@/hooks/useAuth";
-import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
-import Image from "next/image";
-import Link from "next/link";
 import { useState } from "react";
 
 export default function RootLayout({
