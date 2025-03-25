@@ -82,7 +82,7 @@ function Header() {
   ];
 
   return (
-    <div className="flex flex-col md:w-full w-auto fixed top-0 left-0 z-50">
+    <div className="flex flex-col w-full fixed top-0 left-0 z-50">
       <div className="hidden md:flex justify-between items-center w-full bg-[#4A84AA] py-2 px-4 md:px-8">
         <div className="flex items-center text-white font-semibold text-sm">
           <Icon

@@ -4,7 +4,7 @@ import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
 
 function Footer() {
     return (
-        <div className='flex flex-col gap-8 bg-primary px-4 md:px-32 pb-8 pt-16 text-white'>
+        <div className='w-full flex flex-col gap-8 bg-primary px-4 md:px-32 pb-8 pt-16 text-white'>
             <hr className='my-4 hidden md:block'/>
             <div className='flex flex-wrap gap-4 md:gap-0 md:justify-between items-center '>
                 <Image
