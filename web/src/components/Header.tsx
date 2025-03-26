@@ -81,6 +81,10 @@ function Header() {
     { Icon: BlogsIcon, alt: "Vos blogs", path: "/client/dashboard/vos-blogs" },
   ];
 
+  if (user?.type === "admin") {
+    return;
+  }
+
   return (
     <div className="flex flex-col w-full fixed top-0 left-0 z-50">
       <div className="hidden md:flex justify-between items-center w-full bg-[#4A84AA] py-2 px-4 md:px-8">

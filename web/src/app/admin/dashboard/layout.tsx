@@ -12,7 +12,7 @@ export default function RootLayout({
     const [showSideBar, setShowSideBar] = useState(true);
     
     return (
-        <div className="flex">
+        <div className="flex -mt-14">
 
             {/* Sidebar */}
             <div className="transform transition-all duration-300 ease-in-out">
