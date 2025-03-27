@@ -3,6 +3,8 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const {upload} = require("../../middlewares/FilesMiddleware");
 const {path} = require("express/lib/view");
+const { query, validationResult } = require('express-validator');
+const { Op } = require("sequelize");
 
 const User = db.users;
 const Attorney = db.attorneys;
@@ -167,7 +169,105 @@ const createAttorney = async (req, res) => {
     return res.status(500).send('Failed to create attorney');
   }
 };
+/**
+ * @swagger
+ * /admin/attorneys:
+ *   get:
+ *     summary: Fetch attorneys with pagination and search
+ *     description: Allows an admin to fetch attorneys they created, with pagination and optional search by name.
+ *     tags:
+ *       - Attorneys
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - name: page
+ *         in: query
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *       - name: search
+ *         in: query
+ *         required: false
+ *         schema:
+ *           type: string
+ *           example: "John"
+ *     responses:
+ *       200:
+ *         description: Successful response with attorneys and pagination info
+ *       400:
+ *         description: Validation error
+ *       500:
+ *         description: Internal server error
+ */
+const getAdminAttorneys = async (req, res) => {
+  try {
+      const page = parseInt(req.query.page) || 1;
+      const limit = 6;
+      const offset = (page - 1) * limit;
+
+      const totalAttorneys = await Attorney.count();
+
+      const totalPages = Math.ceil(totalAttorneys / limit);
+
+      const attorneys = await Attorney.findAll({
+          limit,
+          offset,
+          order: [['createdAt', 'DESC']]
+      });
+
+      res.json({
+          currentPage: page,
+          totalPages,
+          totalAttorneys,
+          attorneys
+      });
+
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error' });
+  }
+};
+const searchAttorneys = async (req, res) => {
+  try {
+      const { name, page = 1, limit = 6 } = req.query;
+      const offset = (page - 1) * limit;
+
+      // Build search condition
+      const whereCondition = {};
+      if (name) {
+          whereCondition["$User.name$"] = { [Op.like]: `%${name}%` };
+      }
+
+      // Fetch attorneys with pagination and total count
+      const { count, rows: attorneys } = await Attorney.findAndCountAll({
+          where: whereCondition,
+          include: [
+              {
+                  model: User,
+                  as: "User", // Make sure to use the alias from your model associations
+                  attributes: ["id", "name", "surname", "email"],
+              },
+          ],
+          limit: parseInt(limit),
+          offset: parseInt(offset),
+      });
+
+      return res.json({
+          currentPage: parseInt(page),
+          totalPages: Math.ceil(count / limit),
+          totalAttorneys: count,
+          attorneys,
+      });
+
+  } catch (error) {
+      console.error("Error fetching attorneys:", error);
+      return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
 
 module.exports = {
-  createAttorney
+  createAttorney,
+  getAdminAttorneys,
+  searchAttorneys
 };

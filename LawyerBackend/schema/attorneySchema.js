@@ -1,4 +1,4 @@
-const { body } = require('express-validator');
+const { body, query } = require('express-validator');
 
 const add = [
     body('first_name')
@@ -32,7 +32,7 @@ const add = [
 
     body('sex')
         .optional()
-        .isIn(['Homme','Femme']).withMessage('Sex must be "Homme" or "Femme"'),
+        .isIn(['Homme', 'Femme']).withMessage('Sex must be "Homme" or "Femme"'),
 
     body('linkedin_url')
         .optional()
@@ -59,4 +59,31 @@ const add = [
         .isString().withMessage('Status must be a string')
 ];
 
-module.exports = { add };
+const getAttorneys = [
+    query("page")
+        .optional()
+        .isInt({ min: 1 })
+        .withMessage("Page must be a positive integer."),
+    
+    query("search")
+        .optional()
+        .trim()
+        .isString()
+        .withMessage("Search must be a string."),
+];
+const search = [
+    query('name')
+        .optional()
+        .isString().withMessage('Name must be a string')
+        .trim()
+        .escape(),
+
+    query('page')
+        .optional()
+        .isInt({ min: 1 }).withMessage('Page must be a positive integer'),
+
+    query('limit')
+        .optional()
+        .isInt({ min: 1 }).withMessage('Limit must be a positive integer')
+];
+module.exports = { add, getAttorneys, search };

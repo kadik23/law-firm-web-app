@@ -63,8 +63,8 @@ module.exports = (sequelize, DataTypes) => {
       otherKey: 'serviceId',
       as: 'requestedServices'
     });
-
   };
+
   return User;
 };
 
