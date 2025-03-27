@@ -55,6 +55,7 @@ userRouter.post('/blogs/replycomment',authMiddleware(["client","admin","attorney
 userRouter.post('/blogs/likecomment',authMiddleware(["client","admin","attorney"]),commentsSchema.like,validationErrors, blogCommentsController.likeComment);
 userRouter.get('/blogs/commentsByBlog/:id',commentsSchema.getByBlog,validationErrors,blogCommentsController.getCommentsByBlog);
 userRouter.get('/blogs/repliesCommentsByComment/:commentId',commentsSchema.getByComment,validationErrors,blogCommentsController.getRepliesByComment);
+userRouter.get('/blogs/IsCommentLiked/:commentId',authMiddleware(["client","admin","attorney"]),commentsSchema.isLike,validationErrors,blogCommentsController.IsCommentLiked);
 
 //Favorite Routes
 userRouter.post('/favorites',authMiddleware(["client"]),favoriteSchema.add,validationErrors,favoritesController.CreateFavoriteBlog);
