@@ -757,8 +757,46 @@ const getServiceFiles = async (req, res) => {
   }
 };
 
-const getAllServicesByProblem = async (req, res) => {};
+const getAllServicesByProblem = async (req, res) => {
+  try {
+    let services = await Service.findAll({
+      include: [
+        {
+          model: Problem,
+          as: 'problems', 
+          where: { id: req.params.problem_id },
+          attributes: [],
+        },
+      ],
+      attributes: ['id', 'name', 'description', 'requestedFiles', 'coverImage', 'price', 'createdBy', 'createdAt', 'updatedAt'],
+      order: [['createdAt', 'DESC']],
+    });
+    if (services) {
+      services = await Promise.all(services.map(async (service) => {
+        const filePath = path.resolve(__dirname, '..', '..', service.coverImage);
 
+        let base64Image = null;
+        if (fs.existsSync(filePath)) {
+          const fileData = fs.readFileSync(filePath);
+          base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
+        }
+
+        return {
+          ...service.toJSON(),
+          coverImage: base64Image
+        };
+      }));
+
+      return res.status(200).json(services);
+    }else {
+      return res.status(401).send('Error fetching services');
+    }
+
+  } catch (error) {
+    console.error('Error fetching services:', error);
+    return res.status(500).json({ error: 'Server error: ' + error.message });
+  }
+};
 /**
  * @swagger
  * /user/services/{problem_id}:
@@ -927,6 +965,7 @@ const getAssignedServices = async (req, res) => {
 
         return {
           id: service.id,
+          request_service_id: request.id,
           name: service.name,
           description: service.description,
           requestedFiles: service.requestedFiles,
@@ -957,6 +996,134 @@ const getAssignedServices = async (req, res) => {
   }
 };
 
+/**
+ * @swagger
+ * /user/remove-assign/{request_service_id}:
+ *   delete:
+ *     summary: Remove a specific service assignment
+ *     description: Remove a service assignment for the current user by request_service_id
+ *     tags:
+ *       - Services
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: request_service_id
+ *         required: true
+ *         description: The ID of the service request to remove
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Service assignment removed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Service assignment removed successfully"
+ *       404:
+ *         description: Service assignment not found or not owned by user
+ *       500:
+ *         description: Server error
+ */
+const removeAssign = async (req, res) => {
+  try {
+    const { request_service_id } = req.params;
+    const userId = req.user.id;
+
+    if (!request_service_id) {
+      return res.status(400).json({ error: 'Request service ID is required' });
+    }
+
+    const deletedCount = await RequestService.destroy({
+      where: {
+        id: request_service_id,
+        clientId: userId
+      }
+    });
+
+    if (deletedCount === 0) {
+      return res.status(404).json({ error: 'Service assignment not found or not owned by user' });
+    }
+
+    await ServiceFilesUploaded.destroy({
+      where: { request_service_id }
+    });
+
+    return res.status(200).json({ message: 'Service assignment removed successfully' });
+  } catch (error) {
+    console.error('Error removing service assignment:', error);
+    return res.status(500).json({ error: 'Server error: ' + error.message });
+  }
+};
+
+/**
+ * @swagger
+ * /user/remove-all-assign:
+ *   delete:
+ *     summary: Remove all service assignments for current user
+ *     description: Remove all service assignments for the currently authenticated user
+ *     tags:
+ *       - Services
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: All service assignments removed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "All service assignments removed successfully"
+ *                 deletedCount:
+ *                   type: integer
+ *                   example: 3
+ *       500:
+ *         description: Server error
+ */
+const removeAllAssign = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const userRequests = await RequestService.findAll({
+      where: { clientId: userId },
+      attributes: ['id']
+    });
+
+    if (!userRequests || userRequests.length === 0) {
+      return res.status(200).json({ 
+        message: 'No service assignments found',
+        deletedCount: 0
+      });
+    }
+
+    const requestIds = userRequests.map(req => req.id);
+
+    // Delete all associated files first
+    await ServiceFilesUploaded.destroy({
+      where: { request_service_id: requestIds }
+    });
+
+    const deletedCount = await RequestService.destroy({
+      where: { clientId: userId }
+    });
+
+    return res.status(200).json({ 
+      message: 'All service assignments removed successfully',
+      deletedCount
+    });
+  } catch (error) {
+    console.error('Error removing all service assignments:', error);
+    return res.status(500).json({ error: 'Server error: ' + error.message });
+  }
+};
+
 module.exports = {
   getAllServices,
   getOneService,
@@ -967,4 +1134,6 @@ module.exports = {
   getServiceFiles,
   getAllServicesByProblem,
   getAssignedServices,
+  removeAllAssign,
+  removeAssign
 };

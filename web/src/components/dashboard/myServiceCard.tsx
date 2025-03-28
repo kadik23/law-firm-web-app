@@ -1,11 +1,13 @@
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
 type MyServiceCardProps = {
   service: serviceEntity;
+  remService: (id: number) => void;
 };
-function Myservice({ service }: MyServiceCardProps) {
+function Myservice({ service, remService }: MyServiceCardProps) {
   return (
     <div className="rounded-xl shadow-md relative">
       <Image
@@ -20,8 +22,8 @@ function Myservice({ service }: MyServiceCardProps) {
       <div className="flex justify-between w-full p-2">
         <div className="font-semibold text-lg">{service.name}</div>
         <div className="text-xs font-semibold btn mt-2">
-          <a
-            href={`services/${service.id}`}
+          <Link
+            href={`/services/${service.id}`}
             className="flex items-center gap-2 transition-all duration-150 hover:opacity-50"
           >
             En savoir plus{" "}
@@ -31,7 +33,7 @@ function Myservice({ service }: MyServiceCardProps) {
               height="16"
               style={{ color: "#000" }}
             />
-          </a>
+          </Link>
         </div>
       </div>
       <a
@@ -42,6 +44,7 @@ function Myservice({ service }: MyServiceCardProps) {
       </a>
       <Icon
         icon="material-symbols:delete-rounded"
+        onClick={() => remService(service.request_service_id as number)}
         width={32}
         className="absolute top-2 right-2 transition-all duration-150 hover:opacity-80 cursor-pointer text-secondary"
       />

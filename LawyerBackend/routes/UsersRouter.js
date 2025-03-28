@@ -70,7 +70,9 @@ userRouter.delete('/favorites',authMiddleware(["client"]),favoritesController.De
 userRouter.get('/services',servicesController.getAllServices);
 userRouter.get('/services/assignedServices',authMiddleware(["client"]),servicesController.getAssignedServices);
 userRouter.get('/services/:id',servicesSchema.getById,validationErrors,servicesController.getOneService);
-userRouter.post('/services/assign_client',authMiddleware(["client", "admin", "attorney"]),servicesSchema.assignClient,validationErrors,servicesController.assignClient);
+userRouter.post('/services/assign_client',authMiddleware(["client"]),servicesSchema.assignClient,validationErrors,servicesController.assignClient);
+userRouter.delete('/services/remove_assign_client/:request_service_id',authMiddleware(["client"]),servicesSchema.remAssign,validationErrors,servicesController.removeAssign);
+userRouter.delete('/services/remove_all_assign_client',authMiddleware(["client"]),servicesController.removeAllAssign);
 userRouter.delete('/service-files/:request_service_id', authMiddleware(["client"]), servicesController.deleteServiceFiles);
 userRouter.put('/service-files/:uploaded_file_id',authMiddleware(["client"]),upload.array('file', 5),servicesController.updateServiceFile);
 userRouter.post('/service-files/:request_service_id',authMiddleware(["client"]),servicesController.uploadServiceFiles);

@@ -49,5 +49,58 @@ export const useAssignService = (serviceId?: number) => {
     }
   };
 
-  return { loading, assignService, fetchAssignService, assignServices};
+  const remAssignService = async (remove_assign_client: number) => {
+    try {
+      const response = await axios.delete(
+        `/user/services/remove_assign_client/${remove_assign_client}`
+      );
+      if (response.status == 200) {
+        setassignServices((prev) =>
+          prev.filter((item) => item.request_service_id !== remove_assign_client)
+        );
+        showAlert(
+          "success",
+          "Supprimer un service avec succès",
+          "Veuillez sélectionner le service que vous avez choisi ici pour terminer le téléchargement des fichiers requis."
+        );
+      }
+    } catch (err) {
+      if (isAxiosError(err) && err.response?.status === 401) {
+        console.warn("Services not found");
+      } else {
+        console.error("An unexpected error occurred:", err);
+      }
+    }
+  };
+
+  const remAssignServiceAll = async () => {
+    try {
+      const response = await axios.delete(
+        `/user/services/remove_all_assign_client`
+      );
+      if (response.status == 200) {
+        setassignServices([]);
+        showAlert(
+          "success",
+          "Supprimer des services avec succès",
+          "Veuillez sélectionner le service que vous avez choisi pour terminer le téléchargement des fichiers requis."
+        );
+      }
+    } catch (err) {
+      if (isAxiosError(err) && err.response?.status === 401) {
+        console.warn("Services not found");
+      } else {
+        console.error("An unexpected error occurred:", err);
+      }
+    }
+  };
+
+  return {
+    loading,
+    assignService,
+    fetchAssignService,
+    assignServices,
+    remAssignService,
+    remAssignServiceAll
+  };
 };
