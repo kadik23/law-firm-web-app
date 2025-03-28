@@ -1,126 +1,14 @@
 "use client";
 import Myservice from "@/components/dashboard/myServiceCard";
+import { useAssignService } from "@/hooks/useAssignService";
 import usePagination from "@/hooks/usePagination ";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 
 function Services() {
-  const serviceItems = React.useMemo(() => [
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,  
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-  ], []);
   const blogsPerPage = 6;
-  const [filteredServices, setFilteredBlogs] = useState<serviceEntity[]>([]);
 
-  useEffect(() => {
-    setFilteredBlogs(serviceItems);
-  }, [serviceItems]);
+  const { fetchAssignService, assignServices } = useAssignService();
 
   const {
     currentPage,
@@ -129,12 +17,16 @@ function Services() {
     goToNextPage,
     generatePaginationNumbers,
     setCurrentPage,
-  } = usePagination(filteredServices.length, blogsPerPage);
+  } = usePagination(assignServices.length, blogsPerPage);
 
   const startIndex = (currentPage - 1) * blogsPerPage;
   const endIndex = startIndex + blogsPerPage;
 
-  const servicesToDisplay = filteredServices.slice(startIndex, endIndex);
+  const servicesToDisplay = assignServices.slice(startIndex, endIndex);
+
+  useEffect(() => {
+    fetchAssignService();
+  }, []);
 
   return (
     <div className="flex flex-col md:gap-8 gap-6 px-4 md:px-0">
@@ -147,7 +39,12 @@ function Services() {
         </div>
         <div className=" gap-2 items-center md:flex hidden text-secondary  py-2 md:px-4 rounded-lg">
           <Icon icon="tdesign:service-filled" width={24} height={24} />
-          <div className="font-semibold">Total de services : 06 </div>
+          <div className="font-semibold">
+            Total de services :{" "}
+            {assignServices.length < 10
+              ? `0${assignServices.length}`
+              : assignServices.length}{" "}
+          </div>
         </div>
         <div className="text-secondary md:hidden">Total: 06</div>
       </div>
@@ -172,7 +69,7 @@ function Services() {
         </button>
       </div>
       <div>
-        {filteredServices.length > 0 ? (
+        {assignServices.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {servicesToDisplay.map((service, index) => (
               <Myservice service={service} key={index} />
