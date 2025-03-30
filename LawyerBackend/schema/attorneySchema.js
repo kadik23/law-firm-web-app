@@ -92,5 +92,4 @@ body('ids')
     .isArray({ min: 0 })
     .withMessage("ids must be a non-empty array.")
 ]
-
 module.exports = { add, getAttorneys, search, remove };
