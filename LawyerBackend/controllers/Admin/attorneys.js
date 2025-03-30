@@ -1,11 +1,11 @@
 const db = require('../../models');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const {upload} = require("../../middlewares/FilesMiddleware");
 const path = require('path'); 
-const { query, validationResult } = require('express-validator');
 const { Op } = require("sequelize");
 const fs = require('fs');
+const {body, validationResult} = require("express-validator");
+
 const User = db.users;
 const Attorney = db.attorneys;
 
@@ -65,11 +65,6 @@ const Attorney = db.attorneys;
  *                 linkedin_url:
  *                   type: string
  *                   example: "https://www.linkedin.com/in/johndoe"
- *                 certificats:
- *                   type: array
- *                   items:
- *                     type: string
- *                   example: ["Certificate A", "Certificate B"]
  *                 date_membership:
  *                   type: string
  *                   format: date
@@ -104,8 +99,66 @@ const createAttorney = async (req, res) => {
     if (!uploadedFile || uploadedFile.length === 0) {
       return res.status(400).send('No files were uploaded.');
     }
+    await Promise.all([
+      body('first_name')
+          .notEmpty().withMessage('First name is required')
+          .isString().withMessage('First name must be a string').run(req),
+
+      body('last_name')
+          .notEmpty().withMessage('Last name is required')
+          .isString().withMessage('Last name must be a string').run(req),
+
+      body('email')
+          .notEmpty().withMessage('Email is required')
+          .isEmail().withMessage('Invalid email format')
+          .normalizeEmail().run(req),
+
+      body('password')
+          .notEmpty().withMessage('Password is required')
+          .isLength({ min: 8 }).withMessage('Password must be at least 8 characters long').run(req),
+
+      body('phone_number')
+          .optional()
+          .isMobilePhone().withMessage('Invalid phone number format').run(req),
+
+      body('city')
+          .optional()
+          .isString().withMessage('City must be a string').run(req),
+
+      body('age')
+          .optional()
+          .isInt({ min: 18 }).withMessage('Age must be a valid number and at least 18').run(req),
+
+      body('sex')
+          .optional()
+          .isIn(['Homme','Femme']).withMessage('Sex must be "Homme" or "Femme"').run(req),
+
+      body('linkedin_url')
+          .optional()
+          .isURL().withMessage('Invalid LinkedIn URL').run(req),
+
+      body('date_membership')
+          .notEmpty().withMessage('Date_membership is required')
+          .isISO8601().withMessage('Invalid date format (must be YYYY-MM-DD)').run(req),
+
+      body('pays')
+          .notEmpty().withMessage('Pays is required')
+          .isString().withMessage('Pays must be a string').run(req),
+
+      body('terms_accepted')
+          .notEmpty().withMessage('Terms must be accepted')
+          .isBoolean().withMessage('Terms accepted must be true or false').run(req),
+
+      body('status')
+          .optional()
+          .isString().withMessage('Status must be a string').run(req)
+    ]);
 
 
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
   const {
     first_name,
@@ -117,7 +170,6 @@ const createAttorney = async (req, res) => {
     age,
     sex,
     linkedin_url,
-    certificats,
     date_membership,
     pays,
     terms_accepted,
@@ -156,7 +208,6 @@ const createAttorney = async (req, res) => {
       user_id: newUser.id,
       status,
       linkedin_url,
-      certificats: certificats || null,
       date_membership: date_membership ? new Date(date_membership) : new Date(),
       picture_path: uploadedFile.path
     });
@@ -303,8 +354,51 @@ const searchAttorneys = async (req, res) => {
   }
 };
 
+const deleteAttorneys = async (req, res) => {
+  try {
+    const { ids } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).send({ error: 'Invalid attorney IDs' });
+    }
+
+
+
+    const attorneys = await Attorney.findAll({ where: { user_id: ids } });
+    if (attorneys.length === 0) {
+      return res.status(404).send({ error: 'No attorneys found' });
+    }
+
+
+
+    const filePaths = attorneys.map(attorney => attorney.picture_path).filter(path => path);
+
+
+    filePaths.forEach(filePath => {
+      const resolvedPath = path.resolve(filePath);
+      fs.unlink(resolvedPath, (err) => {
+        if (err && err.code !== 'ENOENT') {
+          console.error('Error deleting file:', err);
+        }
+      });
+    });
+
+
+    await Attorney.destroy({ where: { user_id: ids } });
+
+
+    await User.destroy({ where: { id: ids } });
+
+    return res.status(200).send({ message: 'Attorneys and associated users deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting attorneys:', error);
+    return res.status(500).send({ error: 'Failed to delete attorneys' });
+  }
+};
+
+
 module.exports = {
   createAttorney,
+  deleteAttorneys,
   getAdminAttorneys,
   searchAttorneys
 };

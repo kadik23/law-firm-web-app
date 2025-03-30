@@ -4,7 +4,7 @@ const add = [
     body('first_name')
         .notEmpty().withMessage('First name is required')
         .isString().withMessage('First name must be a string'),
-
+    
     body('last_name')
         .notEmpty().withMessage('Last name is required')
         .isString().withMessage('Last name must be a string'),
@@ -86,4 +86,11 @@ const search = [
         .optional()
         .isInt({ min: 1 }).withMessage('Limit must be a positive integer')
 ];
-module.exports = { add, getAttorneys, search };
+const remove=[
+body('ids')
+    .notEmpty()
+    .isArray({ min: 0 })
+    .withMessage("ids must be a non-empty array.")
+]
+
+module.exports = { add, getAttorneys, search, remove };

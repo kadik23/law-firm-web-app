@@ -39,12 +39,14 @@ db.attorneys = require('./attorneys')(sequelize, DataTypes);
 db.files = require('./Files.js')(sequelize, DataTypes);
 db.categories = require('./Categories.js')(sequelize, DataTypes);
 db.blogs = require('./Blogs.js')(sequelize, DataTypes);
+db.like = require('./BlogsLikes.js')(sequelize, DataTypes);
 db.favorites = require('./Favorites.js')(sequelize, DataTypes);
 db.blogcomments = require('./BlogComments.js')(sequelize, DataTypes);
 db.services = require('./Services.js')(sequelize, DataTypes);
 db.testimonials = require("./Testimonials")(sequelize, DataTypes);
 db.problems = require("./problems.js")(sequelize, DataTypes);
 db.Consultation = require("./Consultation")(sequelize, DataTypes);
+db.commentsLikes = require("./CommentsLikes")(sequelize, DataTypes);
 db.request_service = require('./request_service.js')(sequelize, DataTypes);
 db.service_files_uploaded = require('./service_files_uploaded.js')(sequelize, DataTypes);
 
@@ -95,6 +97,20 @@ db.users.belongsToMany(db.blogs, {
   otherKey: 'blogId',
 });
 
+db.blogs.belongsToMany(db.users, {
+  through: db.like,
+  as: 'LikedBy',
+  foreignKey: 'blogId',
+  otherKey: 'userId',
+});
+
+db.users.belongsToMany(db.blogs, {
+  through: db.like,
+  as: 'LikeBlogs',
+  foreignKey: 'userId',
+  otherKey: 'blogId',
+});
+
 db.blogcomments.belongsTo(db.users, {
     foreignKey: 'userId',
     allowNull: false,
@@ -138,7 +154,12 @@ db.users.hasMany(db.testimonials, {
   foreignKey: 'userId',
   as: 'userTestimonials',
 });
-
+db.blogcomments.hasMany(db.commentsLikes, {
+    foreignKey: 'commentId',
+    as: 'commentLikes',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+});
 Object.keys(db).forEach((modelName) => {
   if (db[modelName].associate) {
     db[modelName].associate(db);
@@ -160,6 +181,7 @@ console.log(db.services);
 console.log(db.blogs.associations);
 console.log(db.users.associations);
 console.log(db.favorites.associations);
+console.log(db.like.associations);
 console.log("Loaded Models:", Object.keys(db));
 console.log("Testimonial Associations:", db.testimonials?.associations);
 

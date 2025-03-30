@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AuthClientWrapper from "@/components/AuthClientWrapper";
+import { AlertProvider } from "@/contexts/AlertContext";
 
 // const geistSans = localFont({
 //   src: "../assets/fonts/GeistVF.woff",
@@ -25,19 +26,20 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  
   return (
     <html lang="en">
-      <head/>
-      <body
-        className={`antialiased `}
-      >
-        <AuthClientWrapper>
-          <div>
-            <Header />
-            <div className="mt-12 md:mt-14">{children}</div>
-            <Footer />
-          </div>
-        </AuthClientWrapper>
+      <head />
+      <body className={`antialiased `}>
+        <AlertProvider>
+          <AuthClientWrapper>
+            <div>
+              <Header />
+              <div className="mt-12 md:mt-14">{children}</div>
+              <Footer />
+            </div>
+          </AuthClientWrapper>
+        </AlertProvider>
       </body>
     </html>
   );

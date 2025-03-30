@@ -6,7 +6,7 @@ import Signup from "./Signup";
 import Signin from "./Signin";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   AccountIcon,
   BlogsIcon,
@@ -22,13 +22,13 @@ function Header() {
   const [activeSection, setActiveSection] = useState<null | string>(null);
   const [isSigninModalOpen, setSigninModalOpen] = useState(false);
   const [isSignupModalOpen, setSignupModalOpen] = useState(false);
+  const [iconIsHover, setIconIsHover] = useState(false);
   const router = usePathname();
   const links = [
-    { name: "accueil", href: "#accueil" },
-    { name: "services", href: "#services" },
-    { name: "avocats", href: "#avocats" },
-    { name: "blog", href: "#blog" },
-    { name: "contact", href: "#contact" },
+    { name: "accueil", href: "/#accueil" },
+    { name: "services", href: "/#services" },
+    { name: "avocats", href: "/#avocats" },
+    { name: "contact", href: "/#contact" },
   ];
 
   const toggleMenu = () => {
@@ -61,6 +61,18 @@ function Header() {
     };
   }, []);
 
+  const Router = useRouter();
+
+  const handleNavClick = (href: string) => {
+    if (router === "/") {
+      document.getElementById(href.substring(2))?.scrollIntoView({
+        behavior: "smooth",
+      });
+    } else {
+      Router.push(href);
+    }
+  };
+
   const routes = [
     { Icon: DashboardIcon, alt: "Dashboard", path: "/client/dashboard" },
     { Icon: AccountIcon, alt: "Compte", path: "/client/dashboard/compte" },
@@ -68,6 +80,10 @@ function Header() {
     { Icon: ServiceIcon, alt: "Services", path: "/client/dashboard/services" },
     { Icon: BlogsIcon, alt: "Vos blogs", path: "/client/dashboard/vos-blogs" },
   ];
+
+  if (user?.type === "admin") {
+    return;
+  }
 
   return (
     <div className="flex flex-col w-full fixed top-0 left-0 z-50">
@@ -125,104 +141,119 @@ function Header() {
         />
         <div className="hidden lg:flex items-center justify-between gap-4 cursor-pointer">
           {links.map((link, index) => (
-            <a
+            <button
               key={index}
-              href={link.href}
+              onClick={() => handleNavClick(link.href)}
               className={`uppercase text-sm text-primary hover:underline underline-offset-2 font-semibold transition duration-300 ${
                 activeSection === link.href.substring(1) ? "underline" : ""
               }`}
             >
               {link.name}
-            </a>
+            </button>
           ))}
         </div>
 
         <div className="flex items-center gap-6">
-          <Link
-            href={"/blog"}
-            className="items-center gap-1 hidden md:flex text-primary hover:text-secondary cursor-pointer"
-          >
-            {/* Heart / Favorite */}
-            <Icon icon="mdi:heart" width={20} />
-            <div className="uppercase font-semibold text-sm">My blogs</div>
-          </Link>
-          <div
-            className={` items-center justify-between gap-4 ${
-              user ? "hidden" : "hidden md:flex"
-            }`}
-          >
-            <button
-              className="bg-primary rounded-md p-2 btn font-semibold shadow-lg"
-              onClick={() => setSigninModalOpen(true)}
+          {user && (
+            <Link
+              href={"/client/dashboard/notifications"}
+              onMouseEnter={() => setIconIsHover(true)}
+              onMouseLeave={() => setIconIsHover(false)}
+              className="items-center gap-2 hidden md:flex text-primary hover:text-secondary cursor-pointer
+              transition duration-2000 ease-in-out"
             >
-              connexion
-            </button>
-            <button
-              className="bg-secondary rounded-md p-2 btn font-semibold shadow-lg"
-              onClick={() => setSignupModalOpen(true)}
+              {/* notification */}
+              <Image 
+                src={`/icons/notification${iconIsHover ? "" : "-primary"}.svg`}
+                alt="notification"
+                width={20}
+                height={24}
+              />
+              <div className="uppercase font-semibold text-sm">Mes notifs</div>
+            </Link>
+          )}
+          
+          {!user && (
+            <div
+              className={` items-center justify-between gap-4 ${
+                user ? "hidden" : "hidden md:flex"
+              }`}
             >
-              inscription
-            </button>
-          </div>
-          <div
-            className={` items-center justify-between gap-4 ${
-              user ? "hidden md:flex" : "hidden"
-            }`}
-          >
-            <div className="relative">
               <button
-                className="flex items-center bg-primary rounded-md p-2 capitalize 
-                text-white btn font-semibold shadow-lg"
-                onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+                className="bg-primary rounded-md p-2 btn font-semibold shadow-lg"
+                onClick={() => setSigninModalOpen(true)}
               >
-                Bienvenu {user?.name}
-                <Icon
-                  icon="tabler:chevron-down"
-                  style={{ strokeWidth: 3 }}
-                  width="17"
-                  height="17"
-                  className="ml-2"
-                />
+                connexion
               </button>
-              {profileMenuOpen && (
-                <div
-                  className="flex flex-col gap-3 items-end p-4 rounded-md 
-                absolute w-full top-11 bg-primary text-white"
-                >
-                  {/* Close icon */}
-                  <Icon
-                    icon="mdi:close"
-                    style={{ strokeWidth: 3 }}
-                    width="20"
-                    height="20"
-                    onClick={() => setProfileMenuOpen(false)}
-                    className="hover:text-secondary cursor-pointer"
-                  />
-
-                  <div className="w-full flex flex-col gap-2">
-                    <Link
-                      href={`/client/dashboard/compte`}
-                      className="bg-secondary rounded-md text-sm py-1 text-center font-semibold 
-                      hover:text-primary"
-                      onClick={() => setProfileMenuOpen(false)}
-                    >
-                      Voir mon compte
-                    </Link>
-                    <button
-                      onClick={logout}
-                      className="bg-secondary rounded-md text-sm py-1 text-center font-semibold
-                       hover:text-primary"
-                    >
-                      Déconnectez
-                    </button>
-                  </div>
-                </div>
-              )}
+              <button
+                className="bg-secondary rounded-md p-2 btn font-semibold shadow-lg"
+                onClick={() => setSignupModalOpen(true)}
+              >
+                inscription
+              </button>
             </div>
-            <button className="bg-secondary w-11 h-11 rounded-full text-center text-lg p-2 btn font-semibold shadow-lg">
-              {user?.name[0]}
-            </button>
-          </div>
+          )}
+          {user && (
+            <div
+              className={` items-center justify-between gap-4 ${
+                user ? "hidden md:flex" : "hidden"
+              }`}
+            >
+              <div className="relative">
+                <button
+                  className="flex items-center bg-primary rounded-md p-2 capitalize 
+                text-white btn font-semibold shadow-lg"
+                  onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+                >
+                  Bienvenu {user?.name}
+                  <Icon
+                    icon="tabler:chevron-down"
+                    style={{ strokeWidth: 3 }}
+                    width="17"
+                    height="17"
+                    className="ml-2"
+                  />
+                </button>
+                {profileMenuOpen && (
+                  <div
+                    className="flex flex-col gap-3 items-end p-4 rounded-md 
+                absolute w-full top-11 bg-primary text-white"
+                  >
+                    {/* Close icon */}
+                    <Icon
+                      icon="mdi:close"
+                      style={{ strokeWidth: 3 }}
+                      width="20"
+                      height="20"
+                      onClick={() => setProfileMenuOpen(false)}
+                      className="hover:text-secondary cursor-pointer"
+                    />
+
+                    <div className="w-full flex flex-col gap-2">
+                      <Link
+                        href={`/client/dashboard/compte`}
+                        className="bg-secondary rounded-md text-sm py-1 text-center font-semibold 
+                      hover:text-primary"
+                        onClick={() => setProfileMenuOpen(false)}
+                      >
+                        Voir mon compte
+                      </Link>
+                      <button
+                        onClick={logout}
+                        className="bg-secondary rounded-md text-sm py-1 text-center font-semibold
+                       hover:text-primary"
+                      >
+                        Déconnectez
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <button className="bg-secondary w-11 h-11 rounded-full text-center text-lg p-2 btn font-semibold shadow-lg">
+                {user?.name[0]}
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="flex md:hidden items-center gap-2">
@@ -260,10 +291,10 @@ function Header() {
               </a>
             ))}
             <Link
-              href={"/blog"}
+              href={"/client/dashboard/notifications"}
               className="flex items-center justify-start gap-2 text-white hover:text-secondary cursor-pointer"
             >
-              <span className="uppercase font-semibold text-sm">My blogs</span>
+              <span className="uppercase font-semibold text-sm">Mes notifs</span>
             </Link>
             <div className="flex flex-col items-center ">
               <div

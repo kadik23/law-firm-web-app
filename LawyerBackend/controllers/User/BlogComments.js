@@ -1,7 +1,11 @@
 require('dotenv').config();
 const db = require('../../models')
+const {Sequelize} = require("sequelize");
 const comments=db.blogcomments
 const Blog=db.blogs
+const likes=db.commentsLikes
+User = db.users;
+const { Op, literal } = require("sequelize");
 
 /**
  * @swagger
@@ -55,7 +59,17 @@ const addBlogComment = async (req,res)=> {
             if (!newBlogComment) {
                 return res.status(401).send('Error creating blog comment');
             } else {
-                return res.status(200).send(newBlogComment);
+                const commentWithUser = await comments.findOne({
+                    where: { id: newBlogComment.id },
+                    include: [
+                      {
+                        model: User,
+                        attributes: ["id", "name", "surname"],
+                      },
+                    ],
+                  });
+              
+                  return res.status(200).send(commentWithUser);
             }
 
     }
@@ -106,8 +120,8 @@ const addBlogComment = async (req,res)=> {
 
 const deleteBlogComment= async (req,res)=>{
     try {
-        const {id} = req.body;
-        let comment = await comments.findByPk(id);
+        const {commentId} = req.params;
+        let comment = await comments.findByPk(commentId);
 
         if (!comment) {
             return res.status(404).json("Comment not found");
@@ -165,8 +179,9 @@ const deleteBlogComment= async (req,res)=>{
 
 const updateBlogComment= async (req,res)=>{
     try {
-        const {id ,body} = req.body;
-        let comment = await comments.findByPk(id);
+        const {body} = req.body;
+        const {commentId} = req.params;
+        let comment = await comments.findByPk(commentId);
 
         if (!comment) {
             return res.status(404).json("comment not found");
@@ -178,7 +193,7 @@ const updateBlogComment= async (req,res)=>{
 
         const updatedComments = await comment.update(
             { body:body },
-            { where: { id:id } }
+            { where: { id:commentId } }
         );
         if (!updatedComments) {
             return res.status(404).send('Error updating comment');
@@ -294,17 +309,14 @@ const likeComment = async (req,res)=> {
         if (!comment) {
             return res.status(404).json("comment not found");
         }
+        let like = await likes.findOne({ where: { userId: req.user.id, commentId: id } });
+        if (!like) {
+            await likes.create({userId:req.user.id,commentId:comment.id})
+            return res.status(200).send('Like comment');
 
-
-        const updatedComments = await comment.update(
-            { likes: comment.likes+1 },
-            { where: { id } }
-        );
-
-        if (!updatedComments) {
-            return res.status(404).send('Error updating comment');
-        } else {
-            return res.status(200).send('Comment updated successfully');
+        }else {
+            await like.destroy()
+            return res.status(200).send('Unlike comment');
         }
 
     }
@@ -320,17 +332,14 @@ const likeComment = async (req,res)=> {
  *     summary: Retrieve a list of all comments of a blog
  *     tags:
  *       - Blogs comments
- *     requestBody:
- *         required: true
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               required:
- *                 - id
- *               properties:
- *                 id:
- *                   type: integer
+ *     parameters:
+ *         - in: query
+ *           name: page
+ *           schema:
+ *             type: integer
+ *           description: page number
+ *           required: false
+ *
  *     responses:
  *       200:
  *         description: A list of comments
@@ -344,23 +353,157 @@ const likeComment = async (req,res)=> {
  *         description: Internal Server Error
  */
 
-const getCommentsByBlog= async (req,res)=>{
+const getCommentsByBlog = async (req, res) => {
     try {
-        const {id} = req.params;
+        const { id } = req.params;
+        const page = parseInt(req.query.page) || 1;
+        const pageSize = 4;
+        const offset = (page - 1) * pageSize;
 
-        let commentsList = await comments.findAll({ where: { blogId:id } });
 
-        return res.status(200).send(commentsList);
+
+        const { count, rows: commentsList } = await db.blogcomments.findAndCountAll({
+            where: { blogId: id, isAReply: false },
+            limit: pageSize,
+            offset: offset,
+            order: [["createdAt", "DESC"]],
+            attributes: [
+                "id",
+                "body",
+                "userId",
+                "blogId",
+                "createdAt",
+                "isAReply",
+                "originalCommentId",
+                "updatedAt",
+                [Sequelize.fn("COUNT", Sequelize.col("commentLikes.commentId")), "likesCount"],
+                [
+                    Sequelize.literal(`(
+                        SELECT COUNT(*)
+                        FROM blog_comments AS replies
+                        WHERE replies.originalCommentId = blog_comments.id
+                    )`),
+                    "replies",
+                ],
+            ],
+            include: [
+                {
+                    model: User,
+                    attributes: ["id", "name", "surname"],
+                },
+                {
+                    model: db.commentsLikes,
+                    as: "commentLikes",
+                    attributes: [],
+                },
+            ],
+            group: ["blog_comments.id"],
+            subQuery: false,
+
+        });
+
+
+
+
+
+        return res.status(200).json({
+            success: true,
+            currentPage: page,
+            totalPages: Math.ceil((count.length || 0) / pageSize),
+            totalComments: count.length || 0,
+            comments: commentsList,
+        });
     } catch (e) {
-        console.error('Error fetching comments', e);
-        res.status(500).send('Internal Server Error');
+        console.error("Error fetching comments", e);
+        res.status(500).send("Internal Server Error");
     }
 };
+
+const getRepliesByComment = async (req, res) => {
+    try {
+        const { commentId } = req.params;
+
+        const replies = await comments.findAll({
+            where: { originalCommentId: commentId, isAReply: true },
+            order: [["createdAt", "DESC"]],
+            attributes: [
+                "id",
+                "body",
+                "userId",
+                "blogId",
+                "createdAt",
+                "isAReply",
+                "originalCommentId",
+                "updatedAt",
+                [Sequelize.fn("COUNT", Sequelize.col("commentLikes.commentId")), "likesCount"],
+                [
+                    Sequelize.literal(`(
+                        SELECT COUNT(*)
+                        FROM blog_comments AS replies
+                        WHERE replies.originalCommentId = blog_comments.id
+                    )`),
+                    "replies",
+                ],
+            ],
+            include: [
+                {
+                    model: User,
+                    attributes: ["id", "name", "surname"],
+                },
+                {
+                    model: db.commentsLikes, 
+                    as: "commentLikes",
+                    attributes: [],
+                },
+            ],
+            group: ["blog_comments.id"],
+            subQuery: false, 
+        });
+
+        return res.status(200).json({
+            success: true,
+            replies: replies,
+        });
+    } catch (e) {
+        console.error("Error fetching replies", e);
+        res.status(500).send("Internal Server Error");
+    }
+};
+
+const IsCommentLiked = async (req, res) => {
+    const userId = req.user.id;
+    const commentId = req.params.commentId;
+  
+    if (!commentId) {
+      return res.status(400).json({ message: "Comment ID is required." });
+    }
+  
+    try {
+      const commentExists = await comments.findByPk(commentId);
+      if (!commentExists) {
+        return res.status(404).json({ message: "Comment not found." });
+      }
+  
+      const likeDb = await likes.findOne({
+        where: { userId, commentId },
+      });
+  
+      res.status(200).json({ isliked: !!likeDb });
+    } catch (error) {
+      console.error("Error checking if Comment is liked:", error);
+      res
+        .status(500)
+        .json({ message: "An error occurred while checking like status." });
+    }
+};
+
 module.exports = {
     addBlogComment,
     updateBlogComment,
     deleteBlogComment,
     replyComment,
     likeComment,
-    getCommentsByBlog
+    getCommentsByBlog,
+    getRepliesByComment,
+    IsCommentLiked
 };

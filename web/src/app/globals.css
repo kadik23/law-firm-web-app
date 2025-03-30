@@ -143,6 +143,36 @@ body {
   }
 }
 
+/* Hide default date/time icons */
+.custom-input-date::-webkit-calendar-picker-indicator,
+.custom-input-time::-webkit-calendar-picker-indicator {
+  display: none; /* Hides the default browser icon */
+  appearance: none;
+}
+
+/* Style the input fields */
+.custom-input-date,
+.custom-input-time {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border: 1px solid white;
+  color: white;
+  background-color: transparent;
+  padding: 10px;
+  border-radius: 5px;
+  outline: none;
+  width: 100%;
+}
+
+/* Change background and text color on focus */
+.custom-input-date:focus,
+.custom-input-time:focus {
+  background-color: white;
+  color: black;
+}
+
+
 .error{
   color: red;
   text-align: left;

@@ -30,6 +30,8 @@ adminRouter.delete('/categories/delete', authMiddleware(['admin']), categoriesSc
 adminRouter.post('/attorney/add', authMiddleware(['admin']), attorneySchema.add, validationErrors, attorneysController.createAttorney);
 adminRouter.get('/attorneys', authMiddleware(['admin']), attorneySchema.getAttorneys, validationErrors, attorneysController.getAdminAttorneys); // Added pagination & search
 adminRouter.get('/attorneys/search',authMiddleware(["admin"]),attorneySchema.search,validationErrors,attorneysController.searchAttorneys);
+adminRouter.delete('/attorney/delete',authMiddleware(["admin"]),attroneySchema.remove,validationErrors,attorneysController.deleteAttorneys);
+
 // Blogs
 adminRouter.post('/blogs/add', authMiddleware(['admin']), blogsSchema.add, validationErrors, blogsController.addBlog);
 adminRouter.put('/blogs/update', authMiddleware(['admin']), blogsSchema.update, validationErrors, blogsController.updateBlog);
@@ -37,6 +39,7 @@ adminRouter.delete('/blogs/delete', authMiddleware(['admin']), blogsSchema.remov
 
 // Services
 adminRouter.post('/services/create', authMiddleware(['admin']), servicesSchema.add, validationErrors, servicesController.createService);
+adminRouter.delete('/services/delete',authMiddleware(["admin"]),servicesSchema.remove,validationErrors,servicesController.deleteServices)
 
 // Problems
 adminRouter.post('/problems', authMiddleware(['admin']), problemsSchema.add, validationErrors, problemsController.createProblem);
