@@ -2,10 +2,10 @@ const db = require('../../models');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const {upload} = require("../../middlewares/FilesMiddleware");
-const {path} = require("express/lib/view");
+const path = require('path'); 
 const { query, validationResult } = require('express-validator');
 const { Op } = require("sequelize");
-
+const fs = require('fs');
 const User = db.users;
 const Attorney = db.attorneys;
 
@@ -210,11 +210,33 @@ const getAdminAttorneys = async (req, res) => {
 
       const totalPages = Math.ceil(totalAttorneys / limit);
 
-      const attorneys = await Attorney.findAll({
+      let attorneys = await Attorney.findAll({
           limit,
           offset,
-          order: [['createdAt', 'DESC']]
+          order: [['createdAt', 'DESC']],
+          include: [
+            {
+                model: User,
+                as: "User",
+                attributes: ["id", "name", "surname", "email"],
+            },
+        ],
       });
+
+      attorneys = await Promise.all(attorneys.map(async (attorney) => {
+        const filePath = path.resolve(__dirname, '..', '..', attorney.picture_path);
+
+        let base64Image = null;
+        if (fs.existsSync(filePath)) {
+          const fileData = fs.readFileSync(filePath);
+          base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
+        }
+
+        return {
+          ...attorney.toJSON(),
+          picture: base64Image
+        };
+      }));
 
       res.json({
           currentPage: page,
@@ -240,7 +262,7 @@ const searchAttorneys = async (req, res) => {
       }
 
       // Fetch attorneys with pagination and total count
-      const { count, rows: attorneys } = await Attorney.findAndCountAll({
+      let { count, rows: attorneys } = await Attorney.findAndCountAll({
           where: whereCondition,
           include: [
               {
@@ -252,6 +274,21 @@ const searchAttorneys = async (req, res) => {
           limit: parseInt(limit),
           offset: parseInt(offset),
       });
+
+      attorneys = await Promise.all(attorneys.map(async (attorney) => {
+        const filePath = path.resolve(__dirname, '..', '..', attorney.picture_path);
+
+        let base64Image = null;
+        if (fs.existsSync(filePath)) {
+          const fileData = fs.readFileSync(filePath);
+          base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
+        }
+
+        return {
+          ...attorney.toJSON(),
+          picture: base64Image
+        };
+      }));
 
       return res.json({
           currentPage: parseInt(page),
