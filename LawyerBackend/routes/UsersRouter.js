@@ -96,4 +96,7 @@ userRouter.post('/send-notification', authMiddleware(["admin"]),notifController.
 // Consultation Routes
 userRouter.post('/consultations', authMiddleware(["client"]), consultationController.createConsultation);
 
+// Consultation Routes
+userRouter.post('/consultations', authMiddleware(["client"]), consultationController.createConsultation);
+
 module.exports = userRouter;

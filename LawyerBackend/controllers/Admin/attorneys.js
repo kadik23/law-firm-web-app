@@ -1,9 +1,9 @@
 const db = require('../../models');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const {upload} = require("../../middlewares/FilesMiddleware");
+const path = require('path'); 
+const { Op } = require("sequelize");
 const fs = require('fs');
-const path = require('path');
 const {body, validationResult} = require("express-validator");
 
 const User = db.users;
@@ -222,70 +222,137 @@ const createAttorney = async (req, res) => {
 };
 /**
  * @swagger
- * paths:
- *   /admin/attorney/delete:
- *     delete:
- *       summary: Delete multiple attorneys
- *       description: Deletes attorneys and their associated users, as well as any uploaded files.
- *       tags:
- *         - Attorneys
- *       requestBody:
- *         required: true
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 ids:
- *                   type: array
- *                   items:
- *                     type: integer
- *                   example: [1, 2, 3]
- *               required:
- *                 - ids
- *       responses:
- *         200:
- *           description: Attorneys and associated users deleted successfully
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   message:
- *                     type: string
- *                     example: Attorneys and associated users deleted successfully
- *         400:
- *           description: Invalid request (e.g., missing or incorrect attorney IDs)
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   error:
- *                     type: string
- *                     example: Invalid attorney IDs
- *         404:
- *           description: No attorneys found with the given IDs
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   error:
- *                     type: string
- *                     example: No attorneys found
- *         500:
- *           description: Internal server error
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   error:
- *                     type: string
- *                     example: Failed to delete attorneys
- *
+ * /admin/attorneys:
+ *   get:
+ *     summary: Fetch attorneys with pagination and search
+ *     description: Allows an admin to fetch attorneys they created, with pagination and optional search by name.
+ *     tags:
+ *       - Attorneys
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - name: page
+ *         in: query
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *       - name: search
+ *         in: query
+ *         required: false
+ *         schema:
+ *           type: string
+ *           example: "John"
+ *     responses:
+ *       200:
+ *         description: Successful response with attorneys and pagination info
+ *       400:
+ *         description: Validation error
+ *       500:
+ *         description: Internal server error
  */
+const getAdminAttorneys = async (req, res) => {
+  try {
+      const page = parseInt(req.query.page) || 1;
+      const limit = 6;
+      const offset = (page - 1) * limit;
+
+      const totalAttorneys = await Attorney.count();
+
+      const totalPages = Math.ceil(totalAttorneys / limit);
+
+      let attorneys = await Attorney.findAll({
+          limit,
+          offset,
+          order: [['createdAt', 'DESC']],
+          include: [
+            {
+                model: User,
+                as: "User",
+                attributes: ["id", "name", "surname", "email"],
+            },
+        ],
+      });
+
+      attorneys = await Promise.all(attorneys.map(async (attorney) => {
+        const filePath = path.resolve(__dirname, '..', '..', attorney.picture_path);
+
+        let base64Image = null;
+        if (fs.existsSync(filePath)) {
+          const fileData = fs.readFileSync(filePath);
+          base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
+        }
+
+        return {
+          ...attorney.toJSON(),
+          picture: base64Image
+        };
+      }));
+
+      res.json({
+          currentPage: page,
+          totalPages,
+          totalAttorneys,
+          attorneys
+      });
+
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error' });
+  }
+};
+const searchAttorneys = async (req, res) => {
+  try {
+      const { name, page = 1, limit = 6 } = req.query;
+      const offset = (page - 1) * limit;
+
+      // Build search condition
+      const whereCondition = {};
+      if (name) {
+          whereCondition["$User.name$"] = { [Op.like]: `%${name}%` };
+      }
+
+      // Fetch attorneys with pagination and total count
+      let { count, rows: attorneys } = await Attorney.findAndCountAll({
+          where: whereCondition,
+          include: [
+              {
+                  model: User,
+                  as: "User", // Make sure to use the alias from your model associations
+                  attributes: ["id", "name", "surname", "email"],
+              },
+          ],
+          limit: parseInt(limit),
+          offset: parseInt(offset),
+      });
+
+      attorneys = await Promise.all(attorneys.map(async (attorney) => {
+        const filePath = path.resolve(__dirname, '..', '..', attorney.picture_path);
+
+        let base64Image = null;
+        if (fs.existsSync(filePath)) {
+          const fileData = fs.readFileSync(filePath);
+          base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
+        }
+
+        return {
+          ...attorney.toJSON(),
+          picture: base64Image
+        };
+      }));
+
+      return res.json({
+          currentPage: parseInt(page),
+          totalPages: Math.ceil(count / limit),
+          totalAttorneys: count,
+          attorneys,
+      });
+
+  } catch (error) {
+      console.error("Error fetching attorneys:", error);
+      return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
 
 const deleteAttorneys = async (req, res) => {
   try {
@@ -328,9 +395,10 @@ const deleteAttorneys = async (req, res) => {
   }
 };
 
-module.exports = { deleteAttorneys };
 
 module.exports = {
   createAttorney,
-  deleteAttorneys
+  deleteAttorneys,
+  getAdminAttorneys,
+  searchAttorneys
 };
