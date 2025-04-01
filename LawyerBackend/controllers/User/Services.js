@@ -1124,6 +1124,118 @@ const removeAllAssign = async (req, res) => {
   }
 };
 
+/**
+ * @swagger
+ * /user/assigned-services/{id}:
+ *   get:
+ *     summary: Get a single assigned service by ID
+ *     description: Retrieve details of a specific service that has been assigned to the current user, including the request_service_id.
+ *     tags:
+ *       - Services
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the service to retrieve
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Assigned service retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   example: "1"
+ *                 request_service_id:
+ *                   type: string
+ *                   example: "45"
+ *                 name:
+ *                   type: string
+ *                   example: "Premium Service"
+ *                 description:
+ *                   type: string
+ *                   example: "This is a detailed description of the service."
+ *                 requestedFiles:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["file1.png", "file2.pdf"]
+ *                 coverImage:
+ *                   type: string
+ *                   example: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
+ *                 price:
+ *                   type: string
+ *                   example: "199.99"
+ *                 status:
+ *                   type: string
+ *                   example: "Pending"
+ *                 is_paid:
+ *                   type: boolean
+ *                   example: false
+ *                 createdAt:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2025-01-01T12:00:00Z"
+ *                 updatedAt:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2025-01-01T12:00:00Z"
+ *       404:
+ *         description: Service not found or not assigned to user
+ *       500:
+ *         description: Server error
+ */
+const getOneAssignedService = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+    const serviceRequest = await RequestService.findOne({
+      where: { 
+        clientId: userId,
+        serviceId: id 
+      },
+      include: [
+        {
+          model: Service,
+          as: 'service',
+          required: true
+        }
+      ]
+    });
+
+    if (!serviceRequest) {
+      return res.status(404).json({ error: "Service not found or not assigned to user" });
+    }
+
+    const service = serviceRequest.service;
+
+    return res.status(200).json({
+      id: service.id,
+      request_service_id: serviceRequest.id,
+      name: service.name,
+      description: service.description,
+      requestedFiles: service.requestedFiles,
+      price: service.price,
+      status: serviceRequest.status,
+      is_paid: serviceRequest.is_paid,
+      createdAt: service.createdAt,
+      updatedAt: service.updatedAt
+    });
+  } catch (error) {
+    console.error('Error in getOneAssignedService:', error);
+    return res.status(500).json({ 
+      error: 'Server error',
+      details: error.message 
+    });
+  }
+};
+
 module.exports = {
   getAllServices,
   getOneService,
@@ -1135,5 +1247,6 @@ module.exports = {
   getAllServicesByProblem,
   getAssignedServices,
   removeAllAssign,
-  removeAssign
+  removeAssign,
+  getOneAssignedService
 };

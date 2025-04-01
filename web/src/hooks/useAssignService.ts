@@ -7,6 +7,8 @@ export const useAssignService = (serviceId?: number) => {
   const [loading, setLoading] = useState(true);
   const [assignServices, setassignServices] = useState<serviceEntity[]>([]);
   const { showAlert } = useAlert();
+  const [service, setService] = useState<serviceEntity | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchAssignService = async () => {
     try {
@@ -25,6 +27,19 @@ export const useAssignService = (serviceId?: number) => {
       setLoading(false);
     }
   };
+
+  const fetchServiceAssignDetails = async () => {
+    try {
+        setLoading(true);
+        const response = await axios.get(`/user/services/assignedService/${serviceId}`);
+        setService(response.data);
+    } catch (err) {
+        setError("Failed to fetch service details");
+        console.error(err);
+    } finally {
+        setLoading(false);
+    }
+};
 
   const assignService = async () => {
     try {
@@ -101,6 +116,10 @@ export const useAssignService = (serviceId?: number) => {
     fetchAssignService,
     assignServices,
     remAssignService,
-    remAssignServiceAll
+    remAssignServiceAll,
+    fetchServiceAssignDetails,
+    service,
+    error,
+    setService,
   };
 };

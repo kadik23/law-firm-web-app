@@ -69,6 +69,7 @@ userRouter.delete('/favorites',authMiddleware(["client"]),favoritesController.De
 //Services Routes
 userRouter.get('/services',servicesController.getAllServices);
 userRouter.get('/services/assignedServices',authMiddleware(["client"]),servicesController.getAssignedServices);
+userRouter.get('/services/assignedService/:id/', authMiddleware(["client"]), servicesSchema.getById,validationErrors,servicesController.getOneAssignedService);
 userRouter.get('/services/:id',servicesSchema.getById,validationErrors,servicesController.getOneService);
 userRouter.post('/services/assign_client',authMiddleware(["client"]),servicesSchema.assignClient,validationErrors,servicesController.assignClient);
 userRouter.delete('/services/remove_assign_client/:request_service_id',authMiddleware(["client"]),servicesSchema.remAssign,validationErrors,servicesController.removeAssign);
