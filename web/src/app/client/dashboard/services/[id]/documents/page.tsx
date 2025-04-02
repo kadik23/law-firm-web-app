@@ -1,4 +1,5 @@
 "use client";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import { useAssignService } from "@/hooks/useAssignService";
 import useReqFiles from "@/hooks/useReqFiles";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
@@ -14,7 +15,16 @@ const Documents = () => {
     loading: serviceLoading,
     fetchServiceAssignDetails,
   } = useAssignService(serviceId);
-  const { fetchFiles, files, handleDownload } = useReqFiles();
+  const {
+    fetchFiles,
+    files,
+    handleDownload,
+    uploadedFiles,
+    setUploadedFiles,
+    saveLoading,
+    validateFiles,
+    saveFiles,
+  } = useReqFiles();
 
   useEffect(() => {
     if (serviceId) {
@@ -71,8 +81,16 @@ const Documents = () => {
         <div className="bg-[#4A84AA] bg-opacity-25 rounded-b-2xl px-8 py-4">
           <input
             type="file"
-            name=""
-            id=""
+            multiple
+            onChange={(e) => {
+              if (e.target.files) {
+                const newFiles = Array.from(e.target.files).map((file) => ({
+                  file,
+                  name: file.name,
+                }));
+                setUploadedFiles([...uploadedFiles, ...newFiles]);
+              }
+            }}
             className=" bg-transparent cursor-pointer border-2 p-2 rounded-2xl w-full border-dashed border-[#4A84AA] "
           />
         </div>
@@ -88,7 +106,7 @@ const Documents = () => {
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 text-sm gap-4 py-4 md:px-8  px-2">
-          {files.length === 0 && (
+          {files.length === 0 && uploadedFiles.length === 0 && (
             <div className="text-center text-gray-500">
               Aucun fichier trouvé
             </div>
@@ -98,15 +116,42 @@ const Documents = () => {
               <div className="font-bold border hover:border-red-500 hover:text-red-500 cursor-pointer border-primary text-primary rounded-full w-8 h-8 flex items-center justify-center">
                 <Icon icon="material-symbols:delete" width="24" height="24" />
               </div>{" "}
-              <div onClick={() => handleDownload(file.file_name ,file.base64)} className="hover:text-secondary cursor-pointer text-xs">
+              <div
+                onClick={() => handleDownload(file.file_name, file.base64)}
+                className="hover:text-secondary cursor-pointer text-xs"
+              >
                 {file.file_name}{" "}
+              </div>
+            </div>
+          ))}
+          {uploadedFiles.map((file, index) => (
+            <div key={index} className="flex gap-2 items-center">
+              <div className="font-bold border hover:border-red-500 hover:text-red-500 cursor-pointer border-primary text-primary rounded-full w-8 h-8 flex items-center justify-center">
+                <Icon icon="material-symbols:delete" width="24" height="24" />
+              </div>{" "}
+              <div
+                  onClick={() => handleDownload(file.name, file.file)}
+                className="hover:text-secondary cursor-pointer text-xs"
+              >
+                {file.name}{" "}
               </div>
             </div>
           ))}
         </div>
       </div>
       <div className="shadow-md cursor-pointer w-fit mx-auto md:mx-0 md:ml-auto flex gap-2 items-center text-secondary hover:text-white hover:bg-secondary transition-all duration-200 bg-white px-8 py-2 rounded-xl">
-        <div className="font-semibold text-nowrap">Souvegarder</div>
+        <button
+          onClick={() => {
+            if (!validateFiles(service?.requestedFiles?.length as number)) {
+              return;
+            }
+            saveFiles(service?.request_service_id as number);
+          }}
+          className="font-semibold text-nowrap"
+          disabled={saveLoading}
+        >
+          {saveLoading ? <LoadingSpinner /> : "Souvegarder"}
+        </button>
       </div>
       <div className="font-bold absolute md:hidden bottom-20 right-4 border shadow-md hover:text-secondary transition-all duration-200 bg-primary text-white rounded-xl w-12 h-10 flex items-center justify-center">
         <Icon icon="material-symbols:delete" width="24" height="24" />
