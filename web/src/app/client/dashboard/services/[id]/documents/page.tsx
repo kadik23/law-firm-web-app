@@ -24,6 +24,7 @@ const Documents = () => {
     saveLoading,
     validateFiles,
     saveFiles,
+    handleDelete
   } = useReqFiles();
 
   useEffect(() => {
@@ -102,7 +103,7 @@ const Documents = () => {
           </div>
           <div className="shadow-md md:flex gap-2 items-center hidden cursor-pointer text-secondary hover:text-white hover:bg-secondary transition-all duration-200 bg-white px-4 py-1 rounded-xl">
             <Icon icon="material-symbols:delete" width="24" height="24" />
-            <div className="font-semibold text-nowrap">Supprimer tous </div>
+            <div className="font-semibold text-nowrap" onClick={handleDelete}>Supprimer tous </div>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 text-sm gap-4 py-4 md:px-8  px-2">
@@ -145,7 +146,7 @@ const Documents = () => {
             if (!validateFiles(service?.requestedFiles?.length as number)) {
               return;
             }
-            saveFiles(service?.request_service_id as number);
+            saveFiles(service?.request_service_id as number, service?.requestedFiles?.length as number);
           }}
           className="font-semibold text-nowrap"
           disabled={saveLoading}
