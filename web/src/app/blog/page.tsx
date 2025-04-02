@@ -1,6 +1,7 @@
 "use client";
 import BlogCategory from "@/components/blog/blogCategory";
 import OtherBlogs from "@/components/blog/otherBlogs";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import { useBlogs } from "@/hooks/useBlogs";
 import useCategories from "@/hooks/useCategories";
 
@@ -45,7 +46,7 @@ const Blogs = () => {
           />
           <p>
             {blogsLoading
-              ? "Chargement..."
+              ? <LoadingSpinner/>
               : "Aucun blog disponible pour le moment."}
           </p>
         </>

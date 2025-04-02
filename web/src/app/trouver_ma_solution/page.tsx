@@ -1,4 +1,5 @@
 "use client";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import ServiceCard from "@/components/ServiceCard";
 import useCarousel from "@/hooks/useCarousel";
 import useCategories from "@/hooks/useCategories";
@@ -62,7 +63,7 @@ function Page() {
           <div className="text-black text-sm md:text-lg font-semibold">
             Choisir la catégorie de votre problème
           </div>
-          {categoriesLoading && <div>Loading...</div>}
+          {categoriesLoading && <LoadingSpinner/>}
           {categories.length === 0 && <div>Categories introuvables.</div>}
           <select
             className="py-2 px-4 outline-none shadow-lg bg-white text-sm md:text-base text-black rounded-lg border border-black"
@@ -82,7 +83,7 @@ function Page() {
           <div className="text-black text-sm md:text-lg font-semibold">
             Choisir votre problème
           </div>
-          {problemsLoading && <div>Loading...</div>}
+          {problemsLoading &&  <LoadingSpinner/>}
           {problemsError && <div>{problemsError}</div>}
           {problems.length === 0 && <div>Problems introuvables.</div>}
           <select
@@ -139,7 +140,7 @@ function Page() {
             }}
             transition={{ type: "spring", stiffness: 50 }}
           >
-            {servicesLoading && <div>Loading...</div>}
+            {servicesLoading && <LoadingSpinner/>}
             {servicesError && <div>{servicesError}</div>}
             {services.length === 0 && <div>Services introuvables.</div>}
             {services.map((service, index) => (

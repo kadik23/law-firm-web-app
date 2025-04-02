@@ -5,6 +5,7 @@ import ServiceCard from "../ServiceCard";
 import { motion } from "framer-motion";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import { useServices } from "@/hooks/useServices";
+import LoadingSpinner from "../LoadingSpinner";
 
 function OurServices() {
   const { services, loading, error } = useServices();
@@ -19,8 +20,7 @@ function OurServices() {
   } = useCarousel(services.length, 3.5);
 
   const ServicesLoadingChecker = () => {
-    if (loading)
-      return <h1 className="text-center text-6xl mt-6">Chargement...</h1>;
+    if (loading) return <LoadingSpinner />;
     if (error)
       return <h1 className="text-center text-6xl mt-6">Error: {error}</h1>;
   };

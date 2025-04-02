@@ -58,7 +58,7 @@ function Page() {
 
   const { assignService } = useAssignService(parseInt(id as string));
   const router = useRouter();
-  
+
   const addEmoji = (emoji: string) => {
     setComment((prev) => prev + emoji);
     setShowEmojis(false);
@@ -102,10 +102,7 @@ function Page() {
     }
   };
   const ServiceLoadingChecker = () => {
-    if (serviceLoading)
-      return (
-        <h1 className="text-center text-6xl mt-6 text-white">Chargement...</h1>
-      );
+    if (serviceLoading) return <LoadingSpinner />;
     if (serviceError)
       return (
         <h1 className="text-center text-6xl mt-6 text-white">
@@ -144,7 +141,7 @@ function Page() {
 
   const ServicesLoadingChecker = () => {
     if (servicesLoading)
-      return <h1 className="text-center text-6xl mt-6">Chargement...</h1>;
+      return <LoadingSpinner/>;
     if (servicesError)
       return (
         <h1 className="text-center text-6xl mt-6">Error: {servicesError}</h1>
@@ -219,7 +216,8 @@ function Page() {
                       assignService();
                       setTimeout(
                         () => (
-                          router.push(`/${AuthUSER.type}/dashboard/services`), 2100
+                          router.push(`/${AuthUSER.type}/dashboard/services`),
+                          2100
                         )
                       );
                     } else {

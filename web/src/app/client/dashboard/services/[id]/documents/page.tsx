@@ -39,7 +39,7 @@ const Documents = () => {
   }, [service]);
 
   if (serviceLoading) {
-    return <div>Loading...</div>;
+    return <LoadingSpinner/>;
   }
 
   return (
@@ -69,7 +69,7 @@ const Documents = () => {
       </div>
       <div className=" rounded-2xl bg-white md:shadow-md">
         <div className="border-b border-gray-400/25 pb-4 md:py-4 md:px-8 font-semibold md:text-lg w-full px-2">
-          Voici les documents que vous allez ajouter pour le “nom de service”
+          Voici les documents que vous allez ajouter pour le “{service?.name}”
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 py-4 md:px-8 text-sm px-2">
           {service?.requestedFiles?.map((file, index) => (
@@ -98,7 +98,7 @@ const Documents = () => {
       <div className="border-b">
         <div className="flex justify-between items-center">
           <div className="border-b border-gray-400/25 md:py-4 md:px-8 text-primary font-semibold md:text-lg w-full px-2">
-            Voici les documents que vous allez ajouter pour le “nom de service”
+            Voici les documents que vous allez ajouter pour le “{service?.name}”
           </div>
           <div className="shadow-md md:flex gap-2 items-center hidden cursor-pointer text-secondary hover:text-white hover:bg-secondary transition-all duration-200 bg-white px-4 py-1 rounded-xl">
             <Icon icon="material-symbols:delete" width="24" height="24" />

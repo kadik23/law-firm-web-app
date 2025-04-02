@@ -1,7 +1,8 @@
-"use client"
+"use client";
 import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
-import { useRouter } from "next/navigation"; 
+import { useRouter } from "next/navigation";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const Account = () => {
   const { user, loading } = useAuth();
@@ -14,7 +15,7 @@ const Account = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <span className="text-lg font-semibold">Chargement...</span>
+        <LoadingSpinner />{" "}
       </div>
     );
   }
