@@ -35,7 +35,7 @@ db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
 db.users = require('./Users.js')(sequelize, DataTypes);
-db.attorneys = require('./Attorneys.js')(sequelize, DataTypes);
+db.attorneys = require('./attorneys')(sequelize, DataTypes);
 db.files = require('./Files.js')(sequelize, DataTypes);
 db.categories = require('./Categories.js')(sequelize, DataTypes);
 db.blogs = require('./Blogs.js')(sequelize, DataTypes);
@@ -59,7 +59,15 @@ db.files.belongsTo(db.users, {
   onUpdate: 'CASCADE',
 });
 
+db.users.hasOne(db.attorneys, {
+  foreignKey: "user_id",
+  as: "Attorney"
+});
 
+db.attorneys.belongsTo(db.users, {
+  foreignKey: "user_id",
+  as: "User"
+});
 db.blogs.belongsTo(db.users, {
   foreignKey: 'userId',
   allowNull: false,
@@ -168,7 +176,7 @@ db.sequelize
     console.error('Error during database synchronization:', err);
   });
 
-console.log(db.services);  // Ensure it's not undefined
+console.log(db.services);
 
 console.log(db.blogs.associations);
 console.log(db.users.associations);
