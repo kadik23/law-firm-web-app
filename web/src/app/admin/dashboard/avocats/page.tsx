@@ -55,7 +55,7 @@ const Avocats = () => {
     return (
         <div>
             <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center justify-between">
-                <span className="text-[#202224] font-bold text-2xl">Mes Avocats</span>
+                <span className="text-adminTextHeader font-bold text-2xl">Mes Avocats</span>
                 <div className="flex flex-wrap items-center gap-5">
                     <label className="bg-[#34495E] text-white font-bold py-2 px-5 flex items-center gap-4 rounded-md cursor-pointer text-sm">
                         <input type="checkbox" checked={selectAll} onChange={toggleSelectAll} className="cursor-pointer" />
@@ -110,7 +110,7 @@ const Avocats = () => {
 
             <Modal isOpen={deleteModalOpen} onClose={handleDeleteModalClose} isNotStepOne={true}>
                 <DeleteConfirmation
-                    selectedAvocats={selectedAvocats}
+                    selectedItems={selectedAvocats}
                     onCancel={handleDeleteModalClose}
                     onConfirm={() => {
                         deleteAvocats();

@@ -45,7 +45,7 @@ const FilterControls = ({
           onToggle={() => handleToggle("postTime")}
           onSelect={(option) => {
             onPostTimeChange(option);
-            setOpenDropdown(null); // Close dropdown after selection
+            setOpenDropdown(null); 
           }}
         />
         <Dropdown
@@ -56,7 +56,7 @@ const FilterControls = ({
           onToggle={() => handleToggle("notificationType")}
           onSelect={(option) => {
             onNotificationTypeChange(option);
-            setOpenDropdown(null); // Close dropdown after selection
+            setOpenDropdown(null); 
           }}
         />
       </div>
@@ -74,7 +74,7 @@ const FilterControls = ({
             onToggle={() => handleToggle("consultationTime")}
             onSelect={(option) => {
               onConsultationTimeChange(option);
-              setOpenDropdown(null); // Close dropdown after selection
+              setOpenDropdown(null); 
             }}
           />
           <Dropdown
@@ -85,7 +85,7 @@ const FilterControls = ({
             onToggle={() => handleToggle("consultationType")}
             onSelect={(option) => {
               onConsultationTypeChange(option);
-              setOpenDropdown(null); // Close dropdown after selection
+              setOpenDropdown(null); 
             }}
           />
         </div>

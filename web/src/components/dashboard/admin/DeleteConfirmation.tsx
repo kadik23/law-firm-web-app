@@ -1,28 +1,29 @@
 type DeleteConfirmationProps = {
-    selectedAvocats: {
+    selectedItems: {
         id: number;
-        nom: string;
-        prenom: string;
+        title?: string;
     }[];
+    itemName?: string;
     onCancel: () => void;
     onConfirm: () => void;
 };
 
 export const DeleteConfirmation = ({
-    selectedAvocats,
+    selectedItems,
+    itemName,
     onCancel,
     onConfirm
 }: DeleteConfirmationProps) => {
     return (
         <>
             <div className="text-center text-white font-semibold text-xl my-4">
-                Do you want to delete {selectedAvocats.length > 1 ? 'these lawyers' : 'this lawyer'}?
+                Are you sure you want to delete {selectedItems.length > 1 ? 'these' : 'this'} {itemName}{selectedItems.length > 1 ? 's' : ''}?
             </div>
             
             <div className="mb-6">
-                {selectedAvocats.map((avocat, index) => (
-                    <div key={avocat.id} className="text-white mb-2">
-                        {index + 1} - {avocat.prenom} {avocat.nom}
+                {selectedItems.map((item, index) => (
+                    <div key={item.id} className="text-white mb-2">
+                        {index + 1} - {item.title}
                     </div>
                 ))}
             </div>

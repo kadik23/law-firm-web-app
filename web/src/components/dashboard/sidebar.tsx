@@ -2,7 +2,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import classNames from "classnames";
-import Notification from "../../../public/icons/notification.svg";
 import {
   DashboardIcon,
   AccountIcon,
@@ -26,11 +25,7 @@ const Sidebar = () => {
         { Icon: PaymentsIcon, alt: "Payments", path: "/client/dashboard/payments" },
         { Icon: ServiceIcon, alt: "Services", path: "/client/dashboard/services" },
         { Icon: BlogsIcon, alt: "Vos blogs", path: "/client/dashboard/vos-blogs" },
-<<<<<<< HEAD
-        { Icon: Notification, alt: "Notifications", path: "/client/dashboard/notifications" },
-=======
         { Icon: NotificationIcon, alt: "Notifications", path: "/client/dashboard/notifications" },
->>>>>>> eb36d8d0f2bca78cac5bfae91f6ffbab44e1c0c1
     ];
 
     return (
