@@ -1,5 +1,6 @@
 "use client";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { useAlert } from "@/contexts/AlertContext";
 import { useAssignService } from "@/hooks/useAssignService";
 import useReqFiles from "@/hooks/useReqFiles";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
@@ -9,6 +10,15 @@ import { useEffect } from "react";
 const Documents = () => {
   const { id } = useParams();
   const serviceId = id ? Number(id) : undefined;
+  const { showAlert } = useAlert();
+
+  useEffect(() => {
+    showAlert(
+      "warning",
+      "Remarque importante",
+      "Vous pouvez télécharger les fichiers requis en même temps, ou remplacer les fichiers que vous souhaitez remplacer en les supprimant puis en les ajoutant à nouveau, ou en les supprimant tous et en les téléchargeant à nouveau."
+    );
+  }, [serviceId]);
 
   const {
     service,
@@ -24,7 +34,11 @@ const Documents = () => {
     saveLoading,
     validateFiles,
     saveFiles,
-    handleDelete
+    handleDelete,
+    handleDeleteByOne,
+    setIsDeleteByOne,
+    isUploadingState,
+    setIsUploadingState,
   } = useReqFiles();
 
   useEffect(() => {
@@ -40,7 +54,7 @@ const Documents = () => {
   }, [service]);
 
   if (serviceLoading) {
-    return <LoadingSpinner/>;
+    return <LoadingSpinner />;
   }
 
   return (
@@ -89,6 +103,11 @@ const Documents = () => {
                   file,
                   name: file.name,
                 }));
+                if (uploadedFiles.length !== service?.requestedFiles?.length && isUploadingState) {
+                  alert('Ooh')
+                  setIsDeleteByOne(false);
+                  setIsUploadingState(true);
+                }
                 setUploadedFiles([...uploadedFiles, ...newFiles]);
               }
             }}
@@ -101,9 +120,12 @@ const Documents = () => {
           <div className="border-b border-gray-400/25 md:py-4 md:px-8 text-primary font-semibold md:text-lg w-full px-2">
             Voici les documents que vous allez ajouter pour le “{service?.name}”
           </div>
-          <div className="shadow-md md:flex gap-2 items-center hidden cursor-pointer text-secondary hover:text-white hover:bg-secondary transition-all duration-200 bg-white px-4 py-1 rounded-xl">
+          <div
+            onClick={handleDelete}
+            className="shadow-md md:flex gap-2 items-center hidden cursor-pointer text-secondary hover:text-white hover:bg-secondary transition-all duration-200 bg-white px-4 py-1 rounded-xl"
+          >
             <Icon icon="material-symbols:delete" width="24" height="24" />
-            <div className="font-semibold text-nowrap" onClick={handleDelete}>Supprimer tous </div>
+            <div className="font-semibold text-nowrap">Supprimer tous </div>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 text-sm gap-4 py-4 md:px-8  px-2">
@@ -114,7 +136,10 @@ const Documents = () => {
           )}
           {files.map((file, index) => (
             <div key={index} className="flex gap-2 items-center">
-              <div className="font-bold border hover:border-red-500 hover:text-red-500 cursor-pointer border-primary text-primary rounded-full w-8 h-8 flex items-center justify-center">
+              <div
+                onClick={() => handleDeleteByOne(file.id)}
+                className="font-bold border hover:border-red-500 hover:text-red-500 cursor-pointer border-primary text-primary rounded-full w-8 h-8 flex items-center justify-center"
+              >
                 <Icon icon="material-symbols:delete" width="24" height="24" />
               </div>{" "}
               <div
@@ -127,11 +152,14 @@ const Documents = () => {
           ))}
           {uploadedFiles.map((file, index) => (
             <div key={index} className="flex gap-2 items-center">
-              <div className="font-bold border hover:border-red-500 hover:text-red-500 cursor-pointer border-primary text-primary rounded-full w-8 h-8 flex items-center justify-center">
+              <div
+                onClick={() => handleDeleteByOne(file)}
+                className="font-bold border hover:border-red-500 hover:text-red-500 cursor-pointer border-primary text-primary rounded-full w-8 h-8 flex items-center justify-center"
+              >
                 <Icon icon="material-symbols:delete" width="24" height="24" />
               </div>{" "}
               <div
-                  onClick={() => handleDownload(file.name, file.file)}
+                onClick={() => handleDownload(file.name, file.file)}
                 className="hover:text-secondary cursor-pointer text-xs"
               >
                 {file.name}{" "}
@@ -146,7 +174,10 @@ const Documents = () => {
             if (!validateFiles(service?.requestedFiles?.length as number)) {
               return;
             }
-            saveFiles(service?.request_service_id as number, service?.requestedFiles?.length as number);
+            saveFiles(
+              service?.request_service_id as number,
+              service?.requestedFiles?.length as number
+            );
           }}
           className="font-semibold text-nowrap"
           disabled={saveLoading}
@@ -154,7 +185,10 @@ const Documents = () => {
           {saveLoading ? <LoadingSpinner /> : "Souvegarder"}
         </button>
       </div>
-      <div className="font-bold absolute md:hidden bottom-20 right-4 border shadow-md hover:text-secondary transition-all duration-200 bg-primary text-white rounded-xl w-12 h-10 flex items-center justify-center">
+      <div
+        onClick={handleDelete}
+        className="font-bold absolute md:hidden bottom-20 right-4 border shadow-md hover:text-secondary transition-all duration-200 bg-primary text-white rounded-xl w-12 h-10 flex items-center justify-center"
+      >
         <Icon icon="material-symbols:delete" width="24" height="24" />
       </div>
     </div>
