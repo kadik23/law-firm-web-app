@@ -7,6 +7,7 @@ const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
 
+console.log("RequestService:", RequestService);
 
 const Problem = db.problems;
 
