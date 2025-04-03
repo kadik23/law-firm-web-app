@@ -3,17 +3,24 @@ import React, { useEffect, useState } from "react";
 import Modal from "./Modal";
 import useRegisterForm from "@/hooks/useRegisterForm";
 import { DevTool } from "@hookform/devtools";
-import { FieldErrors, useFieldArray } from "react-hook-form";
+import { FieldErrors } from "react-hook-form";
 import axiosClient from "@/lib/utils/axiosClient";
 import { useAlert } from "@/contexts/AlertContext";
+import { useRouter } from "next/navigation";
 
 interface SignupProps {
   isModalOpen: boolean;
   setModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  isUploadFiles: boolean;
+  setSingingModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  assignService: (() => void) | undefined;
 }
 
-function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
+function Signup({
+  isModalOpen,
+  setModalOpen,
+  setSingingModalOpen,
+  assignService,
+}: SignupProps) {
   const { register, control, handleSubmit, errors, watch } = useRegisterForm();
 
   const [formStep, setFormStep] = useState(0);
@@ -32,10 +39,10 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
 
     return () => subscription.unsubscribe();
   }, [formStep]);
-
+  const router = useRouter();
   const [isDisabled1, setIsDisabled1] = useState(true);
   const [isDisabled2, setIsDisabled2] = useState(true);
-  const [isDisabled3, setIsDisabled3] = useState(true);
+  // const [isDisabled3, setIsDisabled3] = useState(true);
 
   const validateSteps = async (
     stepName: "stepOne" | "stepTwo" | "stepThree",
@@ -55,9 +62,10 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
       setIsDisabled1(!isValidStep);
     } else if (stepName === "stepTwo") {
       setIsDisabled2(!isValidStep);
-    } else if (stepName === "stepThree") {
-      setIsDisabled3(!isValidStep);
     }
+    // else if (stepName === "stepThree") {
+    //   setIsDisabled3(!isValidStep);
+    // }
 
     if (isValidStep && toNextStep) {
       moveNewStep(currentStep, currentStep + 1);
@@ -66,10 +74,10 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
     return isValidStep;
   };
 
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "stepThree.files",
-  });
+  // const { fields, append, remove } = useFieldArray({
+  //   control,
+  //   name: "stepThree.files",
+  // });
 
   const onError = (errors: FieldErrors<SignupformType>) => {
     console.log(errors);
@@ -98,10 +106,17 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
           "Vous avez lu avec succès ce message important."
         );
         setModalOpen(false);
-        setTimeout(
-          () => (window.location.href = `/${response.data.type}/dashboard`),
-          2100
-        );
+        if (assignService) {
+          assignService();
+          setTimeout(
+            () => router.push(`/${response.data.type}/dashboard/services`),
+            2100
+          );
+        } else {
+          setTimeout(
+            () => (router.push(`/${response.data.type}/dashboard`), 2100)
+          );
+        }
       } else {
         showAlert(
           "error",
@@ -258,9 +273,14 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
                   value: 8,
                   message: "Ce champ doit contenir au moins 8 caractères",
                 },
-                validate: (value) =>
-                  value === watch("stepOne.password") ||
-                  "Les mots de passe ne correspondent pas",
+                validate: (value) => {
+                  if (value !== watch("stepOne.password")) {
+                    setIsDisabled1(true); // Disable button immediately on mismatch
+                    return "Les mots de passe ne correspondent pas";
+                  }
+                  setIsDisabled1(false);
+                  return true;
+                },
               })}
               placeholder="Confirmer votre mot de passe"
               className="py-1 px-4 outline-none text-sm md:text-base text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
@@ -297,7 +317,15 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
           </div>
           <div className="flex gap-2 items-center justify-center text-sm font-semibold w-full">
             Avez vous déja un compte?
-            <div className="text-textColor underline ">Connectez</div>{" "}
+            <div
+              className="text-textColor underline cursor-pointer hover:opacity-75"
+              onClick={() => {
+                setModalOpen(false);
+                setSingingModalOpen(true);
+              }}
+            >
+              Connectez
+            </div>{" "}
           </div>
         </div>
       )}
@@ -318,7 +346,7 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
             </label>
             <input
               id="nbr_tel"
-              type="number"
+              type="text"
               placeholder="Enter votre numéro de téléphone"
               {...register("stepTwo.nbr_tel", {
                 required: "Numéro de téléphone est requis",
@@ -438,36 +466,23 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
               >
                 Retour
               </button>
-              {isUploadFiles ? (
-                <button
-                  onClick={() => validateSteps("stepTwo", 1, true)}
-                  className={`${
-                    isDisabled2
-                      ? "btn_desabled active:scale-100"
-                      : "btn bg-textColor"
-                  }  text-sm rounded-md p-2 btn font-semibold shadow-lg w-full `}
-                  disabled={isDisabled2}
-                >
-                  Suivant
-                </button>
-              ) : (
-                <button
-                  type="submit"
-                  disabled={isDisabled2}
-                  className={`${
-                    isDisabled2
-                      ? "btn_desabled active:scale-100"
-                      : "btn bg-textColor"
-                  }  text-sm rounded-md p-2 btn font-semibold shadow-lg w-full `}
-                >
-                  Crée
-                </button>
-              )}
+
+              <button
+                type="submit"
+                disabled={isDisabled2}
+                className={`${
+                  isDisabled2
+                    ? "btn_desabled active:scale-100"
+                    : "btn bg-textColor"
+                }  text-sm rounded-md p-2 btn font-semibold shadow-lg w-full `}
+              >
+                Crée
+              </button>
             </div>
           </div>
         </form>
       )}
-      {formStep == 2 && (
+      {/* {formStep == 2 && (
         <form
           onSubmit={handleSubmit(onsubmit, onError)}
           className="flex flex-col justify-start gap-8 w-[32rem]"
@@ -520,7 +535,7 @@ function Signup({ isModalOpen, setModalOpen, isUploadFiles }: SignupProps) {
             </button>
           </div>
         </form>
-      )}
+      )} */}
     </Modal>
   );
 }

@@ -6,6 +6,7 @@ import CommentInput from "./CommentSection/CommentInput";
 import CommentModal from "../CommentModal";
 import { useReaderFeedback } from "@/hooks/useReaderFeedback";
 import { useEffect } from "react";
+import LoadingSpinner from "../LoadingSpinner";
 
 const ReaderFeedback = ({ blogId }: { blogId: string }) => {
   const {
@@ -29,7 +30,6 @@ const ReaderFeedback = ({ blogId }: { blogId: string }) => {
     commentLoading,
   } = useReaderFeedback(blogId);
 
-  
   useEffect(() => {
     fetchComments();
   }, [blogId]);
@@ -60,7 +60,7 @@ const ReaderFeedback = ({ blogId }: { blogId: string }) => {
         />
       )}
       <div>
-        {loading && <div>Chargement...</div>}
+        {loading && <LoadingSpinner />}
         {allComments.map((comment, index) => (
           <CommentComponent
             key={index}
@@ -85,7 +85,7 @@ const ReaderFeedback = ({ blogId }: { blogId: string }) => {
             onClose={() => setModelIsOpen(false)}
             isNotStepOne={true}
           >
-            {repliesLoading && <div>Chargement...</div>}
+            {repliesLoading && <LoadingSpinner />}
             {commentReplies.map((reply, index) => (
               <div className="mt-6" key={reply.id}>
                 <CommentComponent

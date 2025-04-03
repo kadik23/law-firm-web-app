@@ -5,12 +5,10 @@ import React from "react";
 import AvisCard from "../AvisCard";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import { useTestimonials } from "@/hooks/useTestimonials";
+import LoadingSpinner from "../LoadingSpinner";
 
 function OurTestimonials() {
-  const {
-    testimonials,
-    loading: testimonialsLoading,
-  } = useTestimonials();
+  const { testimonials, loading: testimonialsLoading } = useTestimonials();
   const {
     currentIndex: currentAvisIndex,
     handlePrev: handlePrevAvis,
@@ -35,20 +33,22 @@ function OurTestimonials() {
           }}
           transition={{ type: "spring", stiffness: 50 }}
         >
-          {testimonialsLoading
-            ? "Chargement..."
-            : testimonials.map((testimonial, index) => (
-                <AvisCard
-                  toggleComment={null}
-                  handleDelete={null}
-                  id={testimonial.id}
-                  feedback={testimonial.feedback}
-                  user={testimonial.user}
-                  createdAt={testimonial.createdAt}
-                  userId={testimonial.userId}
-                  key={index}
-                />
-              ))}
+          {testimonialsLoading ? (
+            <LoadingSpinner />
+          ) : (
+            testimonials.map((testimonial, index) => (
+              <AvisCard
+                toggleComment={null}
+                handleDelete={null}
+                id={testimonial.id}
+                feedback={testimonial.feedback}
+                user={testimonial.user}
+                createdAt={testimonial.createdAt}
+                userId={testimonial.userId}
+                key={index}
+              />
+            ))
+          )}
           {testimonials.length == 0 &&
             !testimonialsLoading &&
             "Testimonials introuvable."}

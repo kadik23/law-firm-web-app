@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import FavBlogs from "@/components/blog/favBlogs";
 import { useAuth } from "@/hooks/useAuth";
 import { useFavorites } from "@/hooks/useFavourites";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const VosBlogs = () => {
     const [blogs, setBlogs] = useState<Blog[]>([]);
@@ -42,7 +43,7 @@ const VosBlogs = () => {
     }, [searchFavorites, loadInitialData]);
 
     if (authLoading) {
-        return <div>Chargement...</div>;
+        return <LoadingSpinner/>;
     }
 
 
@@ -50,7 +51,7 @@ const VosBlogs = () => {
         <div>
             <Header totalBlogs={totalBlogs} onSearch={handleSearch} />
             {blogs.length == 0 && !loading ? "Il n'y a pas des articles": (<FavBlogs blogs={blogs} signIn={true} />)}
-            {loading && 'Chargement...'}
+            {loading && <LoadingSpinner/>}
         </div>
     );
 };

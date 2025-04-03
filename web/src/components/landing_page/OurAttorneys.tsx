@@ -3,6 +3,7 @@ import React from "react";
 import AvocatCard from "../AvocatCard";
 import { motion } from "framer-motion";
 import { useAttorneys } from "@/hooks/useAttorneys";
+import LoadingSpinner from "../LoadingSpinner";
 
 function OurAttorneys() {
   const { attorneys, loading } = useAttorneys();
@@ -21,7 +22,7 @@ function OurAttorneys() {
       <div className="mt-8 bg-third flex flex-col items-center py-8 p-4 md:p-8">
         <div className=" font-bold text-3xl">Nos Avocats</div>
         <div className="overflow-hidden py-8">
-          {loading && 'Chargement...'}
+          {loading && <LoadingSpinner />}
           {attorneys.length > 0 && !loading ? (
             <motion.div className="flex gap-4 flex-wrap justify-center">
               {attorneys.map((attorney, index) => (

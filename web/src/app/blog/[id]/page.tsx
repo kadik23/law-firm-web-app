@@ -8,6 +8,7 @@ import OtherBlogs from "@/components/blog/otherBlogs";
 import useBlog from "@/hooks/useBlog";
 import { useBlogs } from "@/hooks/useBlogs";
 import useCategories from "@/hooks/useCategories";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const Page = () => {
   const { id } = useParams() as { id: string };
@@ -42,7 +43,7 @@ const Page = () => {
   if (loading) {
     return (
       <div className="h-screen flex items-center justify-center">
-        <h1 className="text-3xl font-bold">Chargement...</h1>
+        <LoadingSpinner/>
       </div>
     );
   }
@@ -94,7 +95,7 @@ const Page = () => {
           />
           <p>
             {blogsLoading
-              ? "Chargement..."
+              ? <LoadingSpinner/>
               : "Aucun blog disponible pour le moment."}
           </p>
         </>
