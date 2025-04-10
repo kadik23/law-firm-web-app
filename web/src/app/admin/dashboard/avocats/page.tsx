@@ -14,7 +14,7 @@ const Avocats = () => {
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     
     const {
-        avocats,
+        attorneys,
         selectAll,
         formData,
         selectedAvocats,
@@ -24,7 +24,9 @@ const Avocats = () => {
         addAvocat,
         handleInputChange,
         handleImageUpload,
-        resetForm
+        resetForm,
+        file,
+        setFile
     } = useAvocats();
 
     const AvocatPerPage = 6;
@@ -35,7 +37,7 @@ const Avocats = () => {
       goToNextPage,
       generatePaginationNumbers,
       setCurrentPage,
-    } = usePagination(avocats.length, AvocatPerPage);
+    } = usePagination(attorneys.length, AvocatPerPage);
 
     const handleAddModalClose = () => {
         setAddModalOpen(false);
@@ -73,7 +75,7 @@ const Avocats = () => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {avocats
+                {attorneys
                 .slice(
                     (currentPage - 1) * AvocatPerPage,
                     currentPage * AvocatPerPage)
@@ -101,6 +103,8 @@ const Avocats = () => {
                 </div>
                 <AddAvocatForm
                     formData={formData}
+                    file= {file}
+                    setFile= {setFile}
                     onInputChange={handleInputChange}
                     onImageUpload={handleImageUpload}
                     onSubmit={(e) => addAvocat(e, () => setAddModalOpen(false))}

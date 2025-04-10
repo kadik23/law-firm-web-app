@@ -1,108 +1,228 @@
-import { useState } from "react";
-
-type Avocat = {
-    id: number;
-    nom: string;
-    prenom: string;
-    password: string;
-    email: string;
-    linkedin: string;
-    image: string;
-    selected: boolean;
-};
-
-const initialAvocats: Avocat[] = [
-    { id: 1, nom: "Doe", prenom: "John", password: "12345678", email: "john@example.com", linkedin: "https://linkedin.com/in/johndoe", image: "/images/avocatImg-2.png", selected: false },
-    { id: 2, nom: "Smith", prenom: "Jane", password: "12345678", email: "jane@example.com", linkedin: "https://linkedin.com/in/janesmith", image: "/images/avocatImg.png", selected: false },
-    { id: 3, nom: "Smith", prenom: "Jane", password: "12345678", email: "jane@example.com", linkedin: "https://linkedin.com/in/janesmith", image: "/images/avocatImg-2.png", selected: false },
-    { id: 4, nom: "Smith", prenom: "Jane", password: "12345678", email: "jane@example.com", linkedin: "https://linkedin.com/in/janesmith", image: "/images/avocatImg.png", selected: false },
-    { id: 5, nom: "Smith", prenom: "Jane", password: "12345678", email: "jane@example.com", linkedin: "https://linkedin.com/in/janesmith", image: "/images/avocatImg-2.png", selected: false },
-    { id: 6, nom: "Smith", prenom: "Jane", password: "12345678", email: "jane@example.com", linkedin: "https://linkedin.com/in/janesmith", image: "/images/avocatImg.png", selected: false },
-    { id: 7, nom: "Smith", prenom: "Jane", password: "12345678", email: "jane@example.com", linkedin: "https://linkedin.com/in/janesmith", image: "/images/avocatImg-2.png", selected: false },
-    { id: 8, nom: "Smith", prenom: "Jane", password: "12345678", email: "jane@example.com", linkedin: "https://linkedin.com/in/janesmith", image: "/images/avocatImg-2.png", selected: false },
-];
+import axios from "@/lib/utils/axiosClient";
+import { useEffect, useState } from "react";
+import { isAxiosError } from "axios";
+import { useAlert } from "@/contexts/AlertContext";
+import { error } from "console";
 
 export const useAvocats = () => {
-    const [avocats, setAvocats] = useState<Avocat[]>(initialAvocats);
-    const [selectAll, setSelectAll] = useState<boolean>(false);
-    const [formData, setFormData] = useState<Omit<Avocat, 'id' | 'selected'>>({
-        nom: '',
-        prenom: '',
-        password: '',
-        email: '',
-        linkedin: '',
-        image: '/images/avocatImg.png'
-    });
-    const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [attorneys, setAttorneys] = useState<
+    (avocatEntity & { selected?: boolean } & { User?: User })[]
+  >([]);
+  const [loading, setLoading] = useState(true);
+  const [selectAll, setSelectAll] = useState<boolean>(false);
+  const [file, setFile] = useState<File | null>(null);
+  const { showAlert } = useAlert();
 
-    const selectedAvocats = avocats.filter(avocat => avocat.selected);
+  const [formData, setFormData] = useState<
+    Omit<
+      avocatEntity & User,
+      | "id"
+      | "selected"
+      | "pays"
+      | "ville"
+      | "age"
+      | "sex"
+      | "type"
+      | "feedback"
+      | "createdAt"
+      | "serviceId"
+      | "user"
+      | "user_id"
+      | "phone_number"
+      | "date_membership"
+      | "picture_path"
+    >
+  >({
+    name: "",
+    surname: "",
+    password: "",
+    email: "",
+    linkedin_url: "",
+    picture: "/images/avocatImg.png",
+    status: "",
+    certificats: [],
+    updatedAt: new Date().toISOString(),
+  });
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const selectedAvocats = attorneys.filter((avocat) => avocat.selected);
 
-    const toggleSelect = (id: number) => {
-        setAvocats(prev =>
-            prev.map(avocat =>
-                avocat.id === id ? { ...avocat, selected: !avocat.selected } : avocat
-            )
-        );
+  useEffect(() => {
+    const fetchAttorneys = async () => {
+      try {
+        const response = await axios.get("/admin/attorneys");
+        setAttorneys(response.data.attorneys);
+      } catch (err: unknown) {
+        if (isAxiosError(err) && err.response?.status === 401) {
+          console.warn("Attorneys not found");
+        } else {
+          console.error("An unexpected error occurred:", err);
+        }
+        setAttorneys([]);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const toggleSelectAll = () => {
-        const newSelectAll = !selectAll;
-        setSelectAll(newSelectAll);
-        setAvocats(prev => prev.map(avocat => ({ ...avocat, selected: newSelectAll })));
-    };
+    fetchAttorneys();
+  }, []);
 
-    const deleteAvocats = () => {
-        setAvocats(prev => prev.filter(avocat => !avocat.selected));
-        setSelectAll(false);
-    };
+  const toggleSelect = (id: number) => {
+    setAttorneys((prev) =>
+      prev.map((avocat) =>
+        (avocat.id as number) === id
+          ? { ...avocat, selected: !avocat.selected }
+          : avocat
+      )
+    );
+  };
 
-    const addAvocat = (e: React.FormEvent, onSuccess?: () => void) => {
-        e.preventDefault();
-        
-        const newAvocat: Avocat = {
-            id: avocats.length > 0 ? Math.max(...avocats.map(a => a.id)) + 1 : 1,
-            ...formData,
-            image: uploadedImage || '/images/avocatImg.png',
-            selected: false
-        };
-    
-        setAvocats(prev => [...prev, newAvocat]);
-        resetForm();
-        onSuccess?.(); // Call the success callback if provided
-    };
+  const toggleSelectAll = () => {
+    const newSelectAll = !selectAll;
+    setSelectAll(newSelectAll);
+    setAttorneys((prev) =>
+      prev.map((avocat) => ({ ...avocat, selected: newSelectAll }))
+    );
+  };
 
-    const resetForm = () => {
-        setFormData({
-            nom: '',
-            prenom: '',
-            password: '',
-            email: '',
-            linkedin: '',
-            image: '/images/avocatImg.png'
+  const deleteAvocats = () => {
+    setAttorneys((prev) => prev.filter((avocat) => !avocat.selected));
+    setSelectAll(false);
+  };
+
+  const addAvocat = async (e: React.FormEvent, onSuccess?: () => void) => {
+    e.preventDefault();
+    try {
+      const data = new FormData();
+      const formattedDate = new Date().toISOString().split("T")[0];
+      data.append("first_name", formData.name);
+      data.append("last_name", formData.surname);
+      data.append("email", formData.email);
+      data.append("password", formData.password);
+      data.append("linkedin_url", formData.linkedin_url);
+      data.append("date_membership", formattedDate);
+      data.append("pays", "Algerie");
+      data.append("terms_accepted", "true");
+      data.append("status", formData.status || "active");
+      if (file) {
+        data.append("picture", file || "/images/avocatImg.png");
+      }
+
+      if (formData.certificats && formData.certificats.length) {
+        formData.certificats.forEach((cert, index) => {
+          data.append(`certificats[${index}]`, cert);
         });
-        setUploadedImage(null);
-    };
+      }
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
+      const response = await axios.post("/admin/attorney/add", data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      if (response.status == 201) {
+        const newAvocat: Omit<
+          avocatEntity & User & { selected?: boolean },
+          | "pays"
+          | "ville"
+          | "age"
+          | "sex"
+          | "type"
+          | "feedback"
+          | "serviceId"
+          | "User"
+          | "phone_number"
+        > = {
+          id:
+            attorneys.length > 0
+              ? Math.max(...attorneys.map((a) => a.id as number)) + 1
+              : 1,
+          name: formData.name,
+          surname: formData.surname,
+          email: formData.email,
+          password: formData.password,
+          linkedin_url: formData.linkedin_url,
+          picture: uploadedImage || "/images/avocatImg.png",
+          status: formData.status,
+          certificats: formData.certificats,
+          updatedAt: new Date().toISOString(),
+          user_id: "",
+          date_membership: new Date().toISOString(),
+          picture_path: "",
+          createdAt: new Date().toISOString(),
+          selected: false,
+        };
 
-    const handleImageUpload = (imageUrl: string) => {
-        setUploadedImage(imageUrl);
-    };
+        setAttorneys((prev) => [
+          ...prev,
+          {
+            ...newAvocat,
+            User: {
+              id: 1,
+              password: newAvocat.password,
+              email: newAvocat.email,
+              name: newAvocat.name,
+              surname: newAvocat.surname,
+              type: "attorney",
+            },
+          },
+        ]);
+        showAlert("success", "Avocat ajouté avec succès", "...");
+      }
+      else{
+        showAlert("error", "Erreur d'ajout d'avocat", response.data);
+      }
+    } catch (error: unknown) {
+      console.error("Error adding avocat:", error);
+        if (isAxiosError(error) && error.response?.status === 401) {
+            showAlert("error", "Erreur d'ajout d'avocat", error.message);
+        } else {
+            showAlert("error", "Erreur inattendue", error as string);
+        }
+      return;
+    } finally {
+      setLoading(false);
+      resetForm();
+      onSuccess?.();
+    }
+  };
 
-    return {
-        avocats,
-        selectAll,
-        formData,
-        selectedAvocats,
-        toggleSelect,
-        toggleSelectAll,
-        deleteAvocats,
-        addAvocat,
-        handleInputChange,
-        handleImageUpload,
-        resetForm
-    };
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      surname: "",
+      password: "",
+      email: "",
+      linkedin_url: "",
+      picture: "/images/avocatImg.png",
+      status: "",
+      certificats: [],
+      updatedAt: new Date().toISOString(),
+    });
+    setUploadedImage(null);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageUpload = (imageUrl: string) => {
+    setUploadedImage(imageUrl);
+  };
+
+  return {
+    attorneys,
+    loading,
+    selectAll,
+    formData,
+    selectedAvocats,
+    toggleSelect,
+    toggleSelectAll,
+    deleteAvocats,
+    addAvocat,
+    handleInputChange,
+    handleImageUpload,
+    resetForm,
+    file,
+    setFile,
+  };
 };

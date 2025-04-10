@@ -1,8 +1,8 @@
 type DeleteConfirmationProps = {
     selectedAvocats: {
-        id: number;
-        nom: string;
-        prenom: string;
+        id?: number;
+        name: string;
+        surname: string;
     }[];
     onCancel: () => void;
     onConfirm: () => void;
@@ -22,7 +22,7 @@ export const DeleteConfirmation = ({
             <div className="mb-6">
                 {selectedAvocats.map((avocat, index) => (
                     <div key={avocat.id} className="text-white mb-2">
-                        {index + 1} - {avocat.prenom} {avocat.nom}
+                        {index + 1} - {avocat.surname} {avocat.name}
                     </div>
                 ))}
             </div>

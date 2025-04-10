@@ -1,13 +1,14 @@
 "use client";
 import Image from "next/image";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { useDropzone } from "react-dropzone";
 
 type FileUploadProps = {
     onImageUpload: (imageUrl: string) => void;
+    file: File | null,
+    setFile: Dispatch<SetStateAction<File | null>>
 };
-const FileUpload = ({ onImageUpload }: FileUploadProps) => {
-    const [file, setFile] = useState<File | null>(null);
+const FileUpload = ({ onImageUpload, file, setFile }: FileUploadProps) => {
     const [preview, setPreview] = useState<string | null>(null);
     const [progress, setProgress] = useState<number>(0);
     
