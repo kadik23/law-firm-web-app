@@ -23,7 +23,7 @@ const AvocatCard = ({ avocat, toggleSelect }: AvocatProps) => {
             </div>
             <div className="flex flex-col items-center">
                 <Image
-                    src={avocat.picture}
+                    src={avocat.picture as string}
                     alt="Avocat Image"
                     objectFit="cover"
                     width={110}

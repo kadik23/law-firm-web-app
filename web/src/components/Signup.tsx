@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Modal from "./Modal";
-import useRegisterForm from "@/hooks/useRegisterForm";
+import useRegisterForm from "@/hooks/hooksForms/useRegisterForm";
 import { DevTool } from "@hookform/devtools";
 import { FieldErrors } from "react-hook-form";
 import axiosClient from "@/lib/utils/axiosClient";

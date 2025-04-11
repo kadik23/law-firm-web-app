@@ -10,5 +10,23 @@ interface avocatEntity{
     picture_path: string;
     createdAt: string;
     updatedAt: string;
-    picture: string;
+    picture: string | File;
 }
+
+type LawyerFormData = Omit<
+  avocatEntity & User,
+  | "selected"
+  | "pays"
+  | "ville"
+  | "age"
+  | "sex"
+  | "type"
+  | "feedback"
+  | "createdAt"
+  | "serviceId"
+  | "user"
+  | "user_id"
+  | "phone_number"
+  | "date_membership"
+  | "picture_path"
+>;
