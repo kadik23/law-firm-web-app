@@ -2,7 +2,6 @@ import axios from "@/lib/utils/axiosClient";
 import { useEffect, useState } from "react";
 import { isAxiosError } from "axios";
 import { useAlert } from "@/contexts/AlertContext";
-import { error } from "console";
 
 export const useAvocats = () => {
   const [attorneys, setAttorneys] = useState<
@@ -13,8 +12,8 @@ export const useAvocats = () => {
   const [file, setFile] = useState<File | null>(null);
   const { showAlert } = useAlert();
   const selectedAvocats = attorneys.filter((avocat) => avocat.selected);
-const [totalAttorneys, setTotalAttorneys] = useState<number>(0);
-const [totalPages, setTotalPages] = useState<number>(0);
+  const [totalAttorneys, setTotalAttorneys] = useState<number>(0);
+  const [totalPages, setTotalPages] = useState<number>(0);
 
   useEffect(() => {
     const fetchAttorneys = async () => {
@@ -56,14 +55,30 @@ const [totalPages, setTotalPages] = useState<number>(0);
     );
   };
 
-  const deleteAvocats = () => {
-    setAttorneys((prev) => prev.filter((avocat) => !avocat.selected));
-    setSelectAll(false);
+  const deleteAvocats = async () => {
+    try {
+      const response = await axios.delete("/admin/attorney/delete", {
+        data: {
+          ids: attorneys
+            .filter((avocat) => avocat.selected)
+            .map((avocat) => avocat.id),
+        },
+      });
+
+      if (response.status === 200) {
+        setAttorneys((prev) => prev.filter((avocat) => !avocat.selected));
+        setSelectAll(false);
+        showAlert("success", "Avocats supprimé avec succès", "...");
+      } else {
+        showAlert("error", "Erreur de supprimer des avocats", response.data);
+      }
+    } catch (error: unknown) {
+      console.error("Error adding lawyer:", error);
+      showAlert("error", "Erreur de supprimer des avocats", "Une erreur est survenue");
+    }
   };
-  const addAvocat = async (
-    data: LawyerFormData,
-    onSuccess?: () => void
-  ) => {
+
+  const addAvocat = async (data: LawyerFormData, onSuccess?: () => void) => {
     try {
       const formData = new FormData();
       const formattedDate = new Date().toISOString().split("T")[0];
@@ -96,18 +111,18 @@ const [totalPages, setTotalPages] = useState<number>(0);
 
       if (response.status === 201) {
         const newAvocat: Omit<
-        avocatEntity & User & { selected?: boolean },
-        | "pays"
-        | "ville"
-        | "age"
-        | "sex"
-        | "type"
-        | "feedback"
-        | "serviceId"
-        | "User"
-        | "phone_number"
-      >= {
-          id:response.data.attorney.id ,
+          avocatEntity & User & { selected?: boolean },
+          | "pays"
+          | "ville"
+          | "age"
+          | "sex"
+          | "type"
+          | "feedback"
+          | "serviceId"
+          | "User"
+          | "phone_number"
+        > = {
+          id: response.data.attorney.id,
           name: data.name,
           surname: data.surname,
           email: data.email,
