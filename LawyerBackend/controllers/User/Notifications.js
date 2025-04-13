@@ -6,10 +6,20 @@ const getAllNotifications = async (req, res) => {
         const pageSize = 8;
         const offset = (page - 1) * pageSize;
 
+
         const { count, rows: notifList } = await notif.findAndCountAll({
             limit: pageSize,
             offset: offset,
         });
+        const notifIds = notifList.map(n => n.id);
+        await notif.update(
+            { isRead: true },
+            {
+                where: {
+                    id: notifIds
+                }
+            }
+        );
 
         return res.status(200).json({
             success: true,
@@ -24,6 +34,7 @@ const getAllNotifications = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 };
+
 const getUnreadNotificationsCount = async (req, res) => {
     try {
         const count = await notif.count({
