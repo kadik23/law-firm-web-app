@@ -49,6 +49,8 @@ db.Consultation = require("./Consultation")(sequelize, DataTypes);
 db.commentsLikes = require("./CommentsLikes")(sequelize, DataTypes);
 db.request_service = require('./request_service.js')(sequelize, DataTypes);
 db.service_files_uploaded = require('./service_files_uploaded.js')(sequelize, DataTypes);
+db.notifications=require('./Notifications.js')(sequelize,DataTypes);
+db.connectedUsers=require('./ConnectedUsers.js')(sequelize,DataTypes);
 
 
 
@@ -160,6 +162,12 @@ db.blogcomments.hasMany(db.commentsLikes, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
 });
+db.notifications.belongsTo(db.users,{
+    foreignKey: 'userId',
+    allowNull: false,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+});
 Object.keys(db).forEach((modelName) => {
   if (db[modelName].associate) {
     db[modelName].associate(db);
@@ -185,4 +193,4 @@ console.log(db.like.associations);
 console.log("Loaded Models:", Object.keys(db));
 console.log("Testimonial Associations:", db.testimonials?.associations);
 
-module.exports = db;
+module.exports = {db};

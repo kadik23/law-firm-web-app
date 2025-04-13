@@ -6,6 +6,7 @@ const Blog=db.blogs
 const likes=db.commentsLikes
 User = db.users;
 const { Op, literal } = require("sequelize");
+const {createNotification} = require("../createNotification");
 
 /**
  * @swagger
@@ -262,7 +263,19 @@ const replyComment = async (req,res)=> {
         if (!newBlogComment) {
             return res.status(401).send('Error creating comment reply');
         } else {
-            return res.status(200).send(newBlogComment);
+            let notif=await createNotification(
+                "comment_reply",
+                "You have new reply for your comment",
+                originalComment.userId,
+                originalComment.id,
+                userId
+            )
+            if(!notif){
+                return res.status(200).send("Reply created but notification no");
+            }else {
+                return res.status(200).send("Reply sent successfully");
+
+            }
         }
 
     }
