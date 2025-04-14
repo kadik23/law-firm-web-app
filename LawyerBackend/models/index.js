@@ -34,11 +34,11 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-db.users = require('./Users.js')(sequelize, DataTypes);
+db.users = require('./Users')(sequelize, DataTypes);
 db.attorneys = require('./attorneys')(sequelize, DataTypes);
-db.files = require('./Files.js')(sequelize, DataTypes);
-db.categories = require('./Categories.js')(sequelize, DataTypes);
-db.blogs = require('./Blogs.js')(sequelize, DataTypes);
+db.files = require('./FIles')(sequelize, DataTypes);
+db.categories = require('./Categories')(sequelize, DataTypes);
+db.blogs = require('./Blogs')(sequelize, DataTypes);
 db.like = require('./BlogsLikes.js')(sequelize, DataTypes);
 db.favorites = require('./Favorites.js')(sequelize, DataTypes);
 db.blogcomments = require('./BlogComments.js')(sequelize, DataTypes);
@@ -184,13 +184,13 @@ db.sequelize
     console.error('Error during database synchronization:', err);
   });
 
-console.log(db.services);
+// console.log(db.services);
+//
+// console.log(db.blogs.associations);
+// console.log(db.users.associations);
+// console.log(db.favorites.associations);
+// console.log(db.like.associations);
+// console.log("Loaded Models:", Object.keys(db));
+// console.log("Testimonial Associations:", db.testimonials?.associations);
 
-console.log(db.blogs.associations);
-console.log(db.users.associations);
-console.log(db.favorites.associations);
-console.log(db.like.associations);
-console.log("Loaded Models:", Object.keys(db));
-console.log("Testimonial Associations:", db.testimonials?.associations);
-
-module.exports = {db};
+module.exports = db

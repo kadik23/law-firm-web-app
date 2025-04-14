@@ -6,8 +6,6 @@ const db = require('../models')
 
 
 require("dotenv").config()
-const { sequelize } = require('../models'); // Import the Sequelize instance
-const { QueryTypes, NOW} = require('sequelize');
 const {upload} = require("../middlewares/FilesMiddleware.js");
 const fs = require('fs');
 const bcrypt = require("bcrypt")
