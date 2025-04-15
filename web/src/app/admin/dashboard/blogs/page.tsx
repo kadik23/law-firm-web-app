@@ -7,11 +7,24 @@ import blogPosts from "@/consts/blogs";
 import { useState } from "react";
 import Modal from "@/components/Modal";
 import { DeleteConfirmation } from "@/components/dashboard/admin/DeleteConfirmation";
+import FormModal from "@/components/dashboard/admin/formModal";
+import { useAvocats } from "@/hooks/useAvocats";
+import { AddBlogForm } from "@/components/dashboard/admin/AddBlogForm";
 
 const Page = () => {
     const [blogs, setBlogs] = useState(blogPosts);
     const [selectedBlogs, setSelectedBlogs] = useState<{id: number, title: string}[]>([]);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [addModalOpen, setAddModalOpen] = useState(false);
+
+    
+    const {
+        formData,
+        addAvocat,
+        handleInputChange,
+        handleImageUpload,
+        resetForm
+    } = useAvocats();
 
     const BlogsPerPage = 6;
     const {
@@ -39,11 +52,17 @@ const Page = () => {
         setSelectedBlogs([]);
     };
 
+    const handleAddModalClose = () => {
+        setAddModalOpen(false);
+        resetForm();
+    };
+
     return (
         <div>
             {/* Header */}
             <BlogsHeader 
-                blogsPage={true} 
+                blogsPage={true}
+                onAddClick={() => setAddModalOpen(true)}
                 onDeleteClick={() => {
                     if (selectedBlogs.length > 0) {
                         setDeleteModalOpen(true);
@@ -81,6 +100,19 @@ const Page = () => {
                     />
                 )}
             </div>
+
+            <FormModal isOpen={addModalOpen} onClose={handleAddModalClose} isNotStepOne={true}>
+                <div className="text-center text-white font-semibold text-xl">
+                    Ajouter un blog
+                </div>
+                <AddBlogForm
+                    formData={formData}
+                    onInputChange={handleInputChange}
+                    onImageUpload={handleImageUpload}
+                    onSubmit={(e) => addAvocat(e, () => setAddModalOpen(false))}
+                    onClose={() => setAddModalOpen(false)}
+                />
+            </FormModal>
 
             {/* Delete Confirmation Modal */}
             <Modal isOpen={deleteModalOpen} onClose={() => setDeleteModalOpen(false)} isNotStepOne={true}>

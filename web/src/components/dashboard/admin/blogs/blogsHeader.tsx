@@ -9,7 +9,7 @@ interface BlogsHeaderProps {
     onAddClick?: () => void;
 }
 
-const BlogsHeader = ({ blogsPage, blogName, onDeleteClick }: BlogsHeaderProps) => {
+const BlogsHeader = ({ blogsPage, blogName, onDeleteClick, onAddClick }: BlogsHeaderProps) => {
     const categoryOptions = ["Derniers articles", "Actualités", "Évènements"];
     const timeOptions = [
       "Tous",
@@ -46,7 +46,10 @@ const BlogsHeader = ({ blogsPage, blogName, onDeleteClick }: BlogsHeaderProps) =
                     >
                         Supprimer un blog
                     </button>
-                    <button className="bg-primary text-white px-5 py-3 rounded-md text-sm w-full md:w-auto">
+                    <button
+                        className="bg-primary text-white px-5 py-3 rounded-md text-sm w-full md:w-auto"
+                        onClick={onAddClick}
+                    >
                         Ajouter un blog
                     </button>
                 </div>
