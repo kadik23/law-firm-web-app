@@ -38,10 +38,6 @@ const add = [
 ];
 
 const assignClient = [
-  body("clientId")
-    .notEmpty().withMessage("clientId is required")
-    .isInt({ min: 1 }).withMessage("clientId must be a positive integer"),
-    
   body("serviceId")
     .notEmpty().withMessage("serviceId is required")
     .isInt({ min: 1 }).withMessage("serviceId must be a positive integer"),
@@ -53,6 +49,12 @@ const assignClient = [
   body("is_paid")
     .optional()
     .isBoolean().withMessage("is_paid must be a boolean value"),
+];
+
+const remAssign = [
+  param('request_service_id')
+    .notEmpty()
+    .isInt({ min: 1 }).withMessage('Request service id must be a positive integer')
 ];
 
 const getByProblemId=[
@@ -68,4 +70,4 @@ const remove=[
         .withMessage("ids must be a non-empty array.")
 ]
 
-module.exports={getById,remove,getByProblemId, add, assignClient}
+module.exports={getById,remove,getByProblemId, add, assignClient, remAssign}

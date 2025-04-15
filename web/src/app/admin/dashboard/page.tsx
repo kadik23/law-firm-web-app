@@ -1,4 +1,5 @@
 'use client'
+import LoadingSpinner from "@/components/LoadingSpinner";
 import { useAuth } from "@/hooks/useAuth";
 
 const Dashboard = () => {
@@ -6,7 +7,7 @@ const Dashboard = () => {
     const { user, loading } = useAuth()
 
     if(loading){
-      return (<div>Chargement...</div>)
+      return (<LoadingSpinner/>)
     }
     return(
         <div>

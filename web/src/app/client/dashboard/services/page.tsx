@@ -1,126 +1,19 @@
 "use client";
 import Myservice from "@/components/dashboard/myServiceCard";
+import { useAssignService } from "@/hooks/useAssignService";
 import usePagination from "@/hooks/usePagination ";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import React, { useEffect, useState } from "react";
 
 function Services() {
-  const serviceItems = React.useMemo(() => [
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,  
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-    {
-      id: 1,
-      name: "Service Title",
-      coverImage: "serviceImg.png",
-      description: "Preparation, review.",
-    },
-  ], []);
   const blogsPerPage = 6;
-  const [filteredServices, setFilteredBlogs] = useState<serviceEntity[]>([]);
 
-  useEffect(() => {
-    setFilteredBlogs(serviceItems);
-  }, [serviceItems]);
+  const {
+    fetchAssignService,
+    assignServices,
+    remAssignService,
+    remAssignServiceAll,
+  } = useAssignService();
 
   const {
     currentPage,
@@ -129,12 +22,21 @@ function Services() {
     goToNextPage,
     generatePaginationNumbers,
     setCurrentPage,
-  } = usePagination(filteredServices.length, blogsPerPage);
+  } = usePagination(assignServices.length, blogsPerPage);
 
   const startIndex = (currentPage - 1) * blogsPerPage;
   const endIndex = startIndex + blogsPerPage;
 
+  const [filteredServices, setfilteredServices] = useState<serviceEntity[]>([]);
   const servicesToDisplay = filteredServices.slice(startIndex, endIndex);
+
+  useEffect(() => {
+    fetchAssignService();
+  }, []);
+
+  useEffect(() => {
+    setfilteredServices(assignServices);
+  }, [assignServices]);
 
   return (
     <div className="flex flex-col md:gap-8 gap-6 px-4 md:px-0">
@@ -147,7 +49,12 @@ function Services() {
         </div>
         <div className=" gap-2 items-center md:flex hidden text-secondary  py-2 md:px-4 rounded-lg">
           <Icon icon="tdesign:service-filled" width={24} height={24} />
-          <div className="font-semibold">Total de services : 06 </div>
+          <div className="font-semibold">
+            Total de services :{" "}
+            {assignServices.length < 10
+              ? `0${assignServices.length}`
+              : assignServices.length}{" "}
+          </div>
         </div>
         <div className="text-secondary md:hidden">Total: 06</div>
       </div>
@@ -162,11 +69,21 @@ function Services() {
             name="blog-search-bar"
             id="blog-search"
             className="bg-white w-full h-full outline-none"
+            onChange={(e) => {
+              const searchTerm = e.target.value.toLowerCase();
+              setfilteredServices(assignServices.filter((service) =>
+                service.name.toLowerCase().includes(searchTerm)
+              ));
+              setCurrentPage(1);
+            }}
           />
           <Icon icon="mdi:search" width={20} />
         </div>
 
-        <button className="bg-btnSecondary hidden md:flex text-white uppercase text-sm px-4 py-2 rounded-md items-center gap-1">
+        <button
+          onClick={remAssignServiceAll}
+          className="bg-btnSecondary hidden md:flex text-white uppercase text-sm px-4 py-2 rounded-md items-center gap-1"
+        >
           <Icon icon="mdi:delete" width={20} />
           <span className="">Supprimer tous</span>
         </button>
@@ -175,12 +92,16 @@ function Services() {
         {filteredServices.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {servicesToDisplay.map((service, index) => (
-              <Myservice service={service} key={index} />
+              <Myservice
+                service={service}
+                key={index}
+                remService={remAssignService}
+              />
             ))}
           </div>
         ) : (
           <div className="font-semibold text-gray-500 w-full p-4 flex justify-center items-center">
-            <h3>No services available at the moment.</h3>
+            <h3>Aucun service disponible pour le moment.</h3>
           </div>
         )}
 

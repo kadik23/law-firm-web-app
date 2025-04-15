@@ -6,4 +6,5 @@ interface serviceEntity{
     user_id?: string;
     price?: number;
     requestedFiles?: string[];
+    request_service_id?: number;
 }
