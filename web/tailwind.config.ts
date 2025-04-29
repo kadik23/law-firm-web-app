@@ -15,7 +15,8 @@ const config: Config = {
         secondary: "#4A84AA",
         btnSecondary: "#3281B8",
         third: "#E4F1FE",
-        textColor: "#3498DB"
+        textColor: "#3498DB",
+        adminTextHeader: "#202224"
       },
     },
   },

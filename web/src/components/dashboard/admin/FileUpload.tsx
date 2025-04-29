@@ -64,7 +64,7 @@ const FileUpload = ({ file, setFile }: FileUploadProps) => {
                                     className="px-2 py-2 bg-transparent text-gray-300 w-full"
                                     readOnly
                                 />
-                                <button onClick={handleRemoveFile} className="absolute right-2">
+                                <button onClick={handleRemoveFile} className="absolute right-2 bg-[#2c3e50] pl-2">
                                     <Image 
                                         src={"/icons/dashboard/admin/close.svg"}
                                         alt="Upload"

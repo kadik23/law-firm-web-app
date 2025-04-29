@@ -19,6 +19,7 @@ const Sidebar = () => {
     const topRoutes = [
         { Icon: DashboardIcon, alt: "Dashboard", path: "/admin/dashboard" },
         { Icon: ServicesIcon, alt: "Services", path: "/admin/dashboard/services" },
+        { Icon: ServicesIcon, alt: "Blogs", path: "/admin/dashboard/blogs" },
     ];
 
     const bottomRoutes = [
