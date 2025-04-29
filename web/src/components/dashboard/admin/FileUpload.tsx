@@ -38,7 +38,6 @@ const FileUpload = ({ file, setFile }: FileUploadProps) => {
         setFile(null);
         setPreview(null);
         setProgress(0);
-        onImageUpload('/images/avocatImg.png');
     };
 
     return (
