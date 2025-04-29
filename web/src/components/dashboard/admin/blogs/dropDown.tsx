@@ -44,7 +44,7 @@ const DropDown = ({ value, options, onSelect }: DropdownProps) => {
     <div ref={dropdownRef} className="relative">
       <button
         type="button"
-        className="flex items-center justify-between gap-2 px-3 py-2 text-sm rounded-md bg-primary text-white"
+        className="flex items-center justify-between px-3 py-1 gap-2 text-sm rounded-md bg-primary text-white"
         onClick={() => setIsOpen(!isOpen)}
       >
         <span>{value}</span>

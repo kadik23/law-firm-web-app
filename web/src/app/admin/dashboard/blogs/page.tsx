@@ -117,8 +117,8 @@ const Page = () => {
             {/* Delete Confirmation Modal */}
             <Modal isOpen={deleteModalOpen} onClose={() => setDeleteModalOpen(false)} isNotStepOne={true}>
                 <DeleteConfirmation
-                    selectedItems={selectedBlogs}
-                    itemName="blog"
+                    selectedAvocats={selectedBlogs}
+                    itemType="blog"
                     onCancel={() => setDeleteModalOpen(false)}
                     onConfirm={() => {
                         deleteBlogs();

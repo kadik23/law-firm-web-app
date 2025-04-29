@@ -1,25 +1,36 @@
 type DeleteConfirmationProps = {
-  selectedAvocats: (avocatEntity & { selected?: boolean } & { User?: User })[];
+  selectedAvocats:
+    | (avocatEntity & { selected?: boolean } & { User?: User })[]
+    | {
+        id: number;
+        title: string;
+      }[];
   onCancel: () => void;
   onConfirm: () => void;
+  itemType?: string;
 };
 
 export const DeleteConfirmation = ({
   selectedAvocats,
   onCancel,
   onConfirm,
+  itemType = "lawyer",
 }: DeleteConfirmationProps) => {
   return (
     <>
       <div className="text-center text-white font-semibold text-xl my-4">
         Do you want to delete{" "}
-        {selectedAvocats.length > 1 ? "these lawyers" : "this lawyer"}?
+        {selectedAvocats.length > 1 ? `these ${itemType}s` : `this ${itemType}`}?
       </div>
 
       <div className="mb-6">
         {selectedAvocats.map((avocat, index) => (
           <div key={avocat.id} className="text-white mb-2">
-            {index + 1} - {avocat.User?.surname} {avocat.User?.name}
+            {index + 1} - {
+              'title' in avocat 
+                ? avocat.title 
+                : `${avocat.User?.surname || ''} ${avocat.User?.name || ''}`
+            }
           </div>
         ))}
       </div>

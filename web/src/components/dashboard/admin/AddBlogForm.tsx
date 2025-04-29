@@ -18,12 +18,12 @@ type AddBlogFormProps = {
 };
 
 export const AddBlogForm = ({
-    onImageUpload,
     onSubmit,
     onClose
 }: AddBlogFormProps) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
+    const [file, setFile] = useState<File | null>(null);
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
@@ -39,7 +39,7 @@ export const AddBlogForm = ({
     return (
         <form onSubmit={handleSubmit}>
             <div className="pb-4">
-                <FileUpload onImageUpload={onImageUpload} />
+                <FileUpload file={file} setFile={setFile} />
             </div>
             <div className="flex flex-col gap-4">
                 <span className="text-white font-semibold text-sm">Enter Blog information</span>

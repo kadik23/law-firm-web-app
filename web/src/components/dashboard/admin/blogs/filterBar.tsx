@@ -18,7 +18,7 @@ interface DropdownProps {
     onTimeSelect,
   }: DropdownProps) => {
     return (
-      <div className="w-full justify-between lg:w-auto flex items-center gap-4 bg-primary p-2 rounded-md">
+      <div className="w-full px-5 py-2 justify-between lg:w-auto flex items-center gap-4 bg-primary p-2 rounded-md">
         <DropDown
           value={categoryValue}
           options={categoryOptions}
