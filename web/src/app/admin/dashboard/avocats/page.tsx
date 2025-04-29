@@ -3,10 +3,9 @@ import { AddAvocatForm } from "@/components/dashboard/admin/AddAvocatForm";
 import AvocatCard from "@/components/dashboard/admin/avocatCard";
 import { DeleteConfirmation } from "@/components/dashboard/admin/DeleteConfirmation";
 import FormModal from "@/components/dashboard/admin/formModal";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import Modal from "@/components/Modal";
-import Pagination from "@/components/Pagination";
 import { useAvocats } from "@/hooks/useLawyers";
-import usePagination from "@/hooks/usePagination ";
 import { useState } from "react";
 
 const Avocats = () => {
@@ -23,18 +22,15 @@ const Avocats = () => {
     addAvocat,
     file,
     setFile,
-    totalAttorneys,
-  } = useAvocats();
-
-  const AvocatPerPage = 6;
-  const {
     currentPage,
     totalPages,
-    goToPreviousPage,
-    goToNextPage,
-    generatePaginationNumbers,
     setCurrentPage,
-  } = usePagination(totalAttorneys, AvocatPerPage);
+    loading,
+  } = useAvocats();
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage?.(page);
+  };
 
   const handleAddModalClose = () => {
     setAddModalOpen(false);
@@ -82,9 +78,8 @@ const Avocats = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {attorneys
-          .slice((currentPage - 1) * AvocatPerPage, currentPage * AvocatPerPage)
-          .map((avocat) => (
+        {attorneys &&
+          attorneys.map((avocat) => (
             <AvocatCard
               key={avocat.id}
               avocat={avocat}
@@ -93,16 +88,58 @@ const Avocats = () => {
           ))}
       </div>
 
+      {attorneys.length === 0 && !loading && (
+        <div className="flex items-center justify-center mt-8">
+          <span className="text-gray-500">Aucun avocat trouvé</span>
+        </div>
+      )}
+
+      {loading && (
+        <div className="flex items-center justify-center mt-8">
+          <LoadingSpinner />
+        </div>
+      )}
+
       <div className="flex items-center justify-center mt-8">
         {totalPages > 1 && (
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            goToPreviousPage={goToPreviousPage}
-            goToNextPage={goToNextPage}
-            generatePaginationNumbers={generatePaginationNumbers}
-            setCurrentPage={setCurrentPage}
-          />
+          <div className="flex gap-3 justify-center items-center mt-4">
+            {/* Previous Button */}
+            {currentPage > 1 && (
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                className="px-4 py-2 bg-btnSecondary text-white rounded-md"
+              >
+                Previous
+              </button>
+            )}
+
+            <div className="flex gap-2">
+              {Array.from({ length: totalPages }, (_, index) => index + 1).map(
+                (pageNumber) => (
+                  <button
+                    key={pageNumber}
+                    onClick={() => handlePageChange(pageNumber)}
+                    className={`px-3 py-2 text-lg rounded-md ${
+                      currentPage === pageNumber
+                        ? "bg-primary text-white font-bold"
+                        : "bg-gray-200 hover:bg-gray-300"
+                    }`}
+                  >
+                    {pageNumber}
+                  </button>
+                )
+              )}
+            </div>
+
+            {currentPage < totalPages && (
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                className="px-4 py-2 bg-btnSecondary text-white rounded-md"
+              >
+                Next
+              </button>
+            )}
+          </div>
         )}
       </div>
 

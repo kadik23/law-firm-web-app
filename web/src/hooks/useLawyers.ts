@@ -12,16 +12,19 @@ export const useAvocats = () => {
   const [file, setFile] = useState<File | null>(null);
   const { showAlert } = useAlert();
   const selectedAvocats = attorneys.filter((avocat) => avocat.selected);
-  const [totalAttorneys, setTotalAttorneys] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
+  // const [searchItem, setSearchItem] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const perPage = 6;
 
   useEffect(() => {
     const fetchAttorneys = async () => {
       try {
-        const response = await axios.get("/admin/attorneys");
+        const response = await axios.get(`/admin/attorneys?page=${currentPage}&limit=${perPage}`);
         setAttorneys(response.data.attorneys);
-        setTotalAttorneys(response.data.totalAttorneys);
         setTotalPages(response.data.totalPages);
+        setCurrentPage(response.data.currentPage);
+
       } catch (err: unknown) {
         if (isAxiosError(err) && err.response?.status === 401) {
           console.warn("Attorneys not found");
@@ -35,7 +38,36 @@ export const useAvocats = () => {
     };
 
     fetchAttorneys();
-  }, []);
+  }, [currentPage]);
+
+  // const searchAttorneys = async () => {
+  //   console.log('Searching for attorneys with term:', searchItem);
+  //   setLoading(true);
+  //   try {
+  //     const response = await axios.get("/admin/attorneys/search", {
+  //       params: {
+  //         page: 1,
+  //         limit: 10,
+  //         name: searchItem,
+  //       },
+  //     });
+      
+  //     console.log('Search results:', response.data);
+  //     setAttorneys(response.data.attorneys);
+  //     setTotalAttorneys(response.data.totalAttorneys);
+  //     setTotalPages(response.data.totalPages);
+  //   } catch (err: unknown) {
+  //     console.error('Error searching for attorneys:', err);
+  //     if (isAxiosError(err) && err.response?.status === 401) {
+  //       console.warn("Attorneys not found");
+  //     } else {
+  //       console.error("An unexpected error occurred:", err);
+  //     }
+  //     setAttorneys([]);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const toggleSelect = (id: number) => {
     setAttorneys((prev) =>
@@ -176,7 +208,12 @@ export const useAvocats = () => {
     addAvocat,
     file,
     setFile,
-    totalAttorneys,
     totalPages,
+    // searchItem,
+    // setSearchItem,
+    // searchAttorneys,
+    currentPage,
+    perPage,
+    setCurrentPage,
   };
 };
