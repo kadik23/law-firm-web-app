@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Modal from "./Modal";
-import useLoginForm from "@/hooks/useLoginForm";
+import useLoginForm from "@/hooks/hooksForms/useLoginForm";
 import { DevTool } from "@hookform/devtools";
 import axiosClient from "@/lib/utils/axiosClient";
 import { useAlert } from "@/contexts/AlertContext";

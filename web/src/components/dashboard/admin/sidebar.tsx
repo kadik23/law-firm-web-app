@@ -30,8 +30,9 @@ const Sidebar = () => {
     ];
 
     return (
-        <div className="bg-white text-black hidden md:flex flex-col w-[240px] pt-20 pb-10 sticky left-0">
-            <ul className="mb-20 mx-6">
+        <div className="bg-white text-black hidden md:flex flex-col w-[240px] pb-10 sticky left-0">
+            <img src="/images/Logo.png" alt="logo" className="mx-6 mt-4 w-40" />
+            <ul className="mb-20 mx-6 mt-16">
                 {topRoutes.map(({ Icon, alt, path }) => {
                     const isActive = pathname === path || (pathname.startsWith(path) && path !== "/admin/dashboard");
 
