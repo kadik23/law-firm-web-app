@@ -27,7 +27,7 @@ adminRouter.post('/categories/add', authMiddleware(['admin']), categoriesSchema.
 adminRouter.delete('/categories/delete', authMiddleware(['admin']), categoriesSchema.remove, validationErrors, categoriesController.deleteCategory);
 
 // Attorneys
-adminRouter.post('/attorney/add', authMiddleware(['admin']), attorneySchema.add, validationErrors, attorneysController.createAttorney);
+adminRouter.post('/attorney/add', authMiddleware(['admin']), attorneysController.createAttorney);
 adminRouter.get('/attorneys', authMiddleware(['admin']), attorneySchema.getAttorneys, validationErrors, attorneysController.getAdminAttorneys); // Added pagination & search
 adminRouter.get('/attorneys/search',authMiddleware(["admin"]),attorneySchema.search,validationErrors,attorneysController.searchAttorneys);
 adminRouter.delete('/attorney/delete',authMiddleware(["admin"]),attorneySchema.remove,validationErrors,attorneysController.deleteAttorneys);

@@ -21,7 +21,7 @@ export const Header = ({toggleSideBar}:{toggleSideBar:()=>void}) => {
                     onClick={toggleSideBar}
                     className="cursor-pointer"
                   />
-                  <div className="flex items-center gap-2 bg-[#F5F6FA] px-4 py-2 rounded-full border border-gray-300">
+                  {/* <div className="flex items-center gap-2 bg-[#F5F6FA] px-4 py-2 rounded-full border border-gray-300">
                     <Image 
                       src="/icons/dashboard/admin/search.svg"
                       alt="Law Firm Logo"
@@ -33,7 +33,7 @@ export const Header = ({toggleSideBar}:{toggleSideBar:()=>void}) => {
                       className="bg-[#F5F6FA] focus:outline-none placeholder:text-sm"
                       placeholder="Search"
                     />  
-                  </div>
+                  </div> */}
                 </div>
                 <div className="flex items-center gap-4">
                   <Image
