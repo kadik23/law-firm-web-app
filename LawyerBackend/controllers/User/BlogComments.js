@@ -264,7 +264,7 @@ const replyComment = async (req,res)=> {
             return res.status(401).send('Error creating comment reply');
         } else {
             let notif=await createNotification(
-                "comment_reply",
+                "Comments",
                 "You have new reply for your comment",
                 originalComment.userId,
                 originalComment.id,
