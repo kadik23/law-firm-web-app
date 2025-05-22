@@ -19,7 +19,7 @@ const validationErrors=require("../errorHandler/validationErrors")
 const testimonialsController = require("../controllers/User/Testimonials");
 const problemsController = require("../controllers/User/problems.js");
 const consultationController = require("../controllers/User/consultation.js");
-const notifController = require("../controllers/User/NotificationTest");
+const notificationsController = require("../controllers/User/Notifications.js");
 const {upload} = require("../middlewares/FilesMiddleware");
 
 const userRouter = require('express').Router();
@@ -93,14 +93,10 @@ userRouter.get('/problems/category/:category_id',problemsSchema.getByCategoryID,
 
 // Consultation Routes
 userRouter.post('/consultations', authMiddleware(["client"]),consultationSchema.add,validationErrors, consultationController.createConsultation);
-//Notification
-userRouter.post('/send-notification', authMiddleware(["admin"]),notifController.sendNotification);
 
+//Notifications
+userRouter.get('/notifications/all', authMiddleware(["client","admin","attorney"]),notificationsController.getAllNotifications);
+userRouter.get('/notifications/unread/count', authMiddleware(["client","admin","attorney"]),notificationsController.getUnreadNotificationsCount);
 
-// Consultation Routes
-userRouter.post('/consultations', authMiddleware(["client"]), consultationController.createConsultation);
-
-// Consultation Routes
-userRouter.post('/consultations', authMiddleware(["client"]), consultationController.createConsultation);
 
 module.exports = userRouter;

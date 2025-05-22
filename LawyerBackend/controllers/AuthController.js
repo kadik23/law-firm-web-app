@@ -6,8 +6,6 @@ const db = require('../models')
 
 
 require("dotenv").config()
-const { sequelize } = require('../models'); // Import the Sequelize instance
-const { QueryTypes, NOW} = require('sequelize');
 const {upload} = require("../middlewares/FilesMiddleware.js");
 const fs = require('fs');
 const bcrypt = require("bcrypt")
@@ -222,7 +220,7 @@ const addFiles = async (req, res) => {
 const signIn = async (req, res) => {
     try {
         const { email, password } = req.body;
-        const user = await users.findOne({ where: { email } });
+        const user = await users.findOne({ where: { email:email } });
 
         if (!user) {
             return res.status(401).send('Invalid email');
