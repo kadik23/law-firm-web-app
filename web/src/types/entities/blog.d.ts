@@ -9,4 +9,13 @@ interface Blog {
     readingDuration: number; 
     image: string;
     categoryId: number;
+    category: Category;
 }
+
+type BlogFormData = Omit<
+  Blog & Category,
+  | "createdAt"
+  | "updatedAt"
+  | "id"
+  | "selected"
+>;

@@ -33,9 +33,11 @@ adminRouter.get('/attorneys/search',authMiddleware(["admin"]),attorneySchema.sea
 adminRouter.delete('/attorney/delete',authMiddleware(["admin"]),attorneySchema.remove,validationErrors,attorneysController.deleteAttorneys);
 
 // Blogs
-adminRouter.post('/blogs/add', authMiddleware(['admin']), blogsSchema.add, validationErrors, blogsController.addBlog);
+adminRouter.post('/blogs/add', authMiddleware(['admin']), blogsController.addBlog);
 adminRouter.put('/blogs/update', authMiddleware(['admin']), blogsSchema.update, validationErrors, blogsController.updateBlog);
 adminRouter.delete('/blogs/delete', authMiddleware(['admin']), blogsSchema.remove, validationErrors, blogsController.deleteBlog);
+adminRouter.get('/blogs/filter', authMiddleware(['admin']), blogsController.filterBlogs);
+adminRouter.get('/blogs/', authMiddleware(['admin']), blogsController.getAllBlogs);
 
 // Services
 adminRouter.post('/services/create', authMiddleware(['admin']), servicesSchema.add, validationErrors, servicesController.createService);

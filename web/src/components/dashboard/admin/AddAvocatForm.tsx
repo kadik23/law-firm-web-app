@@ -132,5 +132,5 @@ export const AddAvocatForm = ({
         Ajouter
       </button>
     </form>
-  );
+  );onClose
 };
