@@ -28,7 +28,7 @@ export const AddBlogForm = ({
   const [isDisabled, setIsDisabled] = useState(true);
   const [isFocused, setIsFocused] = useState(false);
   const { categories } = useCategories();
-  const { register, control, handleSubmit, errors, isValid, watch, setValue } = useBlogForm(
+  const { register, control, handleSubmit, errors, isValid, watch } = useBlogForm(
     isUpdate && blog ? {
       title: blog.title,
       readingDuration: blog.readingDuration,

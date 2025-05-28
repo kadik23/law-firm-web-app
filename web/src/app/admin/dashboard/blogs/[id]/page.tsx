@@ -11,14 +11,8 @@ import { useBlogsM } from "@/hooks/useBlogsM";
 const BlogOverview = () => {
   const { id } = useParams() as { id: string };
   const {
-    addBlog,
     file,
     setFile,
-    loading: updateLoading,
-    handleCategoryChange,
-    handleTimeChange,
-    selectedCategory,
-    selectedTime,
     updateBlog
   } = useBlogsM();
   const {
@@ -31,13 +25,11 @@ const BlogOverview = () => {
     setisLike,
     setBlog,
   } = useBlog();
-  var oldBlogData
 
   useEffect(() => {
     if (id) {
       fetchBlog(parseInt(id));
     }
-    oldBlogData = blog
   }, [id]);
 
   const handleAddModalClose = () => {

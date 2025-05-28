@@ -20,7 +20,7 @@ function useLawyerForm() {
     register,
     control,
     handleSubmit,
-    formState: { errors, isValid, isSubmitting },
+    formState: { errors, isValid },
     watch,
     setValue,
     reset
@@ -36,7 +36,6 @@ function useLawyerForm() {
     handleSubmit,
     errors,
     isValid,
-    isSubmitting,
     watch,
     setValue,
     reset,
