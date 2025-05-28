@@ -148,6 +148,7 @@ const InPage = () => {
           file={file}
           setFile={setFile}
           onSubmit={(data) => addBlog(data, () => setAddModalOpen(false))}
+          isUpdate= {false}
         />
       </FormModal>
 

@@ -60,6 +60,90 @@ export const useBlogsM = () => {
     );
   };
 
+  const updateBlog = async (
+    blogId: number,
+    data: BlogFormData,
+    oldBlogData: Blog,
+    onSuccess?: () => void,
+  ) => {
+    try {
+      setLoading(true);
+      console.log("Starting blog update...");
+      console.log("Blog ID:", blogId);
+      console.log("Form data:", data);
+      console.log("Old blog data:", oldBlogData);
+      console.log("File:", file);
+
+      const formData = new FormData();
+      formData.append("id", blogId.toString());
+      
+      // Only append fields that have changed
+      if (oldBlogData.title !== data.title)
+        formData.append("title", data.title);
+      if (oldBlogData.body !== data.body) 
+        formData.append("body", data.body);
+      if (oldBlogData.readingDuration !== data.readingDuration)
+        formData.append("readingDuration", data.readingDuration.toString());
+      if (oldBlogData.categoryId !== data.categoryId)
+        formData.append("categoryId", data.categoryId.toString());
+
+      if (file) {
+        formData.append("image", file);
+      }
+
+      // Log the FormData contents
+      for (let pair of formData.entries()) {
+        console.log(pair[0] + ": " + pair[1]);
+      }
+
+      console.log("Sending PUT request to /admin/blogs/update");
+      const response = await axios.put("/admin/blogs/update", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      console.log("Response received:", response);
+
+      if (response.status === 200) {
+        console.log("Update successful");
+        showAlert("success", "Blog mis à jour avec succès", "...");
+        setFile(null);
+        if (onSuccess) {
+          console.log("Calling onSuccess callback");
+          onSuccess();
+        }
+      } else {
+        console.log("Update failed with status:", response.status);
+        showAlert("error", "Erreur de mise à jour du blog", response.data);
+      }
+    } catch (error) {
+      console.error("Error updating blog:", error);
+      if (isAxiosError(error)) {
+        console.error("Axios error details:", {
+          status: error.response?.status,
+          data: error.response?.data,
+          message: error.message,
+        });
+        showAlert(
+          "error",
+          "Erreur de mise à jour du blog",
+          error.response?.data?.message ||
+            error.message ||
+            "Une erreur est survenue"
+        );
+      } else {
+        showAlert(
+          "error",
+          "Erreur de mise à jour du blog",
+          "Une erreur est survenue"
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const deleteBlogs = async () => {
     try {
       const response = await axios.delete("/admin/blogs/delete", {
@@ -91,7 +175,7 @@ export const useBlogsM = () => {
       formData.append("title", data.title);
       formData.append("body", data.body);
       formData.append("readingDuration", data.readingDuration.toString());
-      formData.append("categoryId", data.name.toString());
+      formData.append("categoryId", data.categoryId.toString());
       if (file) {
         formData.append("image", file);
       }
@@ -115,7 +199,7 @@ export const useBlogsM = () => {
           updatedAt: new Date(),
           createdAt: new Date(),
           selected: false,
-          category: response.data.category
+          category: response.data.category,
         };
 
         setBlogs((prev) => [
@@ -153,6 +237,7 @@ export const useBlogsM = () => {
     selectedTime,
     handleCategoryChange,
     handleTimeChange,
-    fetchBlogs
+    fetchBlogs,
+    updateBlog,
   };
 };

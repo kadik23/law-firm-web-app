@@ -34,7 +34,7 @@ adminRouter.delete('/attorney/delete',authMiddleware(["admin"]),attorneySchema.r
 
 // Blogs
 adminRouter.post('/blogs/add', authMiddleware(['admin']), blogsController.addBlog);
-adminRouter.put('/blogs/update', authMiddleware(['admin']), blogsSchema.update, validationErrors, blogsController.updateBlog);
+adminRouter.put('/blogs/update', authMiddleware(['admin']), blogsController.updateBlog);
 adminRouter.delete('/blogs/delete', authMiddleware(['admin']), blogsSchema.remove, validationErrors, blogsController.deleteBlog);
 adminRouter.get('/blogs/filter', authMiddleware(['admin']), blogsController.filterBlogs);
 adminRouter.get('/blogs/', authMiddleware(['admin']), blogsController.getAllBlogs);

@@ -1,13 +1,13 @@
 "use client";
 import { useForm } from "react-hook-form";
 
-function useBlogForm() {
+function useBlogForm(initialValues?: BlogFormData) {
   const form = useForm<BlogFormData>({
     mode: "all",
-    defaultValues: {
+    defaultValues: initialValues || {
       readingDuration: 3,
       title: "",
-      name: "",
+      categoryId: 0,
       likes: 0,
       author: "admin",
       body: "",
