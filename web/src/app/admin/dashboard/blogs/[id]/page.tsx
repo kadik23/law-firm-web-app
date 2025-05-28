@@ -1,12 +1,20 @@
 "use client";
 import { useParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import BLogInfromation from "@/components/blog/blogInfromation";
 import useBlog from "@/hooks/useBlog";
 import BlogsHeader from "@/components/dashboard/admin/blogs/blogsHeader";
+import { AddBlogForm } from "@/components/dashboard/admin/AddBlogForm";
+import FormModal from "@/components/dashboard/admin/formModal";
+import { useBlogsM } from "@/hooks/useBlogsM";
 
 const BlogOverview = () => {
   const { id } = useParams() as { id: string };
+  const {
+    file,
+    setFile,
+    updateBlog
+  } = useBlogsM();
   const {
     fetchBlog,
     blog,
@@ -17,12 +25,18 @@ const BlogOverview = () => {
     setisLike,
     setBlog,
   } = useBlog();
+
   useEffect(() => {
     if (id) {
       fetchBlog(parseInt(id));
     }
-    console.log("isLike: ", isLike);
   }, [id]);
+
+  const handleAddModalClose = () => {
+    setAddModalOpen(false);
+  };
+
+  const [addModalOpen, setAddModalOpen] = useState(false);
 
   if (loading) {
     return (
@@ -41,7 +55,11 @@ const BlogOverview = () => {
 
   return (
     <div className="">
-      <BlogsHeader blogsPage={false} blogName={blog.title} />
+      <BlogsHeader
+        blogsPage={false}
+        blogName={blog.title}
+        onUpdateClick={() => setAddModalOpen(true)}
+      />
       <BLogInfromation
         blog={blog}
         isFavorited={isFavorited}
@@ -50,6 +68,23 @@ const BlogOverview = () => {
         setisFavorited={setisFavorited}
         setBlog={setBlog}
       />
+      <FormModal
+        isOpen={addModalOpen}
+        onClose={handleAddModalClose}
+        isNotStepOne={true}
+      >
+        <div className="text-center text-white font-semibold text-xl">
+          Mettre à jour
+        </div>
+        <AddBlogForm
+          file={file}
+          setFile={setFile}
+          onSubmit={(data) => updateBlog(parseInt(id), data, blog)}
+          isUpdate={true}
+          blog={blog}
+          setBlog={setBlog}
+        />
+      </FormModal>
     </div>
   );
 };

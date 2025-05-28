@@ -18,7 +18,8 @@ interface DropdownProps {
     onTimeSelect,
   }: DropdownProps) => {
     return (
-      <div className="w-full px-5 py-2 justify-between lg:w-auto flex items-center gap-4 bg-primary p-2 rounded-md">
+      <div className="w-full flex-col md:flex-row px-5 py-2 justify-between lg:w-auto flex items-center gap-4 bg-primary p-2 rounded-md">
+        <div className="text-white text-xs">Filter By:</div>
         <DropDown
           value={categoryValue}
           options={categoryOptions}
@@ -29,9 +30,6 @@ interface DropdownProps {
           options={timeOptions}
           onSelect={onTimeSelect}
         />
-        <button className="bg-secondary text-white px-4 py-1 rounded-md text-sm hover:bg-white hover:text-secondary">
-          Filtrer
-        </button>
       </div>
     );
   };

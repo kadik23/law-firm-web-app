@@ -5,6 +5,7 @@ const blogs=db.blogs
 const fs = require('fs');
 const {body: bd ,validationResult} = require("express-validator");
 const { Op } = require("sequelize");
+const { resolve } = require('path');
 
 const uploadFile = upload.single("image");
 
@@ -105,7 +106,15 @@ const addBlog = async (req, res) => {
             if (!newBlog) {
                 return res.status(401).send('Error creating blog');
             } else {
-                return res.status(200).send('Blog created successfully');
+                // Fetch the created blog with its category
+                const blogWithCategory = await blogs.findOne({
+                    where: { id: newBlog.id },
+                    include: [{
+                        model: db.categories,
+                        attributes: ['id', 'name']
+                    }]
+                });
+                return res.status(200).json(blogWithCategory);
             }
         });
     } catch (e) {
@@ -161,6 +170,95 @@ const addBlog = async (req, res) => {
  *         '500':
  *           description: "Internal Server Error"
  */
+
+/**
+ * @swagger
+ * /user/blogs/all:
+ *   get:
+ *     summary: Retrieve a list of all blogs by user
+ *     description: This endpoint retrieves all blog entries from the database with optional pagination.
+ *     tags:
+ *       - Blogs
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Page number for pagination (default is 1)
+ *         required: false
+ *     responses:
+ *       200:
+ *         description: A list of blogs
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 currentPage:
+ *                   type: integer
+ *                   example: 1
+ *                 totalPages:
+ *                   type: integer
+ *                   example: 5
+ *                 totalBlogs:
+ *                   type: integer
+ *                   example: 50
+ *                 blogs:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Blog'
+ *       500:
+ *         description: Internal Server Error - An error occurred while fetching blogs
+ */
+
+
+const getAllBlogs = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const pageSize = 6;
+        const offset = (page - 1) * pageSize;
+
+        const { count, rows: blogsList } = await blogs.findAndCountAll({
+            limit: pageSize,
+            offset: offset,
+            where: {userId: req.user.id},
+            include: [{
+                model: db.categories,
+                attributes: ['id', 'name']
+            }]
+        });
+
+        const updatedBlogsList = await Promise.all(blogsList.map(async (blog) => {
+            const filePath = resolve(__dirname, '..', '..', blog.image);
+
+            let base64Image = null;
+            if (fs.existsSync(filePath)) {
+                const fileData = fs.readFileSync(filePath);
+                base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
+            }
+
+            return {
+                ...blog.toJSON(),
+                image: base64Image
+            };
+        }));
+
+        return res.status(200).json({
+            success: true,
+            currentPage: page,
+            totalPages: Math.ceil(count / pageSize),
+            totalBlogs: count,
+            blogs: updatedBlogsList
+        });
+
+    } catch (e) {
+        console.error('Error fetching blogs', e);
+        res.status(500).send('Internal Server Error');
+    }
+};
 
 const deleteBlog = async (req, res) => {
     try {
@@ -313,8 +411,118 @@ const updateBlog= async (req,res)=>{
     }
 
 };
+
+const filterBlogs = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const pageSize = 6;
+        const offset = (page - 1) * pageSize;
+        const { category, time } = req.query;
+
+        let whereCondition = { userId: req.user.id };
+        let dateFilter = {};
+
+        // Handle category filter
+        if (category && category !== "Tous") {
+            const categoryRecord = await db.categories.findOne({
+                where: { name: category }
+            });
+            if (categoryRecord) {
+                whereCondition.categoryId = categoryRecord.id;
+            }
+        }
+
+        // Handle date filter
+        if (time && time !== "Date de poste") {
+            const now = new Date();
+            switch (time) {
+                case "Aujourd'hui":
+                    dateFilter = {
+                        createdAt: {
+                            [Op.gte]: new Date(now.setHours(0, 0, 0, 0))
+                        }
+                    };
+                    break;
+                case "7 derniers jours":
+                    dateFilter = {
+                        createdAt: {
+                            [Op.gte]: new Date(now.setDate(now.getDate() - 7))
+                        }
+                    };
+                    break;
+                case "30 derniers jours":
+                    dateFilter = {
+                        createdAt: {
+                            [Op.gte]: new Date(now.setDate(now.getDate() - 30))
+                        }
+                    };
+                    break;
+                case "cette année (2024)":
+                    dateFilter = {
+                        createdAt: {
+                            [Op.gte]: new Date('2024-01-01'),
+                            [Op.lt]: new Date('2025-01-01')
+                        }
+                    };
+                    break;
+                case "cette année (2025)":
+                    dateFilter = {
+                        createdAt: {
+                            [Op.gte]: new Date('2025-01-01'),
+                            [Op.lt]: new Date('2026-01-01')
+                        }
+                    };
+                    break;
+            }
+        }
+
+        const { count, rows: blogsList } = await blogs.findAndCountAll({
+            where: {
+                ...whereCondition,
+                ...dateFilter
+            },
+            limit: pageSize,
+            offset: offset,
+            include: [{
+                model: db.categories,
+                attributes: ['id', 'name']
+            }],
+            order: [['createdAt', 'DESC']]
+        });
+
+        const updatedBlogsList = await Promise.all(blogsList.map(async (blog) => {
+            const filePath = resolve(__dirname, '..', '..', blog.image);
+
+            let base64Image = null;
+            if (fs.existsSync(filePath)) {
+                const fileData = fs.readFileSync(filePath);
+                base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
+            }
+
+            return {
+                ...blog.toJSON(),
+                image: base64Image
+            };
+        }));
+
+        return res.status(200).json({
+            success: true,
+            currentPage: page,
+            totalPages: Math.ceil(count / pageSize),
+            totalBlogs: count,
+            blogs: updatedBlogsList
+        });
+
+    } catch (e) {
+        console.error('Error filtering blogs', e);
+        res.status(500).send('Internal Server Error');
+    }
+};
+
 module.exports = {
     addBlog,
     updateBlog,
-    deleteBlog
+    deleteBlog,
+    getAllBlogs,
+    filterBlogs
 };
