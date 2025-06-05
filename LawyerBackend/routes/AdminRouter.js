@@ -9,6 +9,7 @@ const blogsController = require('../controllers/Admin/Blogs.js');
 const attorneysController = require('../controllers/Admin/attorneys.js');
 const servicesController = require('../controllers/Admin/Services.js');
 const problemsController = require('../controllers/Admin/Problems.js');
+const availableTimeController = require('../controllers/Admin/AvailableTime.js');
 
 const contactSchema = require('../schema/contactFormSchema');
 const categoriesSchema = require('../schema/categoriesSchema');
@@ -16,6 +17,7 @@ const attorneySchema = require('../schema/attorneySchema'); // Fixed typo
 const blogsSchema = require('../schema/blogsSchema');
 const servicesSchema = require('../schema/servicesSchema');
 const problemsSchema = require('../schema/problemsSchema');
+const availableTimeSchema = require('../schema/FreeTimeSchema.js');
 
 const adminRouter = express.Router();
 
@@ -46,5 +48,10 @@ adminRouter.delete('/services/delete',authMiddleware(["admin"]),servicesSchema.r
 // Problems
 adminRouter.post('/problems', authMiddleware(['admin']), problemsSchema.add, validationErrors, problemsController.createProblem);
 adminRouter.delete('/problems/:id', authMiddleware(['admin']), problemsSchema.remove, validationErrors, problemsController.deleteProblem);
+
+//FreeTime
+adminRouter.post('/available-times', authMiddleware(["admin"]), availableTimeSchema.createAvailableTime, validationErrors, availableTimeController.createAvailableTime);
+adminRouter.get('/available-times', authMiddleware(['admin']), availableTimeController.getAllAvailableTimes);
+adminRouter.delete('/available-times', authMiddleware(['admin']), availableTimeSchema.deleteAvailableTimes, availableTimeController.deleteAvailableTimes);
 
 module.exports = adminRouter;
