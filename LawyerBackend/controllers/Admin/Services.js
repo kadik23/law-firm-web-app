@@ -3,8 +3,60 @@ const { upload } = require('../../middlewares/FilesMiddleware');
 const fs = require('fs');
 const { Op } = require("sequelize");
 const { body, validationResult } = require("express-validator");
-
 const Service = db.services;
+
+const getAdminServices = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 6;
+    const offset = (page - 1) * limit;
+
+    const totalServices = await Service.count();
+
+    const totalPages = Math.ceil(totalServices / limit);
+
+    const path = require('path'); // Ensure path is required from 'path' module, not destructured
+
+    let services = await Service.findAll({
+      limit,
+      offset,
+      order: [["createdAt", "DESC"]],
+      raw: false, // Ensure we get Sequelize instances, not plain objects
+    });
+
+    services = await Promise.all(
+      services.map(async (service) => {
+        const filePath = path.resolve(
+          __dirname,
+          "..",
+          "..",
+          service.coverImage
+        );
+
+        let base64Image = null;
+        if (fs.existsSync(filePath)) {
+          const fileData = fs.readFileSync(filePath);
+          base64Image = `data:image/png;base64,${fileData.toString("base64")}`;
+        }
+
+        return {
+          ...service.toJSON(),
+          coverImage: base64Image,
+        };
+      })
+    );
+
+    res.json({
+      currentPage: page,
+      totalPages,
+      totalServices,
+      services,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 /**
  * @swagger
@@ -220,5 +272,6 @@ const deleteServices = async (req, res) => {
 };
 module.exports = {
   createService,
-  deleteServices
+  deleteServices,
+  getAdminServices
 };
