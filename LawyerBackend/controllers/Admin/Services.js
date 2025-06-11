@@ -3,8 +3,60 @@ const { upload } = require('../../middlewares/FilesMiddleware');
 const fs = require('fs');
 const { Op } = require("sequelize");
 const { body, validationResult } = require("express-validator");
-
 const Service = db.services;
+
+const getAdminServices = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 6;
+    const offset = (page - 1) * limit;
+
+    const totalServices = await Service.count();
+
+    const totalPages = Math.ceil(totalServices / limit);
+
+    const path = require('path'); // Ensure path is required from 'path' module, not destructured
+
+    let services = await Service.findAll({
+      limit,
+      offset,
+      order: [["createdAt", "DESC"]],
+      raw: false, // Ensure we get Sequelize instances, not plain objects
+    });
+
+    services = await Promise.all(
+      services.map(async (service) => {
+        const filePath = path.resolve(
+          __dirname,
+          "..",
+          "..",
+          service.coverImage
+        );
+
+        let base64Image = null;
+        if (fs.existsSync(filePath)) {
+          const fileData = fs.readFileSync(filePath);
+          base64Image = `data:image/png;base64,${fileData.toString("base64")}`;
+        }
+
+        return {
+          ...service.toJSON(),
+          coverImage: base64Image,
+        };
+      })
+    );
+
+    res.json({
+      currentPage: page,
+      totalPages,
+      totalServices,
+      services,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 /**
  * @swagger
@@ -152,6 +204,64 @@ const createService = async (req, res) => {
     return res.status(500).json({ error: "Server error: " + error.message });
   }
 };
+
+const deleteFile = (filePath) => {
+  if (filePath && fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+  }
+};
+
+const updateService= async (req,res)=>{
+  try {
+      uploadFile(req, res, async (err) => {
+          if (err) {
+              return res.status(400).send('Error uploading files: ' + err.message);
+          }
+          await Promise.all([
+            body("name").isString().optional().run(req),
+            body("description").isString().optional().run(req),
+            body("requestedFiles").isArray().optional().run(req),
+            body("price").optional().isFloat({ gt: 0 }).withMessage("Price must be a positive number.").run(req),
+          ]);
+
+          const errors = validationResult(req);
+          if (!errors.isEmpty()) {
+              return res.status(400).json({ errors: errors.array() });
+          }
+          const { name, description, requestedFiles, price, id } = req.body;
+          const coverImage = req.file;
+
+
+          const service = await Service.findByPk(id);
+          if (!service) {
+              return res.status(404).send('Service not found');
+          }
+
+          if (coverImage) {
+              deleteFile(service.coverImage);
+          }
+
+          const imagePath = coverImage ? coverImage.path : service.coverImage;
+
+          const updatedService = await Service.update(
+              { name, description, requestedFiles, coverImage: imagePath, price },
+              { where: { id } }
+          );
+
+          if (!updatedService[0]) {
+              return res.status(404).send('Error updating service');
+          } else {
+              return res.status(200).send('Service updated successfully');
+          }
+      });
+  }
+  catch (e) {
+      console.error('Error updating service', e);
+      res.status(500).send('Internal Server Error');
+  }
+
+};
+
 /**
  * @swagger
  * /admin/services/delete:
@@ -220,5 +330,7 @@ const deleteServices = async (req, res) => {
 };
 module.exports = {
   createService,
-  deleteServices
+  deleteServices,
+  getAdminServices,
+  updateService
 };

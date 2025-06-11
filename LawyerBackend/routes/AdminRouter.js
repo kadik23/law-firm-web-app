@@ -40,8 +40,10 @@ adminRouter.get('/blogs/filter', authMiddleware(['admin']), blogsController.filt
 adminRouter.get('/blogs/', authMiddleware(['admin']), blogsController.getAllBlogs);
 
 // Services
-adminRouter.post('/services/create', authMiddleware(['admin']), servicesSchema.add, validationErrors, servicesController.createService);
+adminRouter.post('/services/create', authMiddleware(['admin']), servicesController.createService);
+adminRouter.put('/services/update', authMiddleware(['admin']), servicesController.updateService);
 adminRouter.delete('/services/delete',authMiddleware(["admin"]),servicesSchema.remove,validationErrors,servicesController.deleteServices)
+adminRouter.get('/services',authMiddleware(["admin"]),servicesController.getAdminServices)
 
 // Problems
 adminRouter.post('/problems', authMiddleware(['admin']), problemsSchema.add, validationErrors, problemsController.createProblem);
