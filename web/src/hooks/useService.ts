@@ -25,5 +25,5 @@ export const useService = (id: number | undefined) => {
         fetchServiceDetails();
     }, [id]);
 
-    return { service, loading, error };
+    return { service, loading, error, setService };
 };

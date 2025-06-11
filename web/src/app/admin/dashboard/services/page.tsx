@@ -154,6 +154,7 @@ const Services = () => {
         <AddServiceForm
           file={file}
           setFile={setFile}
+          isUpdate={false}
           onSubmit={(data) => addService(data, () => setAddModalOpen(false))}
         />
       </FormModal>

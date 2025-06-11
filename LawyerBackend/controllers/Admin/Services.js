@@ -204,6 +204,64 @@ const createService = async (req, res) => {
     return res.status(500).json({ error: "Server error: " + error.message });
   }
 };
+
+const deleteFile = (filePath) => {
+  if (filePath && fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+  }
+};
+
+const updateService= async (req,res)=>{
+  try {
+      uploadFile(req, res, async (err) => {
+          if (err) {
+              return res.status(400).send('Error uploading files: ' + err.message);
+          }
+          await Promise.all([
+            body("name").isString().optional().run(req),
+            body("description").isString().optional().run(req),
+            body("requestedFiles").isArray().optional().run(req),
+            body("price").optional().isFloat({ gt: 0 }).withMessage("Price must be a positive number.").run(req),
+          ]);
+
+          const errors = validationResult(req);
+          if (!errors.isEmpty()) {
+              return res.status(400).json({ errors: errors.array() });
+          }
+          const { name, description, requestedFiles, price, id } = req.body;
+          const coverImage = req.file;
+
+
+          const service = await Service.findByPk(id);
+          if (!service) {
+              return res.status(404).send('Service not found');
+          }
+
+          if (coverImage) {
+              deleteFile(service.coverImage);
+          }
+
+          const imagePath = coverImage ? coverImage.path : service.coverImage;
+
+          const updatedService = await Service.update(
+              { name, description, requestedFiles, coverImage: imagePath, price },
+              { where: { id } }
+          );
+
+          if (!updatedService[0]) {
+              return res.status(404).send('Error updating service');
+          } else {
+              return res.status(200).send('Service updated successfully');
+          }
+      });
+  }
+  catch (e) {
+      console.error('Error updating service', e);
+      res.status(500).send('Internal Server Error');
+  }
+
+};
+
 /**
  * @swagger
  * /admin/services/delete:
@@ -273,5 +331,6 @@ const deleteServices = async (req, res) => {
 module.exports = {
   createService,
   deleteServices,
-  getAdminServices
+  getAdminServices,
+  updateService
 };

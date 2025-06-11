@@ -137,6 +137,78 @@ export const useServicesM = () => {
     }
   };
 
+  const updateService = async (
+    serviceId: number,
+    data: ServiceFormData,
+    oldServiceData: serviceEntity,
+    onSuccess?: () => void,
+  ) => {
+    try {
+      setLoading(true);
+
+      const formData = new FormData();
+      formData.append("id", serviceId.toString());
+
+      // Only append fields that have changed
+      if (oldServiceData.name !== data.name)
+        formData.append("name", data.name);
+      if (oldServiceData.description !== data.description) 
+        formData.append("description", data.description);
+      if (data.price && oldServiceData.price !== data.price)
+        formData.append("price", data.price.toString());
+      
+      if (data.requestedFiles && oldServiceData.requestedFiles !== data.requestedFiles) {
+        data.requestedFiles.forEach((fileName, index) => {
+          formData.append(`requestedFiles[${index}]`, fileName);
+        });
+      }
+
+      if (file) {
+        formData.append("coverImage", file);
+      }
+
+      const response = await axios.put("/admin/services/update", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (response.status === 200) {
+        showAlert("success", "Service mis à jour avec succès", "...");
+        setFile(null);
+        if (onSuccess) {
+          onSuccess();
+        }
+      } else {
+        showAlert("error", "Erreur de mise à jour du service", response.data);
+      }
+    } catch (error: unknown) {
+      console.error("Error updating service:", error);
+      if (isAxiosError(error)) {
+        console.error("Axios error details:", {
+          status: error.response?.status,
+          data: error.response?.data,
+          message: error.message,
+        });
+        showAlert(
+          "error",
+          "Erreur de mise à jour du service",
+          error.response?.data?.message ||
+            error.message ||
+            "Une erreur est survenue"
+        );
+      } else {
+        showAlert(
+          "error",
+          "Erreur de mise à jour du service",
+          "Une erreur est survenue"
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     services,
     loading,
@@ -152,5 +224,6 @@ export const useServicesM = () => {
     currentPage,
     perPage,
     setCurrentPage,
+    updateService
   };
 };

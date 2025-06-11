@@ -1,15 +1,15 @@
 "use client";
 import { useForm } from "react-hook-form";
 
-function useServiceForm() {
+function useServiceForm(initialValues?: ServiceFormData) {
   const form = useForm<ServiceFormData>({
     mode: "all",
-    defaultValues: {
+    defaultValues: initialValues || {
       name: "",
       description: "",
       price: 0,
       requestedFiles: [],
-      coverImage: "/images/serviceImg.png",
+      coverImage: "",
     },
   });
 
@@ -27,7 +27,6 @@ function useServiceForm() {
     setValue("coverImage", imageUrl, { shouldValidate: true });
   };
 
-  // Add validation for requestedFiles array
   const validateRequestedFiles = (value: string[] | undefined) => {
     if (!value || value.length === 0) {
       return "Au moins un fichier est requis";
