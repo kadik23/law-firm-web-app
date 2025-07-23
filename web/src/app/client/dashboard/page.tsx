@@ -27,7 +27,7 @@ const Dashboard = () => {
           <div className="text-gray-500">Aucune consultation à venir.</div>
         ) : (
           <ul className="divide-y divide-gray-200">
-            {consultations.slice(0, 3).map((c: any) => (
+            {consultations.slice(0, 3).map((c) => (
               <li key={c.id} className="py-2 flex flex-col md:flex-row md:items-center md:gap-4">
                 <span className="font-semibold text-sm text-primary">{c.date} {c.time}</span>
                 <span className="text-sm flex-1">{c.problem_name || c.problem_description}</span>

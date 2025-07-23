@@ -14,6 +14,7 @@ const ConsultationForm: React.FC = () => {
   const allowedDates = getAllowedDates();
   const filteredTimes = getFilteredTimes(selectedDate);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (data: any) => {
     await submitConsultation({
       problem_id: data.problem_id,

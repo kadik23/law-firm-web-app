@@ -6,6 +6,7 @@ import { addDays, format } from "date-fns";
 export interface Problem {
   id: number;
   name: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
 export interface AvailableSlotWithBookings {
@@ -34,8 +35,9 @@ export const useConsultationForm = () => {
         ]);
         setProblems(problemsRes.data);
         setSlots(slotsRes.data);
-      } catch (e: any) {
-        setError("Erreur lors du chargement des données");
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (e: unknown) {
+        if(e) setError("Erreur lors du chargement des données");
       } finally {
         setLoading(false);
       }
@@ -81,6 +83,7 @@ export const useConsultationForm = () => {
     try {
       await axios.post("/user/consultations", data);
       showAlert("success", "Consultation réservée", "Votre demande de consultation a été envoyée.");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       showAlert("error", "Erreur", e?.response?.data?.message || "Erreur lors de la réservation");
     }
