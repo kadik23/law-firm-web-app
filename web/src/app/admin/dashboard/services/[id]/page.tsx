@@ -2,7 +2,7 @@
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import FormModal from "@/components/dashboard/admin/formModal";
-import { useServicesM } from "@/hooks/useServicesM";
+import { useServicesM } from "@/hooks/admin/useServicesM";
 import { useService } from "@/hooks/useService";
 import { AddServiceForm } from "@/components/dashboard/admin/services/AddServiceForm";
 

@@ -23,6 +23,24 @@ interface BlogsFiltersContextType {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  setLoading: Dispatch<SetStateAction<boolean>>;
   logout: () => Promise<void>;
   fetchUser: () => Promise<void>;
+}
+
+interface NotificationContextType {
+  filters: FilterValues;
+  notifications: NotificationType[];
+  unreadCount: number;
+  loading: boolean;
+  error: string | null;
+  updateFilter: (filterType: keyof FilterValues, value: string) => void;
+  deleteNotification: (notificationId: number) => Promise<void>;
+  markAsRead: (notificationId: number) => Promise<void>;
+  fetchNotifications: (page?: number) => Promise<void>;
+  fetchUnreadCount: () => Promise<void>;
+  currentPage: number;
+  setCurrentPage: (page: number) => void;
+  totalPages: number;
+  perPage: number;
 }

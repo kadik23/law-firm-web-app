@@ -1,8 +1,8 @@
 "use client";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { useAlert } from "@/contexts/AlertContext";
-import { useAssignService } from "@/hooks/useAssignService";
-import useReqFiles from "@/hooks/useReqFiles";
+import { useAssignService } from "@/hooks/clients/useAssignService";
+import useReqFiles from "@/hooks/clients/useReqFiles";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import { useParams } from "next/navigation";
 import { useEffect } from "react";

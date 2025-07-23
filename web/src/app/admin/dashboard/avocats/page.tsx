@@ -5,7 +5,7 @@ import { DeleteConfirmation } from "@/components/dashboard/admin/DeleteConfirmat
 import FormModal from "@/components/dashboard/admin/formModal";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import Modal from "@/components/Modal";
-import { useAvocats } from "@/hooks/useLawyers";
+import { useAvocats } from "@/hooks/admin/useLawyers";
 import { useState } from "react";
 
 const Avocats = () => {

@@ -1,6 +1,6 @@
 "use client";
 import Myservice from "@/components/dashboard/myServiceCard";
-import { useAssignService } from "@/hooks/useAssignService";
+import { useAssignService } from "@/hooks/clients/useAssignService";
 import usePagination from "@/hooks/usePagination ";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import React, { useEffect, useState } from "react";

@@ -1,4 +1,4 @@
-import Sidebar from "@/components/dashboard/sidebar";
+import Sidebar from "@/components/dashboard/client/sidebar";
 
 export default function RootLayout({
     children,
@@ -6,11 +6,11 @@ export default function RootLayout({
     children: React.ReactNode;
   }>) {
     return (
-        <div className="flex">
-            <Sidebar />
-            <div className="md:py-20 md:px-10 flex-1 py-6">
-                {children}
-            </div>
-        </div>
+          <div className="flex">
+              <Sidebar />
+              <div className="md:py-20 md:px-10 flex-1 py-6">
+                  {children}
+              </div>
+          </div>
     );
   }

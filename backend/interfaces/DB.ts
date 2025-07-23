@@ -1,0 +1,42 @@
+import { Sequelize, Model, ModelCtor } from 'sequelize';
+import { IUser } from './User';
+import { IAttorney } from './Attorney';
+import { IFile } from './File';
+import { ICategory } from './Category';
+import { IBlog } from './Blog';
+import { ILike } from './Like';
+import { IFavorite } from './Favorite';
+import { IBlogComment } from './BlogComment';
+import { IService } from './Service';
+import { ITestimonial } from './Testimonial';
+import { IProblem } from './Problem';
+import { IConsultation } from './Consultation';
+import { ICommentsLikes } from './CommentsLikes';
+import { IRequestService } from './RequestService';
+import { IServiceFilesUploaded } from './ServiceFilesUploaded';
+import { INotification } from './Notification';
+import { IConnectedUser } from './ConnectedUser';
+import { IAvailableSlot } from './AvailableSlot';
+
+export interface DB {
+  Sequelize: typeof Sequelize;
+  sequelize: Sequelize;
+  users: ModelCtor<Model<IUser>>;
+  attorneys: ModelCtor<Model<IAttorney>>;
+  files: ModelCtor<Model<IFile>>;
+  categories: ModelCtor<Model<ICategory>>;
+  blogs: ModelCtor<Model<IBlog>>;
+  like: ModelCtor<Model<ILike>>;
+  favorites: ModelCtor<Model<IFavorite>>;
+  blogcomments: ModelCtor<Model<IBlogComment>>;
+  services: ModelCtor<Model<IService>>;
+  testimonials: ModelCtor<Model<ITestimonial>>;
+  problems: ModelCtor<Model<IProblem>>;
+  Consultation: ModelCtor<Model<IConsultation>>;
+  commentsLikes: ModelCtor<Model<ICommentsLikes>>;
+  request_service: ModelCtor<Model<IRequestService>>;
+  service_files_uploaded: ModelCtor<Model<IServiceFilesUploaded>>;
+  notifications: ModelCtor<Model<INotification>>;
+  connectedUsers: ModelCtor<Model<IConnectedUser>>;
+  AvailableSlot: ModelCtor<Model<IAvailableSlot>>;
+} 

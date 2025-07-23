@@ -12,12 +12,12 @@ import { useService } from "@/hooks/useService";
 import { useParams, useRouter } from "next/navigation";
 import { useTestimonialsByService } from "@/hooks/useTestimonialsByService";
 import { EmojiPicker } from "@/components/EmojiPicker";
-import { useTestimony } from "@/hooks/useTestimony";
+import { useTestimony } from "@/hooks/clients/useTestimony";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { useAlert } from "@/contexts/AlertContext";
 import Signup from "@/components/Signup";
 import Signin from "@/components/Signin";
-import { useAssignService } from "@/hooks/useAssignService";
+import { useAssignService } from "@/hooks/clients/useAssignService";
 
 function Page() {
   const { id } = useParams();

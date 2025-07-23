@@ -21,7 +21,7 @@ function Signup({
   setSingingModalOpen,
   assignService,
 }: SignupProps) {
-  const { register, control, handleSubmit, errors, watch } = useRegisterForm();
+  const { register, control, handleSubmit, errors, watch, reset } = useRegisterForm();
 
   const [formStep, setFormStep] = useState(0);
 
@@ -105,6 +105,7 @@ function Signup({
           "Connexion réussie",
           "Vous avez lu avec succès ce message important."
         );
+        reset()
         setModalOpen(false);
         if (assignService) {
           assignService();

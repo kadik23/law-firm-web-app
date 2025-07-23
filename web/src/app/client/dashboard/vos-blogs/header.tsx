@@ -1,4 +1,4 @@
-import { useFavorites } from "@/hooks/useFavourites";
+import { useFavorites } from "@/hooks/clients/useFavourites";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import { useState } from "react";
 

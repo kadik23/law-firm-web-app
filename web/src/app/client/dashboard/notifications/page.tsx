@@ -1,4 +1,3 @@
-// Notifications.tsx - UI component
 "use client";
 
 import { useEffect } from "react";
@@ -6,31 +5,32 @@ import Image from "next/image";
 import FilterControls from "@/components/dashboard/Notification/FilterControls";
 import NotificationItem from "@/components/dashboard/Notification/NotificationItem";
 import Pagination from "@/components/Pagination";
-import { useNotifications } from "@/hooks/useNotifications";
-import usePagination from "@/hooks/usePagination ";
+import { useNotificationContext } from "@/contexts/NotificationContext";
 
 const Notifications = () => {
-  const {
-    filters,
-    filteredNotifications,
-    updateFilter,
-    deleteNotification
-  } = useNotifications();
+    const {
+      filters,
+      notifications,
+      updateFilter,
+      deleteNotification,
+      markAsRead,
+      currentPage,
+      totalPages,
+      setCurrentPage,
+      fetchNotifications,
+    } = useNotificationContext();
 
-  const NotificationDataPerPage = 6;
-  const {
-    currentPage,
-    totalPages,
-    goToPreviousPage,
-    goToNextPage,
-    generatePaginationNumbers,
-    setCurrentPage,
-  } = usePagination(filteredNotifications.length, NotificationDataPerPage);
 
   // Reset to first page when filters or data change
   useEffect(() => {
     setCurrentPage(1);
-  }, [filteredNotifications.length, setCurrentPage]);
+  }, [filters, setCurrentPage]);
+
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    fetchNotifications(page);
+  };
 
   return (
     <div className="mx-6 md:mx-0">
@@ -54,17 +54,14 @@ const Notifications = () => {
         onConsultationTypeChange={(value) => updateFilter('consultationType', value)}
       />
       <div className="flex flex-col gap-4">
-        {filteredNotifications.length > 0 ? (
-          filteredNotifications
-            .slice(
-              (currentPage - 1) * NotificationDataPerPage,
-              currentPage * NotificationDataPerPage
-            )
+        {notifications.length > 0 ? (
+          notifications
             .map((item) => (
               <NotificationItem
                 key={item.id}
                 item={item}
                 onDelete={deleteNotification}
+                onMarkAsRead={markAsRead}
               />
             ))
         ) : (
@@ -77,10 +74,15 @@ const Notifications = () => {
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
-          goToPreviousPage={goToPreviousPage}
-          goToNextPage={goToNextPage}
-          generatePaginationNumbers={generatePaginationNumbers}
-          setCurrentPage={setCurrentPage}
+          goToPreviousPage={() => handlePageChange(currentPage - 1)}
+          goToNextPage={() => handlePageChange(currentPage + 1)}
+          generatePaginationNumbers={() => {
+            // Simple pagination numbers generator
+            const pages = [];
+            for (let i = 1; i <= totalPages; i++) pages.push(i);
+            return pages;
+          }}
+          setCurrentPage={handlePageChange}
         />
       )}
     </div>

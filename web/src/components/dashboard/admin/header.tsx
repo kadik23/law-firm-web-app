@@ -1,4 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
+import { useNotificationContext } from "@/contexts/NotificationContext";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import Image from "next/image"
 import Link from "next/link";
@@ -7,6 +8,7 @@ import { useState } from "react";
 export const Header = ({toggleSideBar}:{toggleSideBar:()=>void}) => {
 
     const {user, logout} = useAuth();
+    const { unreadCount } = useNotificationContext();
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
     
 
@@ -35,78 +37,85 @@ export const Header = ({toggleSideBar}:{toggleSideBar:()=>void}) => {
                     />  
                   </div> */}
                 </div>
+                
                 <div className="flex items-center gap-4">
-                  <Image
-                    src="/icons/dashboard/admin/notification.svg"
-                    alt="Law Firm Logo"
-                    width={20}
-                    height={20}
-                  />
+                  <Link href={'/admin/dashboard/notifications'} className="relative">
+                    <Image
+                      src="/icons/dashboard/admin/notification.svg"
+                      alt="Law Firm Logo"
+                      width={20}
+                      height={20}
+                    />
+                    {unreadCount > 0 && (
+                      <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                        {unreadCount > 99 ? '99+' : unreadCount}
+                      </div>
+                    )}
+                  </Link>
                   {user && (
                     <div
                       className={` items-center justify-between gap-4 ${
                         user ? "hidden md:flex" : "hidden"
                       }`}
                     >
-                      <button className="bg-secondary w-11 h-11 rounded-full text-center text-lg p-2 btn font-semibold shadow-lg">
+                      <button className="bg-secondary capitalize w-11 h-11 rounded-full text-center text-lg p-2 btn font-semibold shadow-lg">
                         {user?.name[0]}
                       </button>
-                      <div className="relative">
-                        <button
-                          className="flex items-center gap-9"
-                          onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-                        >
-                          <div className="flex flex-col items-start gap-1 text-sm font-semibold">
-                            {user?.name}
-                            <span className="text-xs font-normal">Admin</span>
-                          </div>
-                          <Icon
-                            icon="tabler:chevron-down"
-                            style={{ strokeWidth: 3 }}
-                            width="17"
-                            height="17"
-                            className="ml-2"
-                          />
-                        </button>
-                        {profileMenuOpen && (
-                          <div
-                            className="flex flex-col gap-3 items-end p-4 rounded-md 
-                        absolute w-[200px] top-12 right-0 bg-primary text-white"
-                          >
-                            {/* Close icon */}
-                            <Icon
-                              icon="mdi:close"
-                              style={{ strokeWidth: 3 }}
-                              width="20"
-                              height="20"
-                              onClick={() => setProfileMenuOpen(false)}
-                              className="hover:text-secondary cursor-pointer"
-                            />
-        
-                            <div className="w-full flex flex-col gap-2">
-                              <Link
-                                href={`/client/dashboard/compte`}
-                                className="bg-secondary rounded-md text-sm py-1 text-center font-semibold 
-                              hover:text-primary"
-                                onClick={() => setProfileMenuOpen(false)}
-                              >
-                                Voir mon compte
-                              </Link>
-                              <button
-                                onClick={logout}
-                                className="bg-secondary rounded-md text-sm py-1 text-center font-semibold
-                                hover:text-primary"
-                              >
-                                Déconnectez
-                              </button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
                       
+                      <button
+                        className="flex items-center gap-9"
+                        onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+                      >
+                        <div className="flex flex-col items-start gap-1 text-sm font-semibold">
+                          {user?.name}
+                          <span className="text-xs font-normal">Admin</span>
+                        </div>
+                        <Icon
+                          icon="tabler:chevron-down"
+                          style={{ strokeWidth: 3 }}
+                          width="17"
+                          height="17"
+                          className="ml-2"
+                        />
+                      </button>
+                      
+                      {profileMenuOpen && (
+                        <div
+                          className="flex flex-col gap-3 items-end p-4 rounded-md 
+                      absolute w-[200px] top-12 right-0 bg-primary text-white"
+                        >
+                          {/* Close icon */}
+                          <Icon
+                            icon="mdi:close"
+                            style={{ strokeWidth: 3 }}
+                            width="20"
+                            height="20"
+                            onClick={() => setProfileMenuOpen(false)}
+                            className="hover:text-secondary cursor-pointer"
+                          />
+      
+                          <div className="w-full flex flex-col gap-2">
+                            <Link
+                              href={`/admin/dashboard/compte`}
+                              className="bg-secondary rounded-md text-sm py-1 text-center font-semibold 
+                            hover:text-primary"
+                              onClick={() => setProfileMenuOpen(false)}
+                            >
+                              Mon Compte
+                            </Link>
+                            <button
+                              onClick={logout}
+                              className="bg-secondary rounded-md text-sm py-1 text-center font-semibold
+                              hover:text-primary"
+                            >
+                              Déconnectez
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
-              </div>
+        </div>
     )
 }

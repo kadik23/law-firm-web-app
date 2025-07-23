@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AuthClientWrapper from "@/components/AuthClientWrapper";
 import { AlertProvider } from "@/contexts/AlertContext";
+import { NotificationProvider } from "@/contexts/NotificationContext";
 
 // const geistSans = localFont({
 //   src: "../assets/fonts/GeistVF.woff",
@@ -33,11 +34,13 @@ export default function RootLayout({
       <body className={`antialiased `}>
         <AlertProvider>
           <AuthClientWrapper>
-            <div>
-              <Header />
-              <div className="mt-12 md:mt-14">{children}</div>
-              <Footer />
-            </div>
+            <NotificationProvider>
+              <div>
+                <Header />
+                <div className="mt-12 md:mt-14">{children}</div>
+                <Footer />
+              </div>
+            </NotificationProvider>
           </AuthClientWrapper>
         </AlertProvider>
       </body>

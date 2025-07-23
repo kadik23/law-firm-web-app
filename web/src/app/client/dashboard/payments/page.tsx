@@ -1,10 +1,10 @@
 "use client";
-import PaymentBoard from "@/components/dashboard/PaymentBoard";
+import PaymentBoard from "@/components/dashboard/client/PaymentBoard";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import { paymentData } from "@/consts/payments";
-import PaymentModal from "@/components/dashboard/PaymentModal";
+import PaymentModal from "@/components/dashboard/client/PaymentModal";
 import { useState } from "react";
-import UnderPaymentModal from "@/components/dashboard/UnderPaymentModal";
+import UnderPaymentModal from "@/components/dashboard/client/UnderPaymentModal";
 
 const Payments = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);

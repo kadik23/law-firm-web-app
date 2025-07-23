@@ -37,6 +37,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async () => {
     try {
+      setLoading(true)
       await axios.get("/user/logout");
       setUser(null);
       showAlert(
@@ -44,7 +45,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         "Déconnexion réussi",
         "Vous avez lu avec succès ce message important."
       );
-      setTimeout(() => router.push("/"), 2100);
+      setTimeout(() => {
+        setLoading(false)
+        router.push("/")}, 2100);
     } catch (err: unknown) {
       showAlert("error", "Oh claquement !", err as string);
       console.error("An unexpected error occurred during logout: ", err);
@@ -52,7 +55,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, logout, fetchUser }}>
+    <AuthContext.Provider value={{ user, loading, logout, fetchUser, setLoading }}>
       {children}
     </AuthContext.Provider>
   );

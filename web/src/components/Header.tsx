@@ -12,9 +12,11 @@ import {
   BlogsIcon,
   DashboardIcon,
   LogoutIcon,
+  NotificationIcon,
   PaymentsIcon,
   ServiceIcon,
 } from "./dashboard/icons";
+import { useNotificationContext } from "@/contexts/NotificationContext";
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -23,13 +25,21 @@ function Header() {
   const [isSigninModalOpen, setSigninModalOpen] = useState(false);
   const [isSignupModalOpen, setSignupModalOpen] = useState(false);
   const [iconIsHover, setIconIsHover] = useState(false);
+  const [hideNavbar, setHideNavbar] = useState(false);
   const router = usePathname();
+  const { unreadCount } = useNotificationContext();
   const links = [
     { name: "accueil", href: "/#accueil" },
     { name: "services", href: "/#services" },
     { name: "avocats", href: "/#avocats" },
     { name: "contact", href: "/#contact" },
   ];
+
+  useEffect(()=>{
+    if(router.includes("/admin") || router.includes("/attorney")){
+      setHideNavbar(true)
+    }
+  },[router])
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -86,7 +96,7 @@ function Header() {
   }
 
   return (
-    <div className="flex flex-col w-full fixed top-0 left-0 z-50">
+    <div className={`flex-col w-full top-0 fixed left-0 z-50 ${hideNavbar ?'hidden' : 'flex'}`}>
       <div className="hidden md:flex justify-between items-center w-full bg-[#4A84AA] py-2 px-4 md:px-8">
         <div className="flex items-center text-white font-semibold text-sm">
           <Icon
@@ -163,15 +173,14 @@ function Header() {
               onMouseEnter={() => setIconIsHover(true)}
               onMouseLeave={() => setIconIsHover(false)}
               className="items-center gap-2 hidden md:flex text-primary hover:text-secondary cursor-pointer
-              transition duration-2000 ease-in-out"
+              transition duration-2000 ease-in-out relative"
             >
-              {/* notification */}
-              <Image 
-                src={`/icons/notification${iconIsHover ? "" : "-primary"}.svg`}
-                alt="notification"
-                width={20}
-                height={24}
-              />
+              {unreadCount > 0 && (
+                <span className="absolute -top-2 left-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+              <NotificationIcon active={iconIsHover} Hover={iconIsHover} />
               <div className="uppercase font-semibold text-sm">Mes notifs</div>
             </Link>
           )}

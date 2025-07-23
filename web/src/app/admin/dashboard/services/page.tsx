@@ -5,7 +5,7 @@ import FormModal from "@/components/dashboard/admin/formModal";
 import ServiceCard from "@/components/dashboard/admin/services/serviceCard";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import Modal from "@/components/Modal";
-import { useServicesM } from "@/hooks/useServicesM";
+import { useServicesM } from "@/hooks/admin/useServicesM";
 import { useState } from "react";
 
 const Services = () => {

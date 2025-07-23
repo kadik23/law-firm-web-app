@@ -7,7 +7,7 @@ import { DeleteConfirmation } from "@/components/dashboard/admin/DeleteConfirmat
 import FormModal from "@/components/dashboard/admin/formModal";
 import { AddBlogForm } from "@/components/dashboard/admin/AddBlogForm";
 import BlogsWrapper from "@/components/BlogsWrapper";
-import { useBlogsM } from "@/hooks/useBlogsM";
+import { useBlogsM } from "@/hooks/admin/useBlogsM";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
 const InPage = () => {

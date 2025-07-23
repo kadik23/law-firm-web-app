@@ -21,16 +21,23 @@ export async function middleware(request: NextRequest) {
     }
     const userData = await response.json();
 
-    if (request.url.includes("/client")) {
+    if (request.url.startsWith("/client")) {
       if (userData.type !== "client") {
         console.log("Access denied: User is not an client");
         return NextResponse.redirect(new URL("/", request.url));
       }
     }
 
-    if (request.url.includes("/admin")) {
+    if (request.url.startsWith("/admin")) {
       if (userData.type !== "admin") {
         console.log("Access denied: User is not an admin");
+        return NextResponse.redirect(new URL("/", request.url)); 
+      }
+    }
+
+    if (request.url.startsWith("/attorney")) {
+      if (userData.type !== "attorney") {
+        console.log("Access denied: User is not an attorney");
         return NextResponse.redirect(new URL("/", request.url)); 
       }
     }
@@ -48,5 +55,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/client/:path*", "/admin/:path*"],
+  matcher: ["/client/:path*", "/admin/:path*", "/attorney/:path*"],
 };

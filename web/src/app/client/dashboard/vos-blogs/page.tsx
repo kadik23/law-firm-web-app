@@ -3,7 +3,7 @@ import { Header } from "./header";
 import { useEffect, useState, useCallback } from "react";
 import FavBlogs from "@/components/blog/favBlogs";
 import { useAuth } from "@/hooks/useAuth";
-import { useFavorites } from "@/hooks/useFavourites";
+import { useFavorites } from "@/hooks/clients/useFavourites";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
 const VosBlogs = () => {

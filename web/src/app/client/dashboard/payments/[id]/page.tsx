@@ -1,10 +1,10 @@
 "use client";
-import UnderPaymentModal from "@/components/dashboard/UnderPaymentModal";
+import UnderPaymentModal from "@/components/dashboard/client/UnderPaymentModal";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import React, { useState } from "react";
 import { underPayments } from "@/consts/payments";
 import { useParams, useRouter } from "next/navigation";
-import UnderPaymentBoard from "@/components/dashboard/UnderPaymentsBoard";
+import UnderPaymentBoard from "@/components/dashboard/client/UnderPaymentsBoard";
 
 function Page() {
   const [isModalOpen, setIsModalOpen] = useState(false);

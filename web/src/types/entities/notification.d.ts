@@ -1,16 +1,34 @@
 interface NotificationType {
+  id: number;
+  type: "Comments" | "Consultation" | "Documents";
+  description: string;
+  userId: number;
+  entityId: number;
+  isRead: boolean;
+  createdAt: string;
+  updatedAt?: string;
+  status?: string;
+  // Optional related data that might be populated by joins
+  blog?: {
+    name: string;
+  };
+  service?: {
+    name: string;
+  };
+  consultation?: {
     id: number;
-    type: string;
-    title: string;
-    content: string;
-    blogName?: string;
-    serviceName?: string;
-    status?: string;
-    createdAt: string;
-    updatedAt: string;
-    user?: {
-        id: number;
-        name: string;
-        avatar: string;
-    };
+    date: string;
+    mode: "online" | "offline";
+  };
+  user?: {
+    id: number;
+    name: string;
+  };
+}
+
+interface FilterValues {
+  postTime: string;
+  notificationType: string;
+  consultationTime: string;
+  consultationType: string;
 }

@@ -22,17 +22,17 @@ function Signin({
   assignService,
 }: SigninProps) {
   const [isDisabled, setIsDisabled] = useState(true);
-  const { register, control, handleSubmit, errors, isValid } = useLoginForm();
+  const { register, control, handleSubmit, errors, isValid, reset } = useLoginForm();
   const { showAlert } = useAlert();
   const router = useRouter();
-  const { fetchUser } = useAuth();
-
+  const { fetchUser, setLoading } = useAuth();
   useEffect(() => {
     setIsDisabled(!isValid);
   }, [isValid]);
 
   const onSubmit = async (data: SigninformType) => {
     try {
+      setLoading(true);
       console.log("Submitting:", data);
       const response = await axiosClient.post(
         "/user/signin",
@@ -48,21 +48,23 @@ function Signin({
           "Connexion réussie",
           "Vous avez lu avec succès ce message important."
         );
-        setModalOpen(false);
         fetchUser();
+        reset()
         if (assignService) {
           assignService();
           if (response.data.type === "client") {
-            setTimeout(
-              () => (
-                router.push(`/${response.data.type}/dashboard/services`), 2100
-              )
-            );
+            setTimeout(() => {
+              router.push(`/${response.data.type}/dashboard/services`);
+              setLoading(false);
+            }, 2100);
           }
         } else {
           setTimeout(
-            () => (router.push(`/${response.data.type}/dashboard`), 2100)
-          );
+            () => {             
+              router.push(`/${response.data.type}/dashboard`)
+              setModalOpen(false);
+            }, 2100)
+          ;
         }
       } else {
         showAlert(
@@ -78,6 +80,8 @@ function Signin({
         "Modifiez quelques éléments et réessayez de soumettre."
       );
       console.error("Error signing in:", err);
+    } finally {
+      setLoading(false);
     }
   };
 

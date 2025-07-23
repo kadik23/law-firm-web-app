@@ -6,7 +6,7 @@ import useBlog from "@/hooks/useBlog";
 import BlogsHeader from "@/components/dashboard/admin/blogs/blogsHeader";
 import { AddBlogForm } from "@/components/dashboard/admin/AddBlogForm";
 import FormModal from "@/components/dashboard/admin/formModal";
-import { useBlogsM } from "@/hooks/useBlogsM";
+import { useBlogsM } from "@/hooks/admin/useBlogsM";
 
 const BlogOverview = () => {
   const { id } = useParams() as { id: string };
