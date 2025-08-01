@@ -19,6 +19,7 @@ if (isProduction && config.dialect === 'postgres') {
     config.dialectOptions = {
         ssl: {
             require: true,
+            rejectUnauthorized: false
         }
     };
 }

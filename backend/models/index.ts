@@ -29,13 +29,9 @@ const sequelizeOptions: any = {
         min: dbConfig.pool.min,
         acquire: dbConfig.pool.acquire,
         idle: dbConfig.pool.idle
-    }
+    },
+    dialectOptions: dbConfig.dialectOptions
 };
-
-if (dbConfig.dialect === 'postgres') {
-    sequelizeOptions.ssl = dbConfig.sslmode ? { require: true, rejectUnauthorized: false } : false;
-    sequelizeOptions.channelBinding = dbConfig.channel_binding;
-}
 
 const sequelize = new Sequelize(
     dbConfig.DB as string,
