@@ -22,7 +22,7 @@ const ServiceFactory = (sequelize: Sequelize, DataTypes: typeof SequelizeDataTyp
       allowNull: false,
     },
     coverImage: {
-      type: DataTypes.TEXT("long") ,
+      type: DataTypes.TEXT,
       allowNull: false,
     },
     price: {
@@ -33,7 +33,7 @@ const ServiceFactory = (sequelize: Sequelize, DataTypes: typeof SequelizeDataTyp
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'Users',
+        model: 'users',
         key: 'id',
       },
     },

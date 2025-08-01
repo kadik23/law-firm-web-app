@@ -2,7 +2,7 @@ import { Sequelize, DataTypes as SequelizeDataTypes, Model, ModelCtor } from 'se
 import { IConsultation } from '../interfaces/Consultation';
 
 const ConsultationFactory = (sequelize: Sequelize, DataTypes: typeof SequelizeDataTypes): ModelCtor<Model<IConsultation>> => {
-  const Consultation = sequelize.define<Model<IConsultation>>('Consultation', {
+  const Consultation = sequelize.define<Model<IConsultation>>('consultations', {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,

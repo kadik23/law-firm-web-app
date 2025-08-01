@@ -2,7 +2,7 @@ import { Sequelize, DataTypes as SequelizeDataTypes, Model, ModelCtor } from 'se
 import { IAvailableSlot } from '../interfaces/AvailableSlot';
 
 const AvailableSlotFactory = (sequelize: Sequelize, DataTypes: typeof SequelizeDataTypes): ModelCtor<Model<IAvailableSlot>> => {
-  const AvailableSlot = sequelize.define<Model<IAvailableSlot>>('AvailableSlot', {
+  const AvailableSlot = sequelize.define<Model<IAvailableSlot>>('available_slots', {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
