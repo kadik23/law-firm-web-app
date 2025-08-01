@@ -1,6 +1,6 @@
 const isProduction = process.env.NODE_ENV === 'production';
 
-export default {
+const config: any = {
     HOST: process.env.DB_HOST,
     USER: process.env.DB_USER,
     PASSWORD: process.env.DB_PASSWORD,
@@ -15,3 +15,10 @@ export default {
         idle: 10000
     }
 }
+
+if (isProduction) {
+    config.sslmode = process.env.DB_SSLMODE || 'require';
+    config.channel_binding = process.env.DB_CHANNEL_BINDING || 'require';
+}
+
+export default config;

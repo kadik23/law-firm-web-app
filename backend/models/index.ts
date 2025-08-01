@@ -20,23 +20,29 @@ import ConnectedUserFactory from './ConnectedUsers';
 import AvailableSlotFactory from './AvailableSlot';
 import { DB } from '../interfaces/DB';
 
+const sequelizeOptions: any = {
+    host: dbConfig.HOST,
+    dialect: dbConfig.dialect as Dialect,
+    port: parseInt(dbConfig.port as string),
+    pool: {
+        max: dbConfig.pool.max,
+        min: dbConfig.pool.min,
+        acquire: dbConfig.pool.acquire,
+        idle: dbConfig.pool.idle
+    }
+};
+
+if (dbConfig.dialect === 'postgres') {
+    sequelizeOptions.ssl = dbConfig.sslmode ? { require: true, rejectUnauthorized: false } : false;
+    sequelizeOptions.channelBinding = dbConfig.channel_binding;
+}
+
 const sequelize = new Sequelize(
     dbConfig.DB as string,
-    dbConfig.USER  as string,
-    dbConfig.PASSWORD, {
-        host: dbConfig.HOST,
-        dialect: dbConfig.dialect as Dialect,
-        port: parseInt(dbConfig.port as string) , 
-
-        pool: {
-            max: dbConfig.pool.max,
-            min: dbConfig.pool.min,
-            acquire: dbConfig.pool.acquire,
-            idle: dbConfig.pool.idle
-
-        }
-    }
-)
+    dbConfig.USER as string,
+    dbConfig.PASSWORD,
+    sequelizeOptions
+);
 
 sequelize
   .authenticate()
