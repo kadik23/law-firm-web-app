@@ -43,7 +43,9 @@ export const AddBlogForm = ({
         name: categories.find(cat => cat.id === blog.categoryId)?.name || "",
         createdAt: new Date(),
         updatedAt: new Date()
-      }
+      },
+      accepted: true,
+      rejectionReason: null
     } : undefined
   );
   const isInitialLoad = useRef(true);

@@ -1,7 +1,6 @@
 "use client"
 import Header from "@/components/dashboard/attorney/header";
 import Sidebar from "@/components/dashboard/attorney/sidebar";
-import { useState } from "react";
 import classNames from "classnames";
 
 export default function RootLayout({
@@ -10,7 +9,7 @@ export default function RootLayout({
     children: React.ReactNode;
   }>) {
 
-    const [showSideBar, setShowSideBar] = useState(true);
+    const showSideBar = true;
     
     return (
         <div className="flex -mt-14 bg-[#F5F6FA] min-h-screen">
