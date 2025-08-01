@@ -7,18 +7,22 @@ const config: any = {
     DB: process.env.DB_NAME,
     port: process.env.DB_PORT, 
     dialect: isProduction ? 'postgres' : 'mysql',
-
     pool: {
         max: 5,
         min: 0,
         acquire: 30000,
         idle: 10000
     }
-}
+};
 
-if (isProduction) {
-    config.sslmode = process.env.DB_SSLMODE || 'require';
-    config.channel_binding = process.env.DB_CHANNEL_BINDING || 'require';
+if (isProduction && config.dialect === 'postgres') {
+    config.dialectOptions = {
+        ssl: {
+            require: true,
+            rejectUnauthorized: false,
+            channelBinding: 'require'
+        }
+    };
 }
 
 export default config;
