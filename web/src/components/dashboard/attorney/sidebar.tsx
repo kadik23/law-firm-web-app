@@ -11,6 +11,7 @@ const routes = [
   { icon: "mdi:account", label: "Compte", path: "/attorney/dashboard/compte" },
 ];
 
+
 export default function AttorneySidebar() {
   const pathname = usePathname();
   const { logout } = useAuth();

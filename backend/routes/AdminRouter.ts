@@ -13,6 +13,7 @@ import * as AssignedServices from "@/controllers/Admin/AssignedServices";
 import * as AvailableSlots from "@/controllers/Admin/availableSlot";
 import * as notificationsController from "@/controllers/User/Notifications";
 import * as consultationsController from "@/controllers/Admin/Consultations";
+import * as dashboardStatsController from "@/controllers/Admin/DashboardStats";
 
 import * as contactSchema from "@/schema/contactFormSchema";
 import * as categoriesSchema from "@/schema/categoriesSchema";
@@ -103,6 +104,11 @@ adminRouter.get(
   authMiddleware(["admin"]),
   blogsController.getAllBlogs
 );
+adminRouter.put(
+  "/blogs/process",
+  authMiddleware(["admin"]),
+  blogsController.processBlog
+);
 
 // Services
 adminRouter.post(
@@ -192,20 +198,27 @@ adminRouter.put(
 // Notifications
 adminRouter.get(
   "/notifications/all",
-  authMiddleware(["admin", "client"]),
+  authMiddleware(["admin", "client", "attorney"]),
   notificationsController.getAllNotifications
 );
 
 adminRouter.get(
   "/notifications/unread/count",
-  authMiddleware(["admin", "client"]),
+  authMiddleware(["admin", "client", "attorney"]),
   notificationsController.getUnreadNotificationsCount
 );
 
 adminRouter.delete(
   "/notifications/:id",
-  authMiddleware(["admin", "client"]),
+  authMiddleware(["admin", "client", "attorney"]),
   notificationsController.deleteNotification
+);
+
+// Dashboard Stats
+adminRouter.get(
+  "/dashboard/stats",
+  authMiddleware(["admin"]),
+  dashboardStatsController.getDashboardStats
 );
 
 export default adminRouter;

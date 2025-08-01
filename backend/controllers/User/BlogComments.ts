@@ -85,6 +85,15 @@ export const addBlogComment = async (
           },
         ],
       });
+      if (blogExists.getDataValue("userId") !== userId) {
+        await createNotification(
+          "Comments",
+          `Vous avez un nouveau commentaire sur votre article : ${blogExists.getDataValue("title")}`,
+          blogExists.getDataValue("userId") as number,
+          blogExists.getDataValue("id") as number,
+          userId
+        );
+      }
       res.status(200).send(commentWithUser);
     }
   } catch (e: any) {

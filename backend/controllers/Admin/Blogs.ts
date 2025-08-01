@@ -6,6 +6,7 @@ import { body as bd, validationResult, ValidationError, Result } from 'express-v
 import { Op, Model, ModelCtor } from 'sequelize';
 import { IBlog } from '@/interfaces/Blog';
 import { resolve } from 'path';
+import { createNotification } from '../createNotification';
 
 const blogs: ModelCtor<Model<IBlog>> = db.blogs;
 export const uploadFile = upload.single('image');
@@ -361,9 +362,18 @@ export const filterBlogs = async (req: Request, res: Response): Promise<void> =>
 
         let whereClause: any = {};
 
-        if (req.user) {
-            whereClause.userId = req.user.id;
+        if (query.status) {
+            if (query.status === 'accepted') {
+                whereClause.accepted = 1;
+            } else if (query.status === 'pending') {
+                whereClause.accepted = 0;
+                whereClause.rejectionReason = null;
+            } else if (query.status === 'refused') {
+                whereClause.accepted = 0;
+                whereClause.rejectionReason = { [Op.not]: null };
+            }
         }
+
 
         if (query.categoryId) {
             whereClause.categoryId = query.categoryId;
@@ -374,7 +384,7 @@ export const filterBlogs = async (req: Request, res: Response): Promise<void> =>
                 [Op.like]: `%${query.search}%`
             };
         }
-
+        console.log(whereClause)
         const { count, rows: blogsList } = await blogs.findAndCountAll({
             limit: pageSize,
             offset: offset,
@@ -401,7 +411,6 @@ export const filterBlogs = async (req: Request, res: Response): Promise<void> =>
             };
         }));
 
-
         res.status(200).json({
             success: true,
             currentPage: page,
@@ -415,4 +424,37 @@ export const filterBlogs = async (req: Request, res: Response): Promise<void> =>
         console.error('Error fetching blogs', e);
         res.status(500).send('Internal Server Error');
     }
+};
+
+export const processBlog = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id, action, rejectionReason } = req.body;
+    const blog = await blogs.findByPk(id) as (Model<IBlog> & IBlog) | null;
+    if (!blog) {
+      res.status(404).json({ error: 'Blog not found' });
+      return;
+    }
+    if (action === 'accept') {
+      blog.accepted = true;
+      blog.rejectionReason = null;
+    } else if (action === 'refuse') {
+      blog.accepted = false;
+      blog.rejectionReason = rejectionReason || 'Refusé par l\'administrateur';
+    } else {
+      res.status(400).json({ error: 'Invalid action' });
+      return;
+    }
+    await createNotification(
+      "Blogs",
+      `Admin a ${action === 'accept' ? 'accepté' : 'refusé'} votre article : ${blog.title}`,
+      blog.userId as number,
+      blog.id as number,
+      2,
+    );
+    await blog.save();
+    res.status(200).json({ success: true, blog });
+  } catch (e) {
+    console.error('Error processing blog', e);
+    res.status(500).send('Internal Server Error');
+  }
 };

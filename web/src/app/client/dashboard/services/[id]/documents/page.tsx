@@ -108,7 +108,7 @@ const Documents = () => {
                   setIsDeleteByOne(false);
                   setIsUploadingState(true);
                 }
-                setUploadedFiles([...uploadedFiles, ...newFiles]);
+                setUploadedFiles([...uploadedFiles, { file: newFiles[0].file, name: newFiles[0].name, status: "Pending" }]);
               }
             }}
             className=" bg-transparent cursor-pointer border-2 p-2 rounded-2xl w-full border-dashed border-[#4A84AA] "
@@ -148,6 +148,24 @@ const Documents = () => {
               >
                 {file.file_name}{" "}
               </div>
+              {file.status === "Refused" && (
+                <div className="text-xs text-red-500 flex items-center flex-col gap-1">
+                  {file.status}
+                  <div className="text-xs text-gray-500 font-semibold">
+                    {file.rejection_reason}
+                  </div>
+                </div>
+              )}
+              {file.status === "Accepted" && (
+                <div className="text-xs text-green-500">
+                  {file.status}
+                </div>
+              )}
+              {file.status === "Pending" && (
+                <div className="text-xs text-yellow-500">
+                  {file.status}
+                </div>
+              )}
             </div>
           ))}
           {uploadedFiles.map((file, index) => (

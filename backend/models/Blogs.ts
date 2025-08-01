@@ -35,6 +35,10 @@ const BlogFactory = (sequelize: Sequelize, DataTypes: typeof SequelizeDataTypes)
       type: DataTypes.BOOLEAN,
       allowNull: false,
     },
+    rejectionReason: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
   }, { tableName: "blogs" });
 
   return Blog;

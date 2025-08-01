@@ -8,4 +8,7 @@ export interface IBlog {
   categoryId: number;
   userId: number;
   accepted: boolean;
+  rejectionReason: string | null;
+  createdAt?: Date;
+  updatedAt?: Date;
 } 

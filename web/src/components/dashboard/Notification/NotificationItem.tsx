@@ -2,6 +2,7 @@
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import { getRelativeTime } from "@/lib/utils/relativeTime";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 
 interface NotificationItemProps {
   item: NotificationType;
@@ -11,6 +12,7 @@ interface NotificationItemProps {
 
 const NotificationItem = ({ item, onDelete, onMarkAsRead }: NotificationItemProps) => {
   const router = useRouter();
+  const { user } = useAuth();
 
   const getNotificationTitle = () => {
     switch (item.type) {
@@ -28,10 +30,24 @@ const NotificationItem = ({ item, onDelete, onMarkAsRead }: NotificationItemProp
   const handleClick = () => {
     if (item.type === "Comments" && item.entityId) {
       router.push(`/blog/${item.entityId}`);
+    } else if (item.type === "Blogs" && item.entityId) {
+      router.push(`/${user?.type}/dashboard/blogs`);
+    } else if (item.type === "Consultation" && item.entityId) {
+      if (user?.type === "client") {
+        router.push(`/${user?.type}/dashboard`);
+      } else {
+        router.push(`/${user?.type}/dashboard/consultations`);
+      }
+    } else if (item.type === "Documents" && item.entityId) {
+      if (user?.type === "client") {
+        router.push(`/${user?.type}/dashboard/services/${item.entityId}/documents`);
+      } else {
+        router.push(`/${user?.type}/dashboard/clients/files_proccessing/${item.entityId}`);
+      }
     }
   };
 
-  const clickable = item.type === "Comments";
+  const clickable = item.type === "Comments" || item.type === "Blogs" || item.type === "Consultation" || item.type === "Documents";
 
   return (
     <div

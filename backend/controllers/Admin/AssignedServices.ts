@@ -3,6 +3,7 @@ import { IService } from "@/interfaces/Service";
 import { db } from "@/models/index";
 import { IUser } from "@/interfaces/User";
 import { Request, Response } from "express";
+import { createNotification } from "../createNotification";
 
 const Service: ModelCtor<Model<IService>> = db.services;
 const RequestService = db.request_service;
@@ -67,6 +68,26 @@ const updateFileStatus = async (req: Request, res: Response): Promise<void> => {
       status,
       rejection_reason: status === 'Refused' ? rejection_reason : null 
     });
+    const assignedService = await RequestService.findByPk(file.getDataValue("request_service_id") as number,{
+      include: [
+        {
+          model: Service,
+          as: "service",
+          attributes: ["id", "name"],
+          required: true,
+        },
+      ],
+    });
+    
+    const serviceName = (assignedService as any)?.service?.getDataValue("name") || "Service";
+    
+    let notif = await createNotification(
+      "Documents",
+      `Votre document ${file.getDataValue("file_name")} de la demande ${serviceName} a été ${status === 'Refused' ? 'refusé' : 'accepté'}`,
+      assignedService?.getDataValue("clientId") as number,
+      assignedService?.getDataValue("serviceId") as number,
+      2
+    );
     res.status(200).json({ message: "File status updated", file });
   } catch (error: any) {
     console.error("Error in updateFileStatus:", error);
@@ -88,6 +109,21 @@ const updateFolderStatus = async (req: Request, res: Response): Promise<void> =>
       return;
     }
     await folder.update({ status });
+    const serviceId = folder.getDataValue("serviceId");
+    let serviceName = "Service";
+    if (serviceId) {
+      const service = await Service.findByPk(serviceId);
+      if (service) {
+        serviceName = service.getDataValue("name");
+      }
+    }
+    await createNotification(
+      "Documents",
+      `Le dossier ${serviceName} a été ${status === 'Completed' ? 'accepté' : status === 'Pending' ? 'en attente' : 'refusé'}`,
+      folder.getDataValue("clientId") as number,
+      folder.getDataValue("serviceId") as number,
+      2
+    );
     res.status(200).json({ message: "Folder status updated", folder });
   } catch (error: any) {
     console.error("Error in updateFolderStatus:", error);

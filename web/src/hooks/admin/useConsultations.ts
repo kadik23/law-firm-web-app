@@ -34,8 +34,7 @@ export function useConsultations() {
     try {
       const res = await axios.get("/admin/consultations");
       setConsultations(res.data);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
-    } catch (e: any) {
+    } catch {
       setError("Erreur lors du chargement des consultations");
     } finally {
       setLoading(false);

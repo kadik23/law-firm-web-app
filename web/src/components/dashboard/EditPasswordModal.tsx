@@ -1,6 +1,6 @@
 import React from "react";
 import Modal from "@/components/Modal";
-import { useAdminAccount } from "@/hooks/admin/useAdminAccount";
+import { useAdminAccount } from "@/hooks/useAdminAccount";
 import { useForm } from "react-hook-form";
 
 interface EditPasswordModalProps {

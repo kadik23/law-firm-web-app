@@ -8,7 +8,6 @@ import { Model, ModelCtor } from 'sequelize';
 import { IBlog } from '@/interfaces/Blog';
 import { ILike } from '@/interfaces/Like';
 import { Op } from 'sequelize';
-
 const blogs: ModelCtor<Model<IBlog>> = db.blogs;
 const like: ModelCtor<Model<ILike>> = db.like;
 
@@ -525,5 +524,5 @@ export {
   dislikeBlog,
   sortBlogs,
   IsBlogLiked,
-  GetLikesCount
+  GetLikesCount,
 };

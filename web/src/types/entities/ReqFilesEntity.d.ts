@@ -4,12 +4,13 @@ interface ReqFilesEntity {
   file_name: string;
   base64: string;
   status: FileStatus;
-  rejectionReason?: string;
+  rejection_reason?: string;
 }
 
 interface FileEntity {
   file: File;
   name: string;
+  status: FileStatus;
 }
 
 type FileStatus = "Accepted" | "Refused" | "Pending";

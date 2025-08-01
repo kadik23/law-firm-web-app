@@ -11,9 +11,10 @@ export interface IUser {
   sex?: 'Homme' | 'Femme';
   terms_accepted: boolean;
   type: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
-import { Request } from 'express';
 declare module 'express-serve-static-core' {
   interface Request {
     user: IUser;

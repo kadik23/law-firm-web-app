@@ -1,6 +1,6 @@
 export interface INotification {
   id?: number;
-  type: 'Comments' | 'Consultation' | 'Documents';
+  type: 'Comments' | 'Consultation' | 'Documents' | 'Blogs';
   description: string;
   userId: number;
   entityId: number;

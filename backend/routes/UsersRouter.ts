@@ -114,11 +114,6 @@ userRouter.get("/blogs/like/count/:id", blogsController.GetLikesCount);
 
 // Attorneys Routes
 userRouter.get("/attorneys", attorneysController.getAllAttorneys);
-userRouter.put(
-  "/attorney/update",
-  authMiddleware(["attorney"]),
-  attorneysController.updateAttorney
-);
 
 //Comments Routes
 userRouter.post(

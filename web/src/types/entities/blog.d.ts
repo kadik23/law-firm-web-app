@@ -10,6 +10,8 @@ interface Blog {
     image: string;
     categoryId: number;
     category: Category;
+    rejectionReason: string | null;
+    accepted: boolean;
 }
 
 type BlogFormData = Omit<

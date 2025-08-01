@@ -10,7 +10,7 @@ const NotificationFactory = (sequelize: Sequelize, DataTypes: typeof SequelizeDa
             primaryKey: true,
         },
         type: {
-            type: DataTypes.ENUM('Comments', 'Consultation','Documents'),
+            type: DataTypes.ENUM('Comments', 'Consultation','Documents','Blogs'),
             allowNull: false,
         },
         description: {

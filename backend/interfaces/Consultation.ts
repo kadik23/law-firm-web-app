@@ -9,4 +9,6 @@ export interface IConsultation {
   status: 'Accepted' | 'Pending' | 'Canceled';
   mode: 'online' | 'onsite';
   meeting_link?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 } 

@@ -43,4 +43,5 @@ interface NotificationContextType {
   setCurrentPage: (page: number) => void;
   totalPages: number;
   perPage: number;
+  setUnreadCount: (count: number) => void;
 }

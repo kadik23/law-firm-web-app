@@ -30,6 +30,9 @@ const InPage = () => {
     handleTimeChange,
     selectedCategory,
     selectedTime,
+    processBlog,
+    status,
+    handleStatusChange,
   } = useBlogsM();
 
   const handlePageChange = (page: number) => {
@@ -73,11 +76,33 @@ const InPage = () => {
         selectedTime={selectedTime}
       />
 
+      {/* Status Switch */}
+      <div className="flex gap-4 justify-center mt-6">
+        <button
+          className={`px-4 py-2 rounded-md font-semibold ${status === "accepted" ? "bg-primary text-white" : "bg-gray-200"}`}
+          onClick={() => handleStatusChange("accepted")}
+        >
+          Acceptés
+        </button>
+        <button
+          className={`px-4 py-2 rounded-md font-semibold ${status === "pending" ? "bg-primary text-white" : "bg-gray-200"}`}
+          onClick={() => handleStatusChange("pending")}
+        >
+          En attente
+        </button>
+        <button
+          className={`px-4 py-2 rounded-md font-semibold ${status === "refused" ? "bg-primary text-white" : "bg-gray-200"}`}
+          onClick={() => handleStatusChange("refused")}
+        >
+          Refusés
+        </button>
+      </div>
+
       {/* Blogs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {blogs &&
           blogs.map((blog) => (
-            <BlogCard blog={blog} key={blog.id} toggleSelect={toggleSelect} />
+            <BlogCard blog={blog} key={blog.id} toggleSelect={toggleSelect} processBlog={processBlog} />
           ))}
       </div>
 

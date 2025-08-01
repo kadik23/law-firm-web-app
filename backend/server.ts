@@ -8,6 +8,7 @@ import path from "path";
 import cookieParser from "cookie-parser";
 import userRouter from "./routes/UsersRouter";
 import adminRouter from "./routes/AdminRouter";
+import attorneyRouter from "./routes/AttorneyRouter";
 import "./socketServer";
 
 const app = express();
@@ -55,6 +56,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use("/user", userRouter);
 app.use("/admin", adminRouter);
+app.use("/attorney", attorneyRouter);
 
 const PORT = process.env.PORT || 5000;
 

@@ -93,6 +93,17 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, currentPage]);
 
+  // Re-fetch notifications on window focus
+  useEffect(() => {
+    const handleFocus = () => {
+      if (user?.id) {
+        fetchNotifications(currentPage);
+      }
+    };
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [user?.id, currentPage, fetchNotifications]);
+
   // Apply filters on the current page only
   const filteredNotifications = applyFilters(notifications, filters);
 
@@ -135,7 +146,8 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
       currentPage,
       setCurrentPage,
       totalPages,
-      perPage
+      perPage,
+      setUnreadCount
     }}>
       {children}
     </NotificationContext.Provider>

@@ -56,14 +56,9 @@ const Sidebar = () => {
       path: "/admin/dashboard/problems",
     },
     {
-      Icon: "ic:outline-contact-support",
-      alt: "Contact",
-      path: "/admin/dashboard/contact",
-    },
-    {
-      Icon: "solar:settings-outline",
-      alt: "Paramètres",
-      path: "/admin/dashboard/settings",
+      Icon: "mdi:account-outline",
+      alt: "Compte",
+      path: "/admin/dashboard/compte",
     },
   ];
 

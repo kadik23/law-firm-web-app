@@ -13,13 +13,14 @@ export const useBlogsM = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [selectedCategory, setSelectedCategory] = useState<string>("Catégorie");
   const [selectedTime, setSelectedTime] = useState<string>("Date de poste");
+  const [status, setStatus] = useState<'accepted' | 'pending' | 'refused'>('accepted');
   const perPage = 6;
 
-  const fetchBlogs = async (page: number = currentPage) => {
+  const fetchBlogs = async (page: number = currentPage, statusFilter = status) => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `/admin/blogs/filter?page=${page}&limit=${perPage}&category=${selectedCategory}&time=${selectedTime}`
+        `/admin/blogs/filter?page=${page}&limit=${perPage}&category=${selectedCategory}&time=${selectedTime}&status=${statusFilter}`
       );
       setBlogs(response.data.blogs);
       setTotalPages(response.data.totalPages);
@@ -38,7 +39,7 @@ export const useBlogsM = () => {
 
   useEffect(() => {
     fetchBlogs();
-  }, [currentPage, selectedCategory, selectedTime]);
+  }, [currentPage, selectedCategory, selectedTime, status]);
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
@@ -48,6 +49,11 @@ export const useBlogsM = () => {
   const handleTimeChange = (time: string) => {
     setSelectedTime(time);
     setCurrentPage(1); // Reset to first page when filter changes
+  };
+
+  const handleStatusChange = (newStatus: 'accepted' | 'pending' | 'refused') => {
+    setStatus(newStatus);
+    setCurrentPage(1);
   };
 
   const toggleSelect = (id: number) => {
@@ -200,6 +206,8 @@ export const useBlogsM = () => {
           createdAt: new Date(),
           selected: false,
           category: response.data.category,
+          accepted: false,
+          rejectionReason: null,
         };
 
         setBlogs((prev) => [
@@ -217,6 +225,33 @@ export const useBlogsM = () => {
     } catch (error: unknown) {
       console.error("Error adding blog:", error);
       showAlert("error", "Erreur d'ajout de blog", "Une erreur est survenue");
+    }
+  };
+
+  const processBlog = async (
+    id: number,
+    action: "accept" | "refuse",
+    rejectionReason?: string,
+    onSuccess?: () => void
+  ) => {
+    try {
+      setLoading(true);
+      const response = await axios.put("/admin/blogs/process", {
+        id,
+        action,
+        rejectionReason,
+      });
+      if (response.status === 200) {
+        showAlert("success", `Blog ${action === "accept" ? "accepté" : "refusé"} avec succès`, "...");
+        fetchBlogs(currentPage);
+        onSuccess?.();
+      } else {
+        showAlert("error", "Erreur de traitement du blog", response.data);
+      }
+    } catch {
+      showAlert("error", "Erreur de traitement du blog", "Une erreur est survenue");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -239,5 +274,8 @@ export const useBlogsM = () => {
     handleTimeChange,
     fetchBlogs,
     updateBlog,
+    processBlog,
+    status,
+    handleStatusChange,
   };
 };

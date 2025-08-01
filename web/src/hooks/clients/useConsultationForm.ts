@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "@/lib/utils/axiosClient";
 import { useAlert } from "@/contexts/AlertContext";
 import { addDays, format } from "date-fns";
+import { isAxiosError } from "axios";
 
 export interface Problem {
   id: number;
@@ -35,9 +36,8 @@ export const useConsultationForm = () => {
         ]);
         setProblems(problemsRes.data);
         setSlots(slotsRes.data);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (e: unknown) {
-        if(e) setError("Erreur lors du chargement des données");
+      } catch {
+        setError("Erreur lors du chargement des données");
       } finally {
         setLoading(false);
       }
@@ -83,9 +83,12 @@ export const useConsultationForm = () => {
     try {
       await axios.post("/user/consultations", data);
       showAlert("success", "Consultation réservée", "Votre demande de consultation a été envoyée.");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (e: any) {
-      showAlert("error", "Erreur", e?.response?.data?.message || "Erreur lors de la réservation");
+    } catch (e: unknown) {
+      if (isAxiosError(e)) {
+        showAlert("error", "Erreur", e?.response?.data?.message || "Erreur lors de la réservation");
+      } else {
+        showAlert("error", "Erreur", "Erreur lors de la réservation");
+      }
     }
   };
 

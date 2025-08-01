@@ -10,7 +10,6 @@ export default function RootLayout({
     children: React.ReactNode;
   }>) {
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [showSideBar, setShowSideBar] = useState(true);
     
     return (

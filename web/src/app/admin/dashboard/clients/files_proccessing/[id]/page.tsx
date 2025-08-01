@@ -38,8 +38,8 @@ function DossierClientPage() {
           ? {
               ...file,
               status: newStatus,
-              rejectionReason:
-                newStatus !== "Refused" ? "" : file.rejectionReason,
+              rejection_reason:
+                newStatus !== "Refused" ? "" : file.rejection_reason,
             }
           : file
       )
@@ -68,7 +68,7 @@ function DossierClientPage() {
   const handleReasonChange = (fileId: number, reason: string) => {
     setFiles(
       files.map((file) =>
-        file.id === fileId ? { ...file, rejectionReason: reason } : file
+        file.id === fileId ? { ...file, rejection_reason: reason } : file
       )
     );
   };
@@ -171,13 +171,13 @@ function DossierClientPage() {
                 <input
                   type="text"
                   placeholder="Motif du rejet..."
-                  value={file.rejectionReason || ""}
+                  value={file.rejection_reason || ""}
                   onChange={(e) => handleReasonChange(file.id, e.target.value)}
                   className="w-full py-2 px-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 transition"
                 />
                 <button
                   onClick={() =>
-                    handleReasonSubmit(file.id, file.rejectionReason || "")
+                    handleReasonSubmit(file.id, file.rejection_reason || "")
                   }
                   className="bg-primary transition-all duration-200 active:scale-105 py-2 px-4 hover:opacity-75 text-white rounded-lg"
                 >

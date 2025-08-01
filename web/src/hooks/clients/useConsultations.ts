@@ -13,9 +13,8 @@ export function useConsultations() {
       try {
         const res = await axios.get("/user/consultations");
         setConsultations(res.data);
-      } catch (e: unknown) {
-        if(e)
-        setError("Erreur lors du chargement des consultations" + e);
+      } catch {
+        setError("Erreur lors du chargement des consultations");
       } finally {
         setLoading(false);
       }

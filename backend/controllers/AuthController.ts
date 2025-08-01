@@ -355,7 +355,6 @@ const logout = (req: Request, res: Response): void => {
   }
 };
 
-// Update admin info
 const updateUserInfo = async (req: Request, res: Response): Promise<void> => {
   try {
     if (!req.user || !req.user.id) {

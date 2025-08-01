@@ -21,7 +21,8 @@ const Notifications = () => {
     fetchNotifications,
     currentPage,
     setCurrentPage,
-    totalPages
+    totalPages,
+    setUnreadCount
   } = useNotificationContext();
 
   // Reset to first page when filters or data change
@@ -29,7 +30,10 @@ const Notifications = () => {
     setCurrentPage(1);
   }, [filters, setCurrentPage]);
 
-  // Handle page change
+  useEffect(() => {
+    setUnreadCount(0);
+  }, []);
+
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     fetchNotifications(page);

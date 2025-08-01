@@ -18,6 +18,7 @@ const Notifications = () => {
       totalPages,
       setCurrentPage,
       fetchNotifications,
+      setUnreadCount
     } = useNotificationContext();
 
 
@@ -26,7 +27,10 @@ const Notifications = () => {
     setCurrentPage(1);
   }, [filters, setCurrentPage]);
 
-  // Handle page change
+  useEffect(() => {
+    setUnreadCount(0);
+  }, []);
+
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     fetchNotifications(page);

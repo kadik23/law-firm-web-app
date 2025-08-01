@@ -3,11 +3,12 @@ import path from 'path';
 import fs from 'fs';
 import multer from 'multer';
 import { Request, Response } from 'express';
-import { Model, ModelCtor } from 'sequelize';
+import { Model, ModelCtor, Op } from 'sequelize';
 import { IService } from '@/interfaces/Service';
 import { IUser } from '@/interfaces/User';
 import { IProblem } from '@/interfaces/Problem';
 import { IServiceFilesUploaded } from '@/interfaces/ServiceFilesUploaded';
+import { createNotification } from '../createNotification';
 
 const Service: ModelCtor<Model<IService>> = db.services;
 const RequestService = db.request_service;
@@ -430,8 +431,6 @@ const updateServiceFile = async (req: Request, res: Response): Promise<void> => 
       return;
     }
 
-    const filesToProcess = (req.files as Express.Multer.File[]).slice(0, fileRecords.length);
-
     await Promise.all((req.files as Express.Multer.File[]).map(async (file: Express.Multer.File, index: number) => {
         const fileRecord = fileRecords[index];
         const fileExt = path.extname(file.originalname);
@@ -453,7 +452,45 @@ const updateServiceFile = async (req: Request, res: Response): Promise<void> => 
     const allFilesUploaded = await verifyAllFilesUploaded(
       fileRecords[0].getDataValue('request_service_id')
     );
-
+      let serviceId: number | undefined;
+      const requestServiceId = fileRecords[0].getDataValue('request_service_id');
+      if (requestServiceId) {
+        const requestService = await RequestService.findByPk(requestServiceId);
+        if (requestService) {
+          const rawServiceId = requestService.getDataValue('serviceId');
+          if (typeof rawServiceId === 'string') {
+            const parsed = parseInt(rawServiceId, 10);
+            if (!isNaN(parsed)) serviceId = parsed;
+          } else if (typeof rawServiceId === 'number') {
+            serviceId = rawServiceId;
+          }
+        }
+      }
+      let serviceName = "Service";
+      if (serviceId) {
+        const service = await Service.findByPk(serviceId);
+        if (service) {
+          serviceName = service.getDataValue('name');
+        }
+      }
+      await ServiceFilesUploaded.update({
+        status: "Pending",
+        rejection_reason: null
+      }, {
+        where: {
+          request_service_id: fileRecords[0].getDataValue('request_service_id'),
+          id: {
+            [Op.in]: fileRecords.map((f: Model<any>) => f.getDataValue('id'))
+          }
+        }
+      });
+      await createNotification(
+        "Documents",
+        `Tous les documents ont été ajoutés pour la demande ${serviceName}`,
+        2,
+        Number(fileRecords[0].getDataValue('request_service_id')),
+        req?.user?.id as number,
+      );
     res.status(200).json({
       message: "Files updated successfully",
       updatedFiles: fileRecords.map((f: Model<any>) => ({
@@ -659,6 +696,21 @@ const uploadServiceFiles = async (req: Request, res: Response): Promise<void> =>
 
           return serviceFileUpload;
       }));
+
+      await Promise.all(uploadedFiles.map(async (file) => {
+        await file.update({
+          status: "Pending",
+          rejection_reason: null
+        });
+      }));
+      
+      await createNotification(
+        "Documents",
+        `Nouveau document ajouté par ${req.user.name} pour la demande ${service.getDataValue('name')}`,
+        req?.user?.id as number,
+        Number(request_service_id),
+        2
+      );
 
       res.status(201).json({
         message: "Files uploaded successfully.",
