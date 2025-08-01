@@ -4,7 +4,14 @@ const connected_users = db.connectedUsers;
 
 export const io = new Server(parseInt(process.env.SOCKET_PORT as string), {
     cors: {
-        origin: process.env.FRONTEND_URL || 'http://localhost:3000'
+        origin: [
+            "http://localhost:3000",
+            "http://localhost:3001",
+            "https://law-site-beryl.vercel.app",
+            process.env.FRONTEND_URL as string,
+            process.env.NEXT_PUBLIC_FRONTEND_URL as string
+        ].filter(Boolean),
+        credentials: true
     }
 });
 
