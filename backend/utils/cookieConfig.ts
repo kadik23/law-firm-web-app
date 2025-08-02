@@ -9,7 +9,7 @@ interface CookieOptions {
 
 export const getCookieConfig = (isProduction: boolean = false): CookieOptions => {
   const baseConfig: CookieOptions = {
-    httpOnly: true,
+    httpOnly: false,
     secure: isProduction,
     sameSite: isProduction ? 'none' : 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000,
