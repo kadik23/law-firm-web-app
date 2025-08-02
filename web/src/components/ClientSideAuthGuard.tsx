@@ -1,19 +1,20 @@
 "use client";
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 
-interface DashboardAuthWrapperProps {
+interface ClientSideAuthGuardProps {
   children: React.ReactNode;
   requiredType: 'admin' | 'client' | 'attorney';
 }
 
-export default function DashboardAuthWrapper({ children, requiredType }: DashboardAuthWrapperProps) {
+export default function ClientSideAuthGuard({ children, requiredType }: ClientSideAuthGuardProps) {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
-    console.log(`🔍 DashboardAuthWrapper Debug:`, {
+    console.log(`🔍 ClientSideAuthGuard Debug:`, {
       loading,
       hasUser: !!user,
       userType: user?.type,
@@ -35,19 +36,29 @@ export default function DashboardAuthWrapper({ children, requiredType }: Dashboa
       }
 
       console.log(`✅ User authenticated and authorized for ${requiredType} dashboard`);
+      setIsAuthorized(true);
     }
   }, [user, loading, requiredType, router]);
 
   if (loading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4">Loading...</p>
+        </div>
+      </div>
+    );
   }
 
-  if (!user) {
-    return null;
-  }
-
-  if (user.type !== requiredType) {
-    return null;
+  if (!isAuthorized) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <p>Checking authorization...</p>
+        </div>
+      </div>
+    );
   }
 
   return <>{children}</>;

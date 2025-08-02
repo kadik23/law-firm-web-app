@@ -25,7 +25,6 @@ function Header() {
   const [isSigninModalOpen, setSigninModalOpen] = useState(false);
   const [isSignupModalOpen, setSignupModalOpen] = useState(false);
   const [iconIsHover, setIconIsHover] = useState(false);
-  const [hideNavbar, setHideNavbar] = useState(false);
   const router = usePathname();
   const { unreadCount } = useNotificationContext();
   const links = [
@@ -34,12 +33,6 @@ function Header() {
     { name: "avocats", href: "/#avocats" },
     { name: "contact", href: "/#contact" },
   ];
-
-  useEffect(()=>{
-    if(router.includes("/admin") || router.includes("/attorney")){
-      setHideNavbar(true)
-    }
-  },[router])
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -91,12 +84,12 @@ function Header() {
     { Icon: BlogsIcon, alt: "Vos blogs", path: "/client/dashboard/vos-blogs" },
   ];
 
-  if (user?.type === "admin") {
+  if(router.includes("/admin") || router.includes("/attorney")){
     return;
   }
 
   return (
-    <div className={`flex-col w-full top-0 fixed left-0 z-50 ${hideNavbar ?'hidden' : 'flex'}`}>
+    <div className={`flex-col w-full top-0 fixed left-0 z-50 flex'}`}>
       <div className="hidden md:flex justify-between items-center w-full bg-[#4A84AA] py-2 px-4 md:px-8">
         <div className="flex items-center text-white font-semibold text-sm">
           <Icon
@@ -243,7 +236,7 @@ function Header() {
 
                     <div className="w-full flex flex-col gap-2">
                       <Link
-                        href={`/client/dashboard/compte`}
+                        href={`${user?.type}/dashboard/compte`}
                         className="bg-secondary rounded-md text-sm py-1 text-center font-semibold 
                       hover:text-primary"
                         onClick={() => setProfileMenuOpen(false)}
@@ -303,7 +296,7 @@ function Header() {
               </a>
             ))}
             <Link
-              href={"/client/dashboard/notifications"}
+              href={`${user?.type}/dashboard/notifications`}
               className="flex items-center justify-start gap-2 text-white hover:text-secondary cursor-pointer"
             >
               <span className="uppercase font-semibold text-sm">Mes notifs</span>
@@ -370,7 +363,7 @@ function Header() {
 
                       <div className="w-full flex flex-col gap-2">
                         <Link
-                          href={"/client/dashboard"}
+                          href={`${user?.type}/dashboard`}
                           className="bg-secondary rounded-md text-sm py-1 text-center font-semibold 
                           hover:text-primary"
                         >
@@ -392,7 +385,7 @@ function Header() {
                 </button>
               </div>
               <div className="flex flex-col gap-2">
-                {user &&
+                {user && user.type !== "client" &&
                   routes.map((route) => (
                     <Link
                       href={route.path}
