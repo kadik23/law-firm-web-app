@@ -33,6 +33,11 @@ console.log('📁 Copying static assets for production...');
 const sourceUploads = path.join(__dirname, '../uploads');
 const destUploads = path.join(__dirname, '../dist/uploads');
 
+if (!fs.existsSync(sourceUploads)) {
+  fs.mkdirSync(sourceUploads, { recursive: true });
+  console.log('✅ Created uploads directory');
+}
+
 if (fs.existsSync(sourceUploads)) {
   copyDirectory(sourceUploads, destUploads);
   console.log('✅ Uploads folder copied to dist/uploads/');

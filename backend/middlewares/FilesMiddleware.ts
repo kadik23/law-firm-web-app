@@ -1,11 +1,18 @@
 // filesMiddleware.ts
 import multer, { FileFilterCallback } from 'multer';
 import { Request } from 'express';
+import path from 'path';
+
+const getUploadDirectory = () => {
+    const isProduction = process.env.NODE_ENV === 'production';
+    return isProduction ? path.join(__dirname, '../../uploads/') : 'uploads/';
+};
 
 // Set up multer storage configuration
 const storage = multer.diskStorage({
     destination: (req: Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
-        cb(null, 'uploads/'); // Directory to save the uploaded files
+        const uploadDir = getUploadDirectory();
+        cb(null, uploadDir);
     },
     filename: (req: Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
         cb(null, `${Date.now()}-${file.originalname}`); // Save file with a unique name

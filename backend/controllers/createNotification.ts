@@ -2,7 +2,7 @@ import { db } from "@/models"
 import { Model, ModelCtor } from "sequelize";
 import { INotification } from "@/interfaces/Notification";
 import { IConnectedUser } from "@/interfaces/ConnectedUser";
-import { io } from "@/socketServer";
+import { io } from "@/server";
 
 const notif: ModelCtor<Model<INotification>> = db.notifications;
 const connected_users: ModelCtor<Model<IConnectedUser>> = db.connectedUsers;

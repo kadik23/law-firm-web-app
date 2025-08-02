@@ -43,7 +43,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   // Socket connection for real-time updates
   useEffect(() => {
     if (user?.id) {
-      const newSocket = io(process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:8080');
+      const newSocket = io(process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000');
       newSocket.on('connect', () => {
         newSocket.emit('register', user.id);
       });
