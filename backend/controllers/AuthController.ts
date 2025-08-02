@@ -8,6 +8,7 @@ import dotenv from "dotenv";
 import { Model, ModelCtor } from "sequelize";
 import { IUser } from '@/interfaces/User';
 import { IFile } from '@/interfaces/File';
+import { getCookieConfig, getClearCookieConfig } from "../utils/cookieConfig";
 dotenv.config();
 
 const users: ModelCtor<Model<IUser>> = db.users;
@@ -85,12 +86,11 @@ const signUp = async (req: Request, res: Response): Promise<void> => {
     const token = jwt.sign({ user: newUser }, process.env.SECRET as string, {
       expiresIn: "7d",
     });
-    res.cookie("authToken", token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict",
-      maxAge: 60 * 60 * 1000,
-    });
+    
+    const isProduction = process.env.NODE_ENV === 'production';
+    const cookieConfig = getCookieConfig(isProduction);
+    
+    res.cookie("authToken", token, cookieConfig);
     res
       .status(200)
       .json({ message: "Signed in successfully", type: newUser.getDataValue('type') });
@@ -248,12 +248,10 @@ const signIn = async (req: Request, res: Response): Promise<void> => {
       { expiresIn: "7d" }
     );
 
-    res.cookie("authToken", token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict",
-      maxAge: 60 * 60 * 1000,
-    });
+    const isProduction = process.env.NODE_ENV === 'production';
+    const cookieConfig = getCookieConfig(isProduction);
+    
+    res.cookie("authToken", token, cookieConfig);
 
     res
       .status(200)
@@ -341,11 +339,10 @@ const checkUserAuthentication = async (req: Request, res: Response): Promise<voi
  */
 const logout = (req: Request, res: Response): void => {
   try {
-    res.clearCookie("authToken", {
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict",
-    });
+    const isProduction = process.env.NODE_ENV === 'production';
+    const clearCookieConfig = getClearCookieConfig(isProduction);
+    
+    res.clearCookie("authToken", clearCookieConfig);
 
     res.status(200).json({ message: "Logged out successfully" });
     console.log("User logged out");
