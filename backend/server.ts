@@ -98,6 +98,20 @@ app.get("/test-cors", (req, res) => {
   });
 });
 
+// Debug endpoint for middleware testing
+app.get("/debug-auth", (req, res) => {
+  const authToken = req.cookies.authToken;
+  res.json({
+    hasAuthToken: !!authToken,
+    tokenLength: authToken ? authToken.length : 0,
+    cookies: req.cookies,
+    headers: {
+      origin: req.headers.origin,
+      'user-agent': req.headers['user-agent']
+    }
+  });
+});
+
 app.use("/user", userRouter);
 app.use("/admin", adminRouter);
 app.use("/attorney", attorneyRouter);
