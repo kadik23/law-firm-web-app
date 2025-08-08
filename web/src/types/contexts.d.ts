@@ -45,3 +45,9 @@ interface NotificationContextType {
   perPage: number;
   setUnreadCount: (count: number) => void;
 }
+
+type AlertContextType = {
+  showAlert: (type: string, title: string, message: string) => void;
+  closeAlert: () => void; 
+  setShowAlert: (show: boolean) => void;
+};

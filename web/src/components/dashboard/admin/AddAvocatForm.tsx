@@ -36,11 +36,11 @@ export const AddAvocatForm = ({
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col items-start gap-4"
+      className="grid grid-cols-2 items-center gap-4"
     >
       {process.env.NODE_ENV === "development" && <DevTool control={control} />}
 
-      <div className="w-full">
+      <div className="w-full col-span-2">
         <FileUpload
           file={file}
           setFile={setFile}
@@ -73,8 +73,8 @@ export const AddAvocatForm = ({
         {errors.surname && <p className="error">{errors.surname.message}</p>}
       </div>
 
-      <div className="flex flex-col justify-start gap-2 w-full">
-        <div className="text-textColor text-sm font-semibold">Email</div>
+      <div className="flex flex-col justify-start gap-2 col-span-2 w-full">
+        <div className="text-textColor text-sm font-semibold ">Email</div>
         <input
           type="email"
           {...register("email", {
@@ -88,6 +88,18 @@ export const AddAvocatForm = ({
           className="py-1 px-4 outline-none text-sm text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
         />
         {errors.email && <p className="error">{errors.email.message}</p>}
+      </div>
+
+      <div className="flex flex-col justify-start gap-2 w-full">
+        <div className="text-textColor text-sm font-semibold col-span-1">Sexe</div>
+        <div>
+          <select {...register("sex", { required: "Sexe requis", validate: (value) => value === "Homme" || value === "Femme" })} className="border rounded px-3 py-2 w-full">
+            <option value="">Sexe</option>
+            <option value="Homme">Homme</option>
+            <option value="Femme">Femme</option>
+          </select>
+        </div>
+        {errors.sex && <p className="error">{errors.sex.message}</p>}
       </div>
 
       <div className="flex flex-col justify-start gap-2 w-full">
@@ -105,6 +117,53 @@ export const AddAvocatForm = ({
           className="py-1 px-4 outline-none text-sm text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
         />
         {errors.password && <p className="error">{errors.password.message}</p>}
+      </div>
+
+      <div className="flex flex-col justify-start gap-2 w-full">
+        <div className="text-textColor text-sm font-semibold">Téléphone</div>
+        <input
+          type="text"
+          {...register("phone_number", {
+            required: "Téléphone est requis",
+          })}
+          placeholder="Entrer le téléphone"
+          className="py-1 px-4 outline-none text-sm text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
+        />
+        {errors.phone_number && <p className="error">{errors.phone_number.message}</p>}
+      </div>
+
+      <div className="flex flex-col justify-start gap-2 w-full">
+        <div className="text-textColor text-sm font-semibold">Ville</div>
+        <input
+          type="text"
+          {...register("ville", {
+            required: "Ville est requis",
+          })}
+          placeholder="Entrer la ville"
+          className="py-1 px-4 outline-none text-sm text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
+        />
+        {errors.ville && <p className="error">{errors.ville.message}</p>}
+      </div>
+
+      <div className="flex flex-col justify-start gap-2 w-full">
+        <div className="text-textColor text-sm font-semibold">Âge</div>
+        <input
+          type="number"
+          {...register("age", {
+            required: "Âge est requis",
+            min: {
+              value: 18,
+              message: "L'âge doit être au moins 18 ans"
+            },
+            max: {
+              value: 100,
+              message: "L'âge ne peut pas dépasser 100 ans"
+            }
+          })}
+          placeholder="Entrer l'âge"
+          className="py-1 px-4 outline-none text-sm text-white rounded-lg border border-white placeholder:text-sm bg-transparent"
+        />
+        {errors.age && <p className="error">{errors.age.message}</p>}
       </div>
 
       <div className="flex flex-col justify-start gap-2 w-full">
@@ -127,7 +186,7 @@ export const AddAvocatForm = ({
         disabled={isDisabled}
         className={`${
           isDisabled ? "btn_desabled active:scale-100" : "btn bg-textColor"
-        } text-sm rounded-md p-2 btn font-semibold shadow-lg w-full`}
+        } text-sm rounded-md p-2 btn font-semibold shadow-lg col-span-2 w-full`}
       >
         Ajouter
       </button>

@@ -108,7 +108,7 @@ const InPage = () => {
 
       {blogs.length === 0 && !loading && (
         <div className="flex items-center justify-center mt-8">
-          <span className="text-gray-500">Aucun avocat trouvé</span>
+          <span className="text-gray-500">Aucun article trouvé</span>
         </div>
       )}
 

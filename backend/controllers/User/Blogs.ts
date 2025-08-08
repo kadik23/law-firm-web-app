@@ -8,6 +8,7 @@ import { Model, ModelCtor } from 'sequelize';
 import { IBlog } from '@/interfaces/Blog';
 import { ILike } from '@/interfaces/Like';
 import { Op } from 'sequelize';
+import { imageToBase64DataUri } from '@/utils/imageUtils';
 const blogs: ModelCtor<Model<IBlog>> = db.blogs;
 const like: ModelCtor<Model<ILike>> = db.like;
 
@@ -65,11 +66,7 @@ const getAllBlogs = async (req: Request, res: Response): Promise<void> => {
         });
         const updatedBlogsList: any[] = await Promise.all(blogsList.map(async (blog: Model<IBlog>) => {
             const filePath = resolve(__dirname, '..', '..', blog.getDataValue('image'));
-            let base64Image: string | null = null;
-            if (fs.existsSync(filePath)) {
-                const fileData = fs.readFileSync(filePath);
-                base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
-            }
+            const base64Image = imageToBase64DataUri(filePath);
             return {
                 ...blog.toJSON(),
                 image: base64Image

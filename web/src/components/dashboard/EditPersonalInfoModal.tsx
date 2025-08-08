@@ -94,7 +94,7 @@ const EditPersonalInfoModal: React.FC<EditPersonalInfoModalProps> = ({ isOpen, o
             {errors.age && <span className="text-red-500 text-xs">{errors.age.message}</span>}
           </div>
           <div>
-            <select {...register("sex")} className="border rounded px-3 py-2 w-full">
+            <select {...register("sex", { required: "Sexe requis", validate: (value) => value === "Homme" || value === "Femme" })} className="border rounded px-3 py-2 w-full">
               <option value="">Sexe</option>
               <option value="Homme">Homme</option>
               <option value="Femme">Femme</option>

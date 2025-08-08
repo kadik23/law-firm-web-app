@@ -18,6 +18,7 @@ import { useAlert } from "@/contexts/AlertContext";
 import Signup from "@/components/Signup";
 import Signin from "@/components/Signin";
 import { useAssignService } from "@/hooks/clients/useAssignService";
+import Link from "next/link";
 
 function Page() {
   const { id } = useParams();
@@ -83,6 +84,16 @@ function Page() {
   } = useCarousel(testimonials.length, 3.5);
   const { showAlert } = useAlert();
 
+  useEffect(() => {
+    if (AuthUSER && AuthUSER.type === "admin") {
+      showAlert(
+        "warning",
+        "Avertissement!",
+        "Veuillez vous connecter pour commencer votre dossier ou consulter vos services."
+      );
+    }
+  }, [AuthUSER]);
+
   const toggleComment = (id: number | null) => {
     if (AuthUSER) {
       if (id) {
@@ -140,8 +151,7 @@ function Page() {
   };
 
   const ServicesLoadingChecker = () => {
-    if (servicesLoading)
-      return <LoadingSpinner/>;
+    if (servicesLoading) return <LoadingSpinner />;
     if (servicesError)
       return (
         <h1 className="text-center text-6xl mt-6">Error: {servicesError}</h1>
@@ -154,7 +164,7 @@ function Page() {
 
   return (
     <div>
-      <div className="bg-primary lg:h-screen flex flex-col gap-8 justify-center items-center px-4 py-8 md:px-16">
+      <div className="bg-primary flex flex-col gap-8 justify-center items-center px-4 py-8 md:px-16">
         <div className="text-white">
           <Signup
             isModalOpen={isSignupModalOpen}
@@ -212,13 +222,19 @@ function Page() {
               <div className="flex flex-col md:flex-row gap-2">
                 <button
                   onClick={() => {
-                    if (AuthUSER) {
+                    if (AuthUSER && AuthUSER.type === "client") {
                       assignService();
                       setTimeout(
                         () => (
                           router.push(`/${AuthUSER.type}/dashboard/services`),
                           2100
                         )
+                      );
+                    } else if (AuthUSER && AuthUSER.type === "admin") {
+                      showAlert(
+                        "warning",
+                        "Avertissement!",
+                        "Veuillez vous connecter pour commencer votre dossier ou consulter vos services."
                       );
                     } else {
                       setSignupModalOpen(true);
@@ -228,9 +244,24 @@ function Page() {
                 >
                   Commencer votre dossier
                 </button>
-                <button className="btn text-xs md:text-sm bg-primary text-white py-2 px-4 rounded-md">
-                  Consultaion initiale gratuite
-                </button>
+                {!AuthUSER && (
+                  <button
+                    onClick={() => {
+                      setSigninModalOpen(true);
+                    }}
+                    className="btn text-xs md:text-sm bg-primary text-white py-2 px-4 rounded-md"
+                  >
+                    Consultaion initiale gratuite
+                  </button>
+                )}
+                {AuthUSER && AuthUSER.type === "client" && (
+                  <Link
+                    href={`/dashboard/${AuthUSER.type}/services`}
+                    className="btn text-xs md:text-sm bg-primary text-white py-2 px-4 rounded-md"
+                  >
+                    Consultaion initiale gratuite
+                  </Link>
+                )}
               </div>
             </div>
           </div>
@@ -318,8 +349,16 @@ function Page() {
             </div>
             <button
               onClick={() => {
-                toggleComment(null);
-                setComment("");
+                if (AuthUSER && AuthUSER.type === "client") {
+                  toggleComment(null);
+                  setComment("");
+                } else {
+                  showAlert(
+                    "warning",
+                    "Avertissement!",
+                    "Veuillez vous connecter en tant que client pour commenter ."
+                  );
+                }
               }}
               className="text-primary border-[1px] border-black font-semibold px-4 py-2 rounded-md
                         flex items-center gap-1 hover:bg-secondary hover:text-white hover:border-none"

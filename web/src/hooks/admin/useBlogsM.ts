@@ -206,7 +206,7 @@ export const useBlogsM = () => {
           createdAt: new Date(),
           selected: false,
           category: response.data.category,
-          accepted: false,
+          accepted: true,
           rejectionReason: null,
         };
 

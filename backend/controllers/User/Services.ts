@@ -9,6 +9,8 @@ import { IUser } from '@/interfaces/User';
 import { IProblem } from '@/interfaces/Problem';
 import { IServiceFilesUploaded } from '@/interfaces/ServiceFilesUploaded';
 import { createNotification } from '../createNotification';
+import { imageToBase64DataUri } from '@/utils/imageUtils';
+import { getImagePath } from '@/utils/getImagePath';
 
 const Service: ModelCtor<Model<IService>> = db.services;
 const RequestService = db.request_service;
@@ -87,17 +89,8 @@ const getAllServices = async (req: Request, res: Response): Promise<void> => {
     if (services) {
       const resultList: any[] = await Promise.all(
         services.map(async (service: Model<IService>) => {
-          const filePath = path.resolve(
-            __dirname,
-            "..",
-            "..",
-            service.getDataValue('coverImage')
-          );
-          let base64Image: string | null = null;
-          if (fs.existsSync(filePath)) {
-            const fileData = fs.readFileSync(filePath);
-            base64Image = `data:image/png;base64,${fileData.toString("base64")}`;
-          }
+          const filePath = getImagePath(service.getDataValue('coverImage'));
+          const base64Image = imageToBase64DataUri(filePath);
           return {
             ...service.toJSON(),
             coverImage: base64Image,
@@ -183,12 +176,8 @@ const getOneService = async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
     const service = await Service.findOne({ where: { id } });
     if (service) {
-      const filePath = path.resolve(__dirname, "..", "..", service.getDataValue('coverImage'));
-      let base64Image: string | null = null;
-      if (fs.existsSync(filePath)) {
-        const fileData = fs.readFileSync(filePath);
-        base64Image = `data:image/png;base64,${fileData.toString("base64")}`;
-      }
+      const filePath = getImagePath(service.getDataValue('coverImage'));
+      const base64Image = imageToBase64DataUri(filePath);
       res.status(200).json({
         ...service.toJSON(),
         coverImage: base64Image,
@@ -339,7 +328,7 @@ const deleteServiceFiles = async (req: Request, res: Response): Promise<void> =>
       return;
     }
     filesToDelete.forEach((file: Model<any>) => {
-      const filePath = path.join(__dirname, "../../uploads", file.getDataValue('file_name'));
+      const filePath = getImagePath(file.getDataValue('file_name'));
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
       }
@@ -840,13 +829,8 @@ const getAllServicesByProblem = async (req: Request, res: Response): Promise<voi
     });
     if (services) {
       const servicesWithImages = await Promise.all(services.map(async (service: Model<IService>) => {
-        const filePath = path.resolve(__dirname, '..', '..', service.getDataValue('coverImage'));
-
-        let base64Image = null;
-        if (fs.existsSync(filePath)) {
-          const fileData = fs.readFileSync(filePath);
-          base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
-        }
+        const filePath = getImagePath(service.getDataValue('coverImage'));
+        const base64Image = imageToBase64DataUri(filePath);
 
         return {
           ...service.toJSON(),
@@ -1018,13 +1002,8 @@ const getAssignedServices = async (req: Request, res: Response): Promise<void> =
         let base64Image: string | null = null;
         if (service.getDataValue('coverImage')) {
           try {
-            const filePath = path.resolve(__dirname, '..', '..', service.getDataValue('coverImage'));
-            if (fs.existsSync(filePath)) {
-              const fileData = fs.readFileSync(filePath);
-              base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
-            } else {
-              console.warn(`Cover image not found at path: ${filePath}`);
-            }
+            const filePath = getImagePath(service.getDataValue('coverImage'));
+            base64Image = imageToBase64DataUri(filePath);
           } catch (fileError) {
             console.error(`Error processing cover image for service ${service.getDataValue('id')}:`, fileError);
           }

@@ -7,6 +7,7 @@ import { Op, Model, ModelCtor } from 'sequelize';
 import { IBlog } from '@/interfaces/Blog';
 import { resolve } from 'path';
 import { createNotification } from '../createNotification';
+import { imageToBase64DataUri } from '@/utils/imageUtils';
 
 const blogs: ModelCtor<Model<IBlog>> = db.blogs;
 export const uploadFile = upload.single('image');
@@ -40,12 +41,7 @@ export const getAllBlogs = async (req: Request, res: Response): Promise<void> =>
         const updatedBlogsList = await Promise.all(blogsList.map(async (blog) => {
             const blogData = blog.toJSON() as IBlog;
             const filePath = resolve(__dirname, '..', '..', blogData.image);
-
-            let base64Image = null;
-            if (fs.existsSync(filePath)) {
-                const fileData = fs.readFileSync(filePath);
-                base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
-            }
+            const base64Image = imageToBase64DataUri(filePath);
 
             return {
                 ...blogData,
@@ -158,7 +154,16 @@ export const addBlog = async (req: Request, res: Response): Promise<void> => {
                         attributes: ['id', 'name']
                     }]
                 });
-                return res.status(200).json(blogWithCategory);
+                
+                const blogData = blogWithCategory?.toJSON() as IBlog;
+                const base64Image = imageToBase64DataUri(resolve(__dirname, '..', '..', blogData.image));
+                
+                const responseData = {
+                    ...blogData,
+                    image: base64Image
+                };
+                
+                return res.status(200).json(responseData);
             }
         });
     } catch (e: any) {
@@ -398,12 +403,7 @@ export const filterBlogs = async (req: Request, res: Response): Promise<void> =>
         const updatedBlogsList = await Promise.all(blogsList.map(async (blog) => {
             const blogData = blog.toJSON() as IBlog;
             const filePath = resolve(__dirname, '..', '..', blogData.image);
-
-            let base64Image = null;
-            if (fs.existsSync(filePath)) {
-                const fileData = fs.readFileSync(filePath);
-                base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
-            }
+            const base64Image = imageToBase64DataUri(filePath);
 
             return {
                 ...blogData,

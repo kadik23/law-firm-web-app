@@ -17,6 +17,7 @@ export const useAvocats = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const perPage = 6;
 
+  
   useEffect(() => {
     const fetchAttorneys = async () => {
       try {
@@ -24,7 +25,7 @@ export const useAvocats = () => {
         setAttorneys(response.data.attorneys);
         setTotalPages(response.data.totalPages);
         setCurrentPage(response.data.currentPage);
-
+  
       } catch (err: unknown) {
         if (isAxiosError(err) && err.response?.status === 401) {
           console.warn("Attorneys not found");
@@ -122,8 +123,12 @@ export const useAvocats = () => {
       formData.append("linkedin_url", data.linkedin_url);
       formData.append("date_membership", formattedDate);
       formData.append("pays", "Algerie");
+      formData.append("age", String(data?.age || 0));
+      formData.append("ville", data.ville);
+      formData.append("phone_number", data.phone_number);
       formData.append("terms_accepted", "true");
       formData.append("status", data.status || "active");
+      formData.append("sex", data.sex);
 
       if (file) {
         formData.append("picture", file);
@@ -160,7 +165,7 @@ export const useAvocats = () => {
           email: data.email,
           password: data.password,
           linkedin_url: data.linkedin_url,
-          picture: "/images/avocatImg.png",
+          picture: response.data.attorney.picture || "/images/avocatImg.png",
           status: data.status,
           certificats: data.certificats,
           updatedAt: new Date().toISOString(),
@@ -181,6 +186,11 @@ export const useAvocats = () => {
               email: newAvocat.email,
               name: newAvocat.name,
               surname: newAvocat.surname,
+              phone_number: data.phone_number,
+              pays: data.pays,
+              ville: data.ville,
+              age: data.age,
+              sex: "",
               type: "attorney",
             },
           },

@@ -21,16 +21,18 @@ function ServiceCard({
   const descriptionTruncated = useTruncateText(description, 100);
   return (
     <div className="max-w-full lg:max-w-[calc(100%/4)] md:max-w-[calc(100%/2)] w-full flex-shrink-0 h-full shadow-lg rounded-md bg-white">
-      <Image
-        src={coverImage}
-        className="rounded-md object-cover h-full"
-        title={name}
-        alt="service"
-        layout="responsive"
-        width={125}
-        height={125}
-        priority
-      />
+      {coverImage !== null && coverImage !== undefined && coverImage.trim() !== '' && (
+        <Image
+          src={coverImage}
+          className="rounded-md object-cover h-full"
+          title={name}
+          alt="service"
+          layout="responsive"
+          width={125}
+          height={125}
+          priority
+        />
+      )}
       <div className={`p-2 flex flex-col justify-center ${style} py-2`}>
         <div className="font-semibold text-lg text-textColor">{name}</div>
         {isDescription && <div className="text-xs">{descriptionTruncated}</div>}

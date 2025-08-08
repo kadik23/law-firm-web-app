@@ -6,6 +6,8 @@ import { body, validationResult, ValidationError, Result } from 'express-validat
 import { IService } from '@/interfaces/Service';
 import fs from 'fs';
 import path from 'path';
+import { getImagePath } from '@/utils/getImagePath';
+import { imageToBase64DataUri } from '@/utils/imageUtils';
 
 const Service: ModelCtor<Model<IService>> = db.services;
 
@@ -137,7 +139,14 @@ export const createService = async (req: Request, res: Response): Promise<void> 
         price,
         createdBy,
       } as IService);
-      res.status(201).json({ message: 'Service created successfully', service });
+      const base64Image = imageToBase64DataUri(filePath);
+      
+      const responseData = {
+        ...service.toJSON(),
+        coverImage: base64Image
+      };
+      
+      res.status(201).json({ message: 'Service created successfully', service: responseData });
     });
   } catch (error: any) {
     console.error('Error creating service:', error);
@@ -339,13 +348,8 @@ export const getAdminServices = async (req: Request, res: Response) => {
     const servicesWithImages = await Promise.all(
       services.map(async (service) => {
         const serviceData = service.toJSON() as IService;
-        const filePath = path.resolve(process.cwd(), serviceData.coverImage);
-
-        let base64Image = null;
-        if (fs.existsSync(filePath)) {
-          const fileData = fs.readFileSync(filePath);
-          base64Image = `data:image/png;base64,${fileData.toString("base64")}`;
-        }
+        const filePath = getImagePath(serviceData.coverImage);
+        const base64Image = imageToBase64DataUri(filePath);
 
         return {
           ...serviceData,

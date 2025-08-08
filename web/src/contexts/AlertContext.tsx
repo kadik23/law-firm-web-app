@@ -2,11 +2,6 @@
 import { Alert } from "@/components/alert";
 import { createContext, ReactNode, useContext, useState, useCallback } from "react";
 
-type AlertContextType = {
-  showAlert: (type: string, title: string, message: string) => void;
-  closeAlert: () => void; 
-};
-
 const AlertContext = createContext<AlertContextType | undefined>(undefined);
 
 export const AlertProvider = ({ children }: { children: ReactNode }) => {
@@ -20,9 +15,10 @@ export const AlertProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const closeAlert = useCallback(() => setAlert(null), []);
+  const setShowAlert = useCallback((show: boolean) => setAlert(show ? { type: "success", title: "Success", message: "This is a success message" } : null), []);
 
   return (
-    <AlertContext.Provider value={{ showAlert, closeAlert }}>
+    <AlertContext.Provider value={{ showAlert, closeAlert, setShowAlert }}>
       {children}
       {alert && (
         <Alert

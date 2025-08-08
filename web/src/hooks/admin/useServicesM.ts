@@ -23,7 +23,7 @@ export const useServicesM = () => {
         setServices(response.data.services);
         setTotalPages(response.data.totalPages);
         setCurrentPage(response.data.currentPage);
-
+  
       } catch (err: unknown) {
         if (isAxiosError(err) && err.response?.status === 401) {
           console.warn("Services not found");
@@ -115,7 +115,7 @@ export const useServicesM = () => {
           description: data.description,
           price: data.price,
           requestedFiles: data.requestedFiles,
-          coverImage: "/images/serviceImg.png",
+          coverImage: response.data.service.coverImage || "/images/serviceImg.png",
           selected: false,
         };
 

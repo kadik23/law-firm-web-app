@@ -8,6 +8,8 @@ import fs from 'fs';
 import { Model, ModelCtor } from 'sequelize';
 import { IAttorney } from '@/interfaces/Attorney';
 import { IUser } from '@/interfaces/User';
+import { body, validationResult, ValidationError, Result } from 'express-validator';
+import { imageToBase64DataUri } from '@/utils/imageUtils';
 
 const User: ModelCtor<Model<IUser>> = db.users;
 const Attorney: ModelCtor<Model<IAttorney>> = db.attorneys;
@@ -92,43 +94,95 @@ export const uploadFile = upload.single('picture');
  */
 export const createAttorney = async (req: Request, res: Response): Promise<void> => {
   try {
-    await db.sequelize.transaction(async (t) => {
-      uploadFile(req, res, async (err: any) => {
-        if (err) {
-          return res.status(400).json({ error: 'Error uploading files: ' + err.message });
-        }
-        const { name, surname, email, password, phone_number, pays, ville, age, sex, terms_accepted, date_membership, linkedin_url } = req.body;
-        const uploadedFile = req.file;
-        if (!name || !surname || !email || !password || !phone_number || !pays || !terms_accepted || !date_membership || !uploadedFile) {
-          return res.status(400).json({ error: 'Missing required fields' });
-        }
+    uploadFile(req, res, async (err: any) => {
+      if (err) {
+        res.status(400).json({ error: 'Error uploading file: ' + err.message });
+        return;
+      }
+      
+      await Promise.all([
+        body('first_name').isString().notEmpty().withMessage('First name is required.').run(req),
+        body('last_name').isString().notEmpty().withMessage('Last name is required.').run(req),
+        body('email').isEmail().withMessage('Valid email is required.').run(req),
+        body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters.').run(req),
+        body('phone_number').isString().notEmpty().withMessage('Phone number is required.').run(req),
+        body('pays').isString().notEmpty().withMessage('Country is required.').run(req),
+        body('ville').isString().notEmpty().withMessage('City is required.').run(req),
+        body('age').isInt({ min: 18, max: 100 }).withMessage('Age must be between 18 and 100.').run(req),
+        body('sex').isString().notEmpty().withMessage('Sex is required.').run(req),
+        body('linkedin_url').isURL().withMessage('Valid LinkedIn URL is required.').run(req),
+      ]);
+      
+      const errors: Result<ValidationError> = validationResult(req);
+      if (!errors.isEmpty()) {
+        res.status(400).json({ errors: errors.array() });
+        return;
+      }
+      
+      if (!req.file) {
+        res.status(400).json({ error: 'Profile picture is required.' });
+        return;
+      }
+      
+      const { 
+        first_name, 
+        last_name, 
+        email, 
+        password, 
+        phone_number, 
+        pays, 
+        ville, 
+        age, 
+        sex, 
+        linkedin_url 
+      } = req.body;
+      
+      const filePath = req.file.path;
+      const formattedDate = new Date().toISOString().split("T")[0];
+      
+      await db.sequelize.transaction(async (t) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
+        
         const newUser = await User.create({
-          name,
-          surname,
+          name: first_name,
+          surname: last_name,
           email,
           password: hashedPassword,
           phone_number,
           pays,
           ville,
-          age,
+          age: parseInt(age),
           sex,
-          terms_accepted,
+          terms_accepted: true,
           type: 'attorney',
         } as IUser, { transaction: t });
+        
         const newAttorney = await Attorney.create({
           user_id: (newUser as Model<IUser>).getDataValue('id'),
           linkedin_url,
-          date_membership,
-          picture_path: uploadedFile.path,
+          date_membership: new Date(formattedDate),
+          picture_path: filePath,
+          status: 'active',
         } as IAttorney, { transaction: t });
-        res.status(201).json({ user: newUser, attorney: newAttorney });
+        
+        const base64Image = imageToBase64DataUri(filePath);
+        
+        res.status(201).json({ 
+          message: 'Attorney created successfully', 
+          attorney: { 
+            user: newUser, 
+            attorney: {
+              ...newAttorney.toJSON(),
+              picture: base64Image
+            }
+          } 
+        });
       });
     });
-  } catch (e: any) {
-    console.error('Error creating attorney', e);
-    res.status(500).json({ error: 'Server error', details: e.message });
+  } catch (error: any) {
+    console.error('Error creating attorney:', error);
+    res.status(500).json({ error: 'Server error: ' + error.message });
   }
 };
 

@@ -68,7 +68,7 @@ export const useAvocats = () => {
     
         setAvocats(prev => [...prev, newAvocat]);
         resetForm();
-        onSuccess?.(); // Call the success callback if provided
+        onSuccess?.();
     };
 
     const resetForm = () => {
@@ -78,7 +78,7 @@ export const useAvocats = () => {
             password: '',
             email: '',
             linkedin: '',
-            image: '/images/avocatImg.png'
+            image: '/images/avocatImg.png',
         });
         setUploadedImage(null);
     };

@@ -12,7 +12,12 @@ function useLawyerForm() {
       linkedin_url: "",
       picture: "/images/avocatImg.png",
       certificats: [],
-      status: "active"
+      status: "active",
+      phone_number: "",
+      pays: "Algerie",
+      age: 0,
+      ville: "",
+      sex:"Homme"
     },
   });
 

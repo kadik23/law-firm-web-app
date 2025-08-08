@@ -42,7 +42,7 @@ export const Alert = ({ alertType, alertTitle, alertMessage, onClose }: AlertPro
             width={25}
             icon="mdi:close"
             className="pr-2 cursor-pointer"
-            onClick={onClose} // Close the alert when clicked
+            onClick={onClose}
           />
         </div>
         <img

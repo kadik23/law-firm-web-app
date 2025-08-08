@@ -162,7 +162,7 @@ function Header() {
         <div className="flex items-center gap-6">
           {user && (
             <Link
-              href={"/client/dashboard/notifications"}
+              href={`/${user?.type}/dashboard/notifications`}
               onMouseEnter={() => setIconIsHover(true)}
               onMouseLeave={() => setIconIsHover(false)}
               className="items-center gap-2 hidden md:flex text-primary hover:text-secondary cursor-pointer
@@ -236,7 +236,7 @@ function Header() {
 
                     <div className="w-full flex flex-col gap-2">
                       <Link
-                        href={`${user?.type}/dashboard/compte`}
+                        href={`/${user?.type}/dashboard/compte`}
                         className="bg-secondary rounded-md text-sm py-1 text-center font-semibold 
                       hover:text-primary"
                         onClick={() => setProfileMenuOpen(false)}
@@ -296,7 +296,7 @@ function Header() {
               </a>
             ))}
             <Link
-              href={`${user?.type}/dashboard/notifications`}
+              href={`/${user?.type}/dashboard/notifications`}
               className="flex items-center justify-start gap-2 text-white hover:text-secondary cursor-pointer"
             >
               <span className="uppercase font-semibold text-sm">Mes notifs</span>
@@ -363,7 +363,7 @@ function Header() {
 
                       <div className="w-full flex flex-col gap-2">
                         <Link
-                          href={`${user?.type}/dashboard`}
+                          href={`/${user?.type}/dashboard`}
                           className="bg-secondary rounded-md text-sm py-1 text-center font-semibold 
                           hover:text-primary"
                         >
