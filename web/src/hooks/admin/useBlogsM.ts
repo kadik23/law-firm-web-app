@@ -175,6 +175,7 @@ export const useBlogsM = () => {
   };
 
   const addBlog = async (data: BlogFormData, onSuccess?: () => void) => {
+    setLoading(true);
     try {
       const formData = new FormData();
 
@@ -225,6 +226,8 @@ export const useBlogsM = () => {
     } catch (error: unknown) {
       console.error("Error adding blog:", error);
       showAlert("error", "Erreur d'ajout de blog", "Une erreur est survenue");
+    } finally {
+      setLoading(false);
     }
   };
 

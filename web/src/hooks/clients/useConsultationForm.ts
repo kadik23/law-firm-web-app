@@ -80,15 +80,19 @@ export const useConsultationForm = () => {
   };
 
   const submitConsultation = async (data: Record<string, unknown>) => {
+    setLoading(true);
     try {
       await axios.post("/user/consultations", data);
       showAlert("success", "Consultation réservée", "Votre demande de consultation a été envoyée.");
     } catch (e: unknown) {
       if (isAxiosError(e)) {
-        showAlert("error", "Erreur", e?.response?.data?.message || "Erreur lors de la réservation");
+        showAlert("error", "Erreur", "Erreur lors de la réservation");
+        console.log(e?.response?.data?.message)
       } else {
         showAlert("error", "Erreur", "Erreur lors de la réservation");
       }
+    } finally {
+      setLoading(false);
     }
   };
 

@@ -43,6 +43,7 @@ function Signup({
   const [isDisabled1, setIsDisabled1] = useState(true);
   const [isDisabled2, setIsDisabled2] = useState(true);
   // const [isDisabled3, setIsDisabled3] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const validateSteps = async (
     stepName: "stepOne" | "stepTwo" | "stepThree",
@@ -86,6 +87,7 @@ function Signup({
   const { showAlert } = useAlert();
 
   const onsubmit = async (data: SignupformType) => {
+    setLoading(true)
     try {
       const response = await axiosClient.post("/user/signup", {
         name: data.stepOne.name,
@@ -132,6 +134,8 @@ function Signup({
         "Modifiez quelques éléments et réessayez de soumettre."
       );
       console.log(err);
+    } finally{
+      setLoading(false)
     }
   };
 
@@ -248,7 +252,7 @@ function Signup({
                 required: "password est requis",
                 minLength: {
                   value: 8,
-                  message: "This input must exceed 8 characters",
+                  message: "Cette entrée doit dépasser 8 caractères",
                 },
               })}
               placeholder="Enter votre mot de passe"
@@ -453,12 +457,12 @@ function Signup({
               <p className="error">{errors.stepTwo?.gender?.message}</p>
             )}{" "}
           </div>
-          <div className="flex justify-start items-center gap-2 w-full">
+          {/* <div className="flex justify-start items-center gap-2 w-full">
             <input type="checkbox" required />
             <div className="text-textColor text-sm font-semibold">
               J’accepte tout
             </div>
-          </div>
+          </div> */}
           <div className="flex items-center justify-between gap-4 w-full">
             <div className="flex items-center justify-between w-full gap-8">
               <button
@@ -470,7 +474,7 @@ function Signup({
 
               <button
                 type="submit"
-                disabled={isDisabled2}
+                disabled={isDisabled2 || loading}
                 className={`${
                   isDisabled2
                     ? "btn_desabled active:scale-100"

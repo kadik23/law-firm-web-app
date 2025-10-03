@@ -17,6 +17,7 @@ export const applyFilters = (
       Commentaires: "Comments",
       Consultations: "Consultation",
       Documents: "Documents",
+      Paiments: "Payment",
     };
     const typeFilter =
       typeMapping[filters.notificationType] || filters.notificationType;

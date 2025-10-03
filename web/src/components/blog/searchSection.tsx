@@ -11,6 +11,7 @@ const SearchSection = () => {
     sort,
     setSort,
     setSelectedCategory,
+    blogsLoading
   } = useBlogs();
 
   useEffect(() => {
@@ -43,7 +44,7 @@ const SearchSection = () => {
           type="text"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
-          placeholder="Hinted search text"
+          placeholder="Texte de recherche suggéré"
           name="blog-search-bar"
           id="blog-search"
           className="bg-white w-full outline-none py-2"
@@ -63,6 +64,7 @@ const SearchSection = () => {
       >
         <button
           onClick={() => setSort("best")}
+          disabled={blogsLoading}
           className={` ${
             sort == "best"
               ? "bg-btnSecondary hover:bg-primary"
@@ -76,6 +78,7 @@ const SearchSection = () => {
 
         <button
           onClick={() => setSort("new")}
+          disabled={blogsLoading}
           className={` ${
             sort == "new"
               ? "bg-btnSecondary hover:bg-primary"
@@ -89,6 +92,7 @@ const SearchSection = () => {
 
         <button
           onClick={resetAll}
+          disabled={blogsLoading}
           className={` ${
             sort == null
               ? "bg-btnSecondary hover:bg-primary"
@@ -97,7 +101,7 @@ const SearchSection = () => {
                     flex items-center gap-1`}
         >
           <Icon icon="grommet-icons:power-reset" width={20} />
-          Reset all
+          Tout réinitialiser
         </button>
       </div>
     </div>

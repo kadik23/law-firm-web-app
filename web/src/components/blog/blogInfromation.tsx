@@ -112,7 +112,7 @@ const BlogInformation = ({
             <div>
               <button
                 onClick={handleFavoriteToggle}
-                className="relative group overflow-visible"
+                className={`${user?.type === "client" ? "relative group overflow-visible" : "hidden"}`}
               >
                 <Icon
                   icon="mdi:heart"

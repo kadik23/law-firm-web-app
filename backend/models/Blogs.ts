@@ -23,6 +23,10 @@ const BlogFactory = (sequelize: Sequelize, DataTypes: typeof SequelizeDataTypes)
       type: DataTypes.STRING(200),
       allowNull: false,
     },
+    file_id: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     categoryId: {
       type: DataTypes.INTEGER,
       allowNull: false,

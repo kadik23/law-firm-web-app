@@ -17,6 +17,8 @@ import { IServiceFilesUploaded } from './ServiceFilesUploaded';
 import { INotification } from './Notification';
 import { IConnectedUser } from './ConnectedUser';
 import { IAvailableSlot } from './AvailableSlot';
+import { IPayment, IPaymentTransaction, IPaymentMethod } from './Payment';
+import { IToken } from './Token';
 
 export interface DB {
   Sequelize: typeof Sequelize;
@@ -39,4 +41,8 @@ export interface DB {
   notifications: ModelCtor<Model<INotification>>;
   connectedUsers: ModelCtor<Model<IConnectedUser>>;
   AvailableSlot: ModelCtor<Model<IAvailableSlot>>;
+  payments: ModelCtor<Model<IPayment>>;
+  payment_transactions: ModelCtor<Model<IPaymentTransaction>>;
+  payment_methods: ModelCtor<Model<IPaymentMethod>>;
+  tokens: ModelCtor<Model<IToken>>;
 } 

@@ -50,13 +50,13 @@ export const ManageAvailabilityModal = ({
   };
 
   const weekDays = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
+    "Dimanche",
+    "Lundi",
+    "Mardi",
+    "Mercredi",
+    "Jeudi",
+    "Vendredi",
+    "Samedi",
   ];
 
   if (!isOpen) return null;
@@ -65,7 +65,7 @@ export const ManageAvailabilityModal = ({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white p-8 rounded-lg w-full max-w-2xl">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">Manage Recurring Availability</h2>
+          <h2 className="text-2xl font-bold">Gérer la disponibilité récurrente</h2>
           <button onClick={onClose}>
             <Icon icon="ic:round-close" width="24" height="24" />
           </button>
@@ -76,7 +76,7 @@ export const ManageAvailabilityModal = ({
           <>
             <div className="mb-6 max-h-60 overflow-y-auto">
               <h3 className="text-lg font-semibold mb-2">
-                Current Recurring Slots
+                Créneaux récurrents actuels
               </h3>
               <div className="space-y-2">
                 {slots.length > 0 ? (
@@ -100,13 +100,13 @@ export const ManageAvailabilityModal = ({
                     </div>
                   ))
                 ) : (
-                  <p className="text-gray-500">No recurring slots defined.</p>
+                  <p className="text-gray-500">Aucun créneau récurrent défini.</p>
                 )}
               </div>
             </div>
             <form onSubmit={handleAddSlot} className="space-y-4">
               <h3 className="text-lg font-semibold border-t pt-4">
-                Add New Slot
+                Ajouter un nouvel créneau
               </h3>
               <div className="grid grid-cols-3 gap-4">
                 <div>
@@ -114,7 +114,7 @@ export const ManageAvailabilityModal = ({
                     htmlFor="day"
                     className="block text-sm font-medium text-gray-700"
                   >
-                    Day of Week
+                    Jour de la semaine
                   </label>
                   <select
                     name="day"
@@ -141,7 +141,7 @@ export const ManageAvailabilityModal = ({
                     htmlFor="startTime"
                     className="block text-sm font-medium text-gray-700"
                   >
-                    Start Time
+                    Heure de début
                   </label>
                   <input
                     type="time"
@@ -160,7 +160,7 @@ export const ManageAvailabilityModal = ({
                     htmlFor="endTime"
                     className="block text-sm font-medium text-gray-700"
                   >
-                    End Time
+                    Heure de fin
                   </label>
                   <input
                     type="time"
@@ -179,7 +179,7 @@ export const ManageAvailabilityModal = ({
                 type="submit"
                 className="w-full bg-[#34495E] text-white py-2 px-4 rounded-md hover:bg-opacity-90"
               >
-                Add Slot
+                Ajouter un créneau
               </button>
             </form>
             {error && <div className="text-red-500 mt-2">{error}</div>}

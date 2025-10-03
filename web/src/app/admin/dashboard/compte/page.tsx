@@ -31,7 +31,7 @@ const AdminAccount = () => {
     { label: "Pays", value: user?.pays },
     { label: "Âge", value: user?.age },
     { label: "Ville", value: user?.ville },
-    { label: "Numéro de téléphone", value: user?.phone_number },
+    { label: "Numéro de téléphone", value: "0" + user?.phone_number },
   ];
 
   return (

@@ -110,7 +110,7 @@ function Signin({
               required: "Email is required",
               pattern: {
                 value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                message: "Invalid email format",
+                message: "Format d'e-mail invalide",
               },
             })}
             placeholder="Enter votre email"
@@ -128,7 +128,7 @@ function Signin({
               required: "Password is required",
               minLength: {
                 value: 8,
-                message: "Password must be at least 8 characters",
+                message: "Le mot de passe doit comporter au moins 8 caractères",
               },
             })}
             placeholder="Enter votre mot de passe"

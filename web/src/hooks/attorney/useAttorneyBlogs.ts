@@ -48,6 +48,7 @@ export const useAttorneyBlogs = () => {
   };
 
   const addBlog = async (data: BlogFormData, onSuccess?: () => void) => {
+    setLoading(true);
     try {
       const formData = new FormData();
       formData.append("title", data.title);
@@ -70,10 +71,12 @@ export const useAttorneyBlogs = () => {
       }
     } catch (error: unknown) {
       if (isAxiosError(error)) {
-        showAlert("error", "Erreur d'ajout de blog", error.response?.data?.message || "Une erreur est survenue");
+        showAlert("error", "Erreur d'ajout de blog", "Une erreur est survenue");
       } else {
         showAlert("error", "Erreur d'ajout de blog", "Une erreur est survenue");
       }
+    } finally{
+      setLoading(false)
     }
   };
 
@@ -104,7 +107,8 @@ export const useAttorneyBlogs = () => {
       }
     } catch (error: unknown) {
       if (isAxiosError(error)) {
-        showAlert("error", "Erreur de mise à jour du blog", error.response?.data?.message || "Une erreur est survenue");
+        showAlert("error", "Erreur de mise à jour du blog", "Une erreur est survenue");
+        console.log(error.response?.data?.message)
       } else {
         showAlert("error", "Erreur de mise à jour du blog", "Une erreur est survenue");
       }
@@ -114,6 +118,7 @@ export const useAttorneyBlogs = () => {
   };
 
   const deleteBlogs = async () => {
+    setLoading(true);
     try {
       const response = await axios.delete("/attorney/blogs", {
         data: { ids: blogs.filter((blog) => blog.selected).map((blog) => blog.id) },
@@ -127,6 +132,8 @@ export const useAttorneyBlogs = () => {
       }
     } catch {
       showAlert("error", "Erreur de supprimer des blogs", "Une erreur est survenue");
+    } finally {
+      setLoading(false);
     }
   };
 

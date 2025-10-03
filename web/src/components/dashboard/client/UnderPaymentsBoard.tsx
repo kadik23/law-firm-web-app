@@ -1,11 +1,15 @@
 "use client";
-import usePagination from "@/hooks/usePagination ";
+import usePagination from "@/hooks/usePagination";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import React, { useEffect, useState, useRef } from "react";
 import useUnderPayments from "@/hooks/clients/useUnderPayments";
+import { useParams } from "next/dist/client/components/navigation";
+import { useAuth } from "@/hooks/useAuth";
 
-function UnderPaymentBoard({ underPayments }: { underPayments: underPaymentEntity[] }) {
+function UnderPaymentBoard() {
   const paymentsPerPage = 6;
+  const params = useParams();
+  const { user } = useAuth();
   const {
     filteredPaiments,
     filterValues,
@@ -13,7 +17,8 @@ function UnderPaymentBoard({ underPayments }: { underPayments: underPaymentEntit
     setFilterValues,
     setActiveFilters,
     handleFilterChange,
-  } = useUnderPayments(underPayments);
+    fetchPayment
+  } = useUnderPayments(user?.type == "admin" ? Number(params.id) : undefined);
   const {
     currentPage,
     totalPages,
@@ -23,23 +28,33 @@ function UnderPaymentBoard({ underPayments }: { underPayments: underPaymentEntit
     setCurrentPage,
   } = usePagination(filteredPaiments.length, paymentsPerPage);
 
-  const [paidAmountModal, setPaidAmountModal] = useState(false);
+  useEffect(() => {
+    if (params.id) {
+      if(user?.type == 'admin'){
+        fetchPayment(Number(params.payment_id));
+        return;
+      }
+      fetchPayment(Number(params.id));
+    }
+  }, [params.id]);
+
+  const [transaction_amountModal, settransaction_amountModal] = useState(false);
   const [paymentDateModal, setPaymentDateModal] = useState(false);
 
-  const paidAmountRef = useRef<HTMLDivElement>(null);
+  const transaction_amountRef = useRef<HTMLDivElement>(null);
   const paymentDateRef = useRef<HTMLDivElement>(null);
 
-  const paidAmountInputRef = useRef<HTMLInputElement>(null);
+  const transaction_amountInputRef = useRef<HTMLInputElement>(null);
   const paymentDateInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
-        paidAmountModal &&
-        paidAmountRef.current &&
-        !paidAmountRef.current.contains(event.target as Node)
+        transaction_amountModal &&
+        transaction_amountRef.current &&
+        !transaction_amountRef.current.contains(event.target as Node)
       ) {
-        setPaidAmountModal(false);
+        settransaction_amountModal(false);
       }
       if (
         paymentDateModal &&
@@ -55,13 +70,13 @@ function UnderPaymentBoard({ underPayments }: { underPayments: underPaymentEntit
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [
-    paidAmountModal,
+    transaction_amountModal,
     paymentDateModal,
   ]);
 
   const startIndex = (currentPage - 1) * paymentsPerPage;
   const endIndex = startIndex + paymentsPerPage;
-  const paimentsToDisplay = filteredPaiments.slice(startIndex, endIndex);
+  const paimentsToDisplay = filteredPaiments?.slice(startIndex, endIndex);
 
   const toggleModal = (
     modalState: boolean,
@@ -72,7 +87,7 @@ function UnderPaymentBoard({ underPayments }: { underPayments: underPaymentEntit
   };
 
   const closeAllModals = () => {
-    setPaidAmountModal(false);
+    settransaction_amountModal(false);
     setPaymentDateModal(false);
   };
 
@@ -108,9 +123,9 @@ function UnderPaymentBoard({ underPayments }: { underPayments: underPaymentEntit
               }`}
             >
               <div
-                ref={paidAmountRef}
+                ref={transaction_amountRef}
                 className={`bg-secondary ${
-                  paidAmountModal ? "flex" : "hidden"
+                  transaction_amountModal ? "flex" : "hidden"
                 } flex-col gap-2 p-2 absolute -bottom-16 left-0 z-10`}
               >
                 <div className="text-white">Filtrer en le saisant </div>
@@ -120,7 +135,7 @@ function UnderPaymentBoard({ underPayments }: { underPayments: underPaymentEntit
                     className=" outline-none placeholder:font-normal"
                     placeholder="Montant payé"
                     onChange={(e) => handleFilterChange(e, "paidAmount")}
-                    ref={paidAmountInputRef}
+                    ref={transaction_amountInputRef}
                   />
                   DA
                 </div>
@@ -137,7 +152,7 @@ function UnderPaymentBoard({ underPayments }: { underPayments: underPaymentEntit
                 }`}
                 onClick={() =>
                   activeFilters.paidAmount &&
-                  clearFilter("paidAmount", paidAmountInputRef)
+                  clearFilter("paidAmount", transaction_amountInputRef)
                 }
               />
               <Icon
@@ -147,7 +162,7 @@ function UnderPaymentBoard({ underPayments }: { underPayments: underPaymentEntit
                 className="inline-block ml-1 cursor-pointer hover:text-btnSecondary"
                 onClick={(e) => {
                   e.stopPropagation();
-                  toggleModal(paidAmountModal, setPaidAmountModal);
+                  toggleModal(transaction_amountModal, settransaction_amountModal);
                 }}
               />
             </td>
@@ -208,8 +223,8 @@ function UnderPaymentBoard({ underPayments }: { underPayments: underPaymentEntit
               className="text-xs border-b"
             >
               <td className="px-4 py-3 border">{item.id}</td>
-              <td className="px-4 py-3 border">{item.paidAmount}</td>
-              <td className="px-4 py-3 border">{item.paymentDate}</td>
+              <td className="px-4 py-3 border">{item.transaction_amount}</td>
+              <td className="px-4 py-3 border">{item.transaction_date.split("T")[0]}</td>
             </tr>
           ))}
         </tbody>

@@ -14,7 +14,7 @@ const routes = [
 
 export default function AttorneySidebar() {
   const pathname = usePathname();
-  const { logout } = useAuth();
+  const { logout, loading } = useAuth();
 
   return (
     <div className="bg-white text-black flex flex-col w-[240px] pb-10 sticky left-0 min-h-screen">
@@ -31,9 +31,9 @@ export default function AttorneySidebar() {
           </li>
         ))}
       </ul>
-      <button onClick={logout} className="flex items-center gap-3 font-semibold text-black py-2 px-3 hover:bg-primary hover:text-white rounded-md mx-6 transition-all duration-300">
+      <button disabled={loading} onClick={logout} className="flex items-center gap-3 font-semibold text-black py-2 px-3 hover:bg-primary hover:text-white rounded-md mx-6 transition-all duration-300">
         <Icon icon="ic:round-logout" width="24" height="24" />
-        <span>Logout</span>
+        <span>Déconnexion</span>
       </button>
     </div>
   );

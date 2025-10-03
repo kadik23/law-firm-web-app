@@ -1,5 +1,4 @@
 
-import { upload } from '@/middlewares/FilesMiddleware';
 import { body as bd, validationResult, ValidationError, Result } from 'express-validator';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -9,6 +8,7 @@ import fs, { existsSync, readFileSync } from 'fs';
 import { Request, Response } from 'express';
 import { Model, ModelCtor } from 'sequelize';
 import { IBlog } from '@/interfaces/Blog';
+import { upload, uploadToDrive, getFileBase64FromDrive, deleteFileFromDrive} from '@/middlewares/FilesMiddleware';
 
 const blogs: ModelCtor<Model<IBlog>> = db.blogs;
 
@@ -51,11 +51,10 @@ const getMyBlogs = async (req: Request, res: Response): Promise<void> => {
         });
         const updatedBlogsList = await Promise.all(blogsList.map(async (blog: Model<IBlog>) => {
             const blogData = blog.toJSON() as IBlog;
-            const filePath = resolve(__dirname, '..', '..', blogData.image);
-            let base64Image: string | null = null;
-            if (fs.existsSync(filePath)) {
-                const fileData = fs.readFileSync(filePath);
-                base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
+
+            let base64Image = null;
+            if (blogData.file_id && blogData.file_id !== '') {
+                base64Image = await getFileBase64FromDrive(blogData.file_id);
             }
             return {
                 ...blogData,
@@ -101,10 +100,15 @@ const addMyBlog = async (req: Request, res: Response): Promise<void> => {
                 res.status(400).json({ error: 'Image is required.' });
                 return;
             }
+            const fileId = await uploadToDrive(
+                req.file.path,
+                req.file.originalname,
+                req.file.mimetype
+            );
             const { title, body, readingDuration, categoryId } = req.body;
             const imagePath = req.file.path;
             let newBlog: Model<IBlog> = await blogs.create({
-                title, likes: 0, body, readingDuration, image: imagePath, categoryId, userId: req.user.id, accepted: false, rejectionReason: null
+                title, likes: 0, body, readingDuration, image: imagePath, categoryId, userId: req.user.id, accepted: false, rejectionReason: null, file_id: fileId
             } as IBlog);
             if (!newBlog) {
                 res.status(401).send('Error creating blog');
@@ -143,11 +147,9 @@ const getMyBlogById = async (req: Request, res: Response): Promise<void> => {
             res.status(404).json({ message: 'Blog not found' });
             return;
         }
-        const filePath = resolve(__dirname, '..', '..', blog.getDataValue('image'));
         let base64Image = null;
-        if (existsSync(filePath)) {
-            const fileData = readFileSync(filePath);
-            base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
+        if (blog.getDataValue('file_id') && blog.getDataValue('file_id') !== '') {
+            base64Image = await getFileBase64FromDrive(blog.getDataValue('file_id'));
         }
         res.status(200).send({
             ...blog.toJSON(),
@@ -192,8 +194,18 @@ const updateMyBlog = async (req: Request, res: Response): Promise<void> => {
                 return;
             }
             const { title, body, readingDuration, categoryId } = req.body;
+            let fileId;
+
             if (req.file) {
-                deleteFile(blogToUpdate.image);
+            deleteFile(blogToUpdate.image);
+                if (blogToUpdate.file_id && blogToUpdate.file_id !== '') {
+                    await deleteFileFromDrive(blogToUpdate.file_id);
+                }
+                fileId  = await uploadToDrive(
+                    req.file.path,
+                    req.file.originalname,
+                    req.file.mimetype
+                );
                 blogToUpdate.image = req.file.path;
             }
             if (title) blogToUpdate.title = title;
@@ -202,6 +214,7 @@ const updateMyBlog = async (req: Request, res: Response): Promise<void> => {
                 blogToUpdate.rejectionReason = null;
                 blogToUpdate.accepted = false;
             }
+            blogToUpdate.file_id = fileId || blogToUpdate.file_id;
             if (readingDuration) blogToUpdate.readingDuration = readingDuration;
             if (categoryId) blogToUpdate.categoryId = categoryId;
             await createNotification(
@@ -237,8 +250,13 @@ const deleteMyBlogs = async (req: Request, res: Response): Promise<void> => {
             res.status(404).json({ success: false, message: 'No matching blogs found' });
             return;
         }
-        blogsToDelete.forEach((blog) => {
-            if (blog.image) deleteFile(blog.image);
+        blogsToDelete.forEach(async (blog) => {
+        if (blog.image) {
+                if (blog.file_id && blog.file_id !== '') {
+                    await deleteFileFromDrive(blog.file_id);
+                }
+                deleteFile(blog.image);
+            }
         });
         const result = await blogs.destroy({ where: { id: { [Op.in]: ids }, userId: req.user.id } });
         res.status(200).json({ success: true, message: `${result} blogs deleted` });

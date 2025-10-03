@@ -57,6 +57,7 @@ function ContactUs() {
               <input
                 type="email"
                 {...register("email", {
+                  required: "email est requis",
                   pattern: {
                     value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
                     message: "Format d'email invalide",
@@ -102,13 +103,14 @@ function ContactUs() {
             </div>
             <button
               onClick={() => validateForm()}
+              disabled={isDisabled}
               className={`${
                 isDisabled
                   ? "btn_desabled active:scale-100"
                   : "btn bg-textColor"
               } py-1 px-4 text-center rounded-md text-white`}
             >
-              Submit
+              Soumettre
             </button>
           </form>
         </div>

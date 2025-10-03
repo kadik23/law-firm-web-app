@@ -1,14 +1,15 @@
 "use client";
 import BlogCard from "@/components/dashboard/admin/blogs/blogCard";
 import BlogsHeader from "@/components/dashboard/admin/blogs/blogsHeader";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Modal from "@/components/Modal";
 import { DeleteConfirmation } from "@/components/dashboard/admin/DeleteConfirmation";
 import FormModal from "@/components/dashboard/admin/formModal";
-import { AddBlogForm } from "@/components/dashboard/admin/AddBlogForm";
+import { AddBlogForm } from "@/components/dashboard/admin/blogs/AddBlogForm";
 import BlogsWrapper from "@/components/BlogsWrapper";
 import { useBlogsM } from "@/hooks/admin/useBlogsM";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { LoadingContext } from "@/contexts/LoadingContext";
 
 const InPage = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -34,6 +35,12 @@ const InPage = () => {
     status,
     handleStatusChange,
   } = useBlogsM();
+
+  const {setLoading} = useContext(LoadingContext);
+
+  useEffect(() => {
+    setLoading(loading);
+  }, [loading]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage?.(page);
@@ -127,7 +134,7 @@ const InPage = () => {
                 onClick={() => handlePageChange(currentPage - 1)}
                 className="px-4 py-2 bg-btnSecondary text-white rounded-md"
               >
-                Previous
+                Précédente
               </button>
             )}
 
@@ -154,7 +161,7 @@ const InPage = () => {
                 onClick={() => handlePageChange(currentPage + 1)}
                 className="px-4 py-2 bg-btnSecondary text-white rounded-md"
               >
-                Next
+                Suivante
               </button>
             )}
           </div>
@@ -174,6 +181,7 @@ const InPage = () => {
           setFile={setFile}
           onSubmit={(data) => addBlog(data, () => setAddModalOpen(false))}
           isUpdate= {false}
+          loading={loading}
         />
       </FormModal>
 
@@ -191,6 +199,7 @@ const InPage = () => {
             deleteBlogs();
             setDeleteModalOpen(false);
           }}
+          loading={loading}
         />
       </Modal>
     </div>

@@ -1,7 +1,9 @@
 "use client";
 import { useConsultations } from "@/hooks/admin/useConsultations";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { LoadingContext } from "@/contexts/LoadingContext";
+import { statusTranslations } from "@/lib/utils/statusTranslations ";
 
 const statusColors: Record<string, string> = {
   Accepted: "bg-green-100 text-green-700",
@@ -21,6 +23,12 @@ export default function AdminConsultationsPage() {
     setUpdatingId(null);
   };
 
+  const {setLoading} = useContext(LoadingContext);
+
+  useEffect(() => {
+    setLoading(loading);
+  }, [loading]);
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6 text-primary">Gestion des consultations</h1>
@@ -39,8 +47,8 @@ export default function AdminConsultationsPage() {
                 <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Heure</th>
                 <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Mode</th>
                 <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Lien Meet</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Lien Rencontre</th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Actes</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -63,8 +71,9 @@ export default function AdminConsultationsPage() {
                   <td className="px-4 py-2">{c.time}</td>
                   <td className="px-4 py-2 capitalize">{c.mode}</td>
                   <td className="px-4 py-2">
-                    <span className={`px-2 py-1 rounded text-xs font-semibold ${statusColors[c.status] || "bg-gray-200 text-gray-700"}`}>
-                      {c.status}
+                    <span className={`px-2 py-1 rounded text-nowrap text-xs font-semibold ${statusColors[c.status] || "bg-gray-200 text-gray-700"}`}>
+                      {/* @ts-expect-error: status type not yet strictly enforced */}
+                      {statusTranslations[c.status.toUpperCase()] || c.status}
                     </span>
                   </td>
                   <td className="px-4 py-2">
@@ -79,21 +88,21 @@ export default function AdminConsultationsPage() {
                   <td className="px-4 py-2 flex gap-2">
                     <button
                       className="px-2 py-1 rounded bg-green-500 text-white text-xs font-bold disabled:opacity-50"
-                      disabled={c.status === "Accepted" || updatingId === c.id}
+                      disabled={c.status === "Accepted" || updatingId === c.id || loading}
                       onClick={() => handleStatusChange(c.id, "Accepted")}
                     >
                       Accepter
                     </button>
                     <button
                       className="px-2 py-1 rounded bg-yellow-500 text-white text-xs font-bold disabled:opacity-50"
-                      disabled={c.status === "Pending" || updatingId === c.id}
+                      disabled={c.status === "Pending" || updatingId === c.id || loading}
                       onClick={() => handleStatusChange(c.id, "Pending")}
                     >
                       En attente
                     </button>
                     <button
                       className="px-2 py-1 rounded bg-red-500 text-white text-xs font-bold disabled:opacity-50"
-                      disabled={c.status === "Canceled" || updatingId === c.id}
+                      disabled={c.status === "Canceled" || updatingId === c.id || loading}
                       onClick={() => handleStatusChange(c.id, "Canceled")}
                     >
                       Annuler

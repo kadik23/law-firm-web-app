@@ -4,6 +4,7 @@ export interface IService {
   description: string;
   requestedFiles: string[];
   coverImage: string;
+  file_id: string;
   price: number;
   createdBy: number;
   createdAt?: Date;

@@ -34,6 +34,7 @@ export const BlogsFiltersProvider = ({ children }: { children: ReactNode }) => {
     }
   };
   const getFilteredBlogs = async (page: number = 1) => {
+    setBlogsLoading(true);
     try {
       const params: Record<string, string> = { page: page.toString() };
       if (selectedCategory) params.categoryId = selectedCategory.id.toString();

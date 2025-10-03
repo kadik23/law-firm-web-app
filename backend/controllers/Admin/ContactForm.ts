@@ -55,20 +55,23 @@ import { Request, Response } from 'express';
 export const contactForm = async (req: Request, res: Response): Promise<void> => {
     try {
         const { name, surname, email, message } = req.body;
+        if (!name || !surname || !email || !message) {
+            res.status(400).json({ error: 'All fields are required' });
+            return;
+        }
         let transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 465,
-            secure: true,
+            service: "gmail",
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS,
             },
         });
         let info = await transporter.sendMail({
-            from: `${name} ${surname} <${email}>`,
-            to: 'buis.meriem.03@gmail.com',
-            subject: 'Contact us',
+            from: `"${name} ${surname}" <${process.env.EMAIL_USER}>`,
+            to: "kadiksalah03@gmail.com",
+            subject: `Contact us - ${email}`,
             text: message,
+            replyTo: email, 
         });
         console.log(info.messageId);
         res.status(200).json({ message: 'Message sent successfully', messageId: info.messageId });

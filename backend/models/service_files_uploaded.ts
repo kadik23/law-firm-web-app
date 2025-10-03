@@ -21,6 +21,10 @@ const ServiceFilesUploadedFactory = (sequelize: Sequelize, DataTypes: typeof Seq
       type: DataTypes.STRING,
       allowNull: false,
     },
+    file_id: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     rejection_reason: {
       type: DataTypes.TEXT,
       allowNull: true,

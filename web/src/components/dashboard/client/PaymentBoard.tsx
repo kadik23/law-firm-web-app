@@ -1,12 +1,16 @@
 "use client";
-import usePagination from "@/hooks/usePagination ";
+import usePagination from "@/hooks/usePagination";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import React, { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import usePayments from "@/hooks/clients/usePayments";
+import { statusTranslations } from "@/lib/utils/statusTranslations";
+import { useAuth } from "@/hooks/useAuth";
 
-function PaymentBoard({ paymentData }: { paymentData: paimentEntity[] }) {
+function PaymentBoard() {
   const paimentsPerPage = 6;
+  const { user } = useAuth();
+  const param = useParams()
   const {
     filteredPaiments,
     filterValues,
@@ -14,7 +18,9 @@ function PaymentBoard({ paymentData }: { paymentData: paimentEntity[] }) {
     setFilterValues,
     setActiveFilters,
     handleFilterChange,
-  } = usePayments(paymentData);
+    loading,
+  } = usePayments(user?.type == "admin" ? Number(param.id) : undefined);
+
   const {
     currentPage,
     totalPages,
@@ -24,42 +30,41 @@ function PaymentBoard({ paymentData }: { paymentData: paimentEntity[] }) {
     setCurrentPage,
   } = usePagination(filteredPaiments.length, paimentsPerPage);
 
-  const [totalAmountModal, setTotalAmountModal] = useState(false);
-  const [paidAmountModal, setPaidAmountModal] = useState(false);
+  const [total_amountModal, setTotal_amountModal] = useState(false);
+  const [paid_amountModal, setPaid_amountModal] = useState(false);
   const [remainingAmountModal, setRemainingAmountModal] = useState(false);
-  const [paymentDateModal, setPaymentDateModal] = useState(false);
+  const [created_atModal, setcreated_atModal] = useState(false);
   const [serviceModal, setServiceModal] = useState(false);
-  const [statusModal, setStatusModal] = useState(false);
-
-  const totalAmountRef = useRef<HTMLDivElement>(null);
-  const paidAmountRef = useRef<HTMLDivElement>(null);
+  const [payment_statusModal, setpayment_statusModal] = useState(false);
+  const total_amountRef = useRef<HTMLDivElement>(null);
+  const paid_amountRef = useRef<HTMLDivElement>(null);
   const remainingAmountRef = useRef<HTMLDivElement>(null);
-  const paymentDateRef = useRef<HTMLDivElement>(null);
+  const created_atRef = useRef<HTMLDivElement>(null);
   const serviceRef = useRef<HTMLDivElement>(null);
-  const statusRef = useRef<HTMLDivElement>(null);
+  const payment_statusRef = useRef<HTMLDivElement>(null);
 
-  const totalAmountInputRef = useRef<HTMLInputElement>(null);
-  const paidAmountInputRef = useRef<HTMLInputElement>(null);
+  const total_amountInputRef = useRef<HTMLInputElement>(null);
+  const paid_amountInputRef = useRef<HTMLInputElement>(null);
   const remainingAmountInputRef = useRef<HTMLInputElement>(null);
-  const paymentDateInputRef = useRef<HTMLInputElement>(null);
+  const created_atInputRef = useRef<HTMLInputElement>(null);
   const serviceSelectRef = useRef<HTMLSelectElement>(null);
-  const statusSelectRef = useRef<HTMLSelectElement>(null);
+  const payment_statusSelectRef = useRef<HTMLSelectElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
-        totalAmountModal &&
-        totalAmountRef.current &&
-        !totalAmountRef.current.contains(event.target as Node)
+        total_amountModal &&
+        total_amountRef.current &&
+        !total_amountRef.current.contains(event.target as Node)
       ) {
-        setTotalAmountModal(false);
+        setTotal_amountModal(false);
       }
       if (
-        paidAmountModal &&
-        paidAmountRef.current &&
-        !paidAmountRef.current.contains(event.target as Node)
+        paid_amountModal &&
+        paid_amountRef.current &&
+        !paid_amountRef.current.contains(event.target as Node)
       ) {
-        setPaidAmountModal(false);
+        setPaid_amountModal(false);
       }
       if (
         remainingAmountModal &&
@@ -69,11 +74,11 @@ function PaymentBoard({ paymentData }: { paymentData: paimentEntity[] }) {
         setRemainingAmountModal(false);
       }
       if (
-        paymentDateModal &&
-        paymentDateRef.current &&
-        !paymentDateRef.current.contains(event.target as Node)
+        created_atModal &&
+        created_atRef.current &&
+        !created_atRef.current.contains(event.target as Node)
       ) {
-        setPaymentDateModal(false);
+        setcreated_atModal(false);
       }
       if (
         serviceModal &&
@@ -83,11 +88,11 @@ function PaymentBoard({ paymentData }: { paymentData: paimentEntity[] }) {
         setServiceModal(false);
       }
       if (
-        statusModal &&
-        statusRef.current &&
-        !statusRef.current.contains(event.target as Node)
+        payment_statusModal &&
+        payment_statusRef.current &&
+        !payment_statusRef.current.contains(event.target as Node)
       ) {
-        setStatusModal(false);
+        setpayment_statusModal(false);
       }
     }
 
@@ -96,12 +101,12 @@ function PaymentBoard({ paymentData }: { paymentData: paimentEntity[] }) {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [
-    totalAmountModal,
-    paidAmountModal,
+    total_amountModal,
+    paid_amountModal,
     remainingAmountModal,
-    paymentDateModal,
+    created_atModal,
     serviceModal,
-    statusModal,
+    payment_statusModal,
   ]);
 
   const startIndex = (currentPage - 1) * paimentsPerPage;
@@ -110,7 +115,7 @@ function PaymentBoard({ paymentData }: { paymentData: paimentEntity[] }) {
   const router = useRouter();
 
   const navigateToUnderPayment = (id: number) => {
-    router.push(`payments/${id}`);
+    router.push(`${user?.type == 'admin' ? `/admin/dashboard/clients/paiments_clients/${param.id}/payments` : '/client/dashboard/payments/'}/${id}`);
   };
 
   const toggleModal = (
@@ -122,12 +127,12 @@ function PaymentBoard({ paymentData }: { paymentData: paimentEntity[] }) {
   };
 
   const closeAllModals = () => {
-    setTotalAmountModal(false);
-    setPaidAmountModal(false);
+    setTotal_amountModal(false);
+    setPaid_amountModal(false);
     setRemainingAmountModal(false);
-    setPaymentDateModal(false);
+    setcreated_atModal(false);
     setServiceModal(false);
-    setStatusModal(false);
+    setpayment_statusModal(false);
   };
 
   const clearFilter = (
@@ -145,7 +150,7 @@ function PaymentBoard({ paymentData }: { paymentData: paimentEntity[] }) {
     });
 
     if (inputRef.current) {
-      if (inputRef === statusSelectRef) {
+      if (inputRef === payment_statusSelectRef) {
         inputRef.current.value = "Tous";
       } else if (inputRef === serviceSelectRef) {
         inputRef.current.value = "Tous les services";
@@ -156,30 +161,30 @@ function PaymentBoard({ paymentData }: { paymentData: paimentEntity[] }) {
   };
 
   return (
-    <div className="pb-4 overflow-x-auto -mx-8">
+    <div className="pb-4 overflow-x-auto">
       <table className="w-full rounded-lg  table-auto text-left shadow-md">
         <thead>
           <tr className="text-xs ">
             <td className="px-4 py-2 border">#</td>
             <td
               className={`px-4 py-2 border text-nowrap relative ${
-                activeFilters.totalAmount && "border-textColor border"
+                activeFilters.total_amount && "border-textColor border"
               }`}
             >
               <div
-                ref={totalAmountRef}
+                ref={total_amountRef}
                 className={`bg-secondary ${
-                  totalAmountModal ? "flex" : "hidden"
+                  total_amountModal ? "flex" : "hidden"
                 } flex-col gap-2 p-2 absolute -bottom-16 left-0 z-10`}
               >
                 <div className="text-white">Filtrer en le saisant </div>
                 <div className="flex rounded-md bg-white py-1 px-2">
                   <input
-                    ref={totalAmountInputRef}
+                    ref={total_amountInputRef}
                     type="number"
                     className=" outline-none placeholder:font-normal"
                     placeholder="Montant total"
-                    onChange={(e) => handleFilterChange(e, "totalAmount")}
+                    onChange={(e) => handleFilterChange(e, "total_amount")}
                   />
                   DA
                 </div>
@@ -190,13 +195,13 @@ function PaymentBoard({ paymentData }: { paymentData: paimentEntity[] }) {
                 width="12"
                 height="12"
                 className={`inline-block ml-1 ${
-                  activeFilters.totalAmount
+                  activeFilters.total_amount
                     ? "text-textColor cursor-pointer"
                     : "hidden"
                 }`}
                 onClick={() =>
-                  activeFilters.totalAmount &&
-                  clearFilter("totalAmount", totalAmountInputRef)
+                  activeFilters.total_amount &&
+                  clearFilter("total_amount", total_amountInputRef)
                 }
               />
               <Icon
@@ -206,19 +211,19 @@ function PaymentBoard({ paymentData }: { paymentData: paimentEntity[] }) {
                 className="inline-block ml-1 cursor-pointer hover:text-btnSecondary"
                 onClick={(e) => {
                   e.stopPropagation(); // Prevent outside click handler
-                  toggleModal(totalAmountModal, setTotalAmountModal);
+                  toggleModal(total_amountModal, setTotal_amountModal);
                 }}
               />
             </td>
             <td
               className={`px-4 py-2 border text-nowrap relative ${
-                activeFilters.paidAmount && "border-textColor border"
+                activeFilters.paid_amount && "border-textColor border"
               }`}
             >
               <div
-                ref={paidAmountRef}
+                ref={paid_amountRef}
                 className={`bg-secondary ${
-                  paidAmountModal ? "flex" : "hidden"
+                  paid_amountModal ? "flex" : "hidden"
                 } flex-col gap-2 p-2 absolute -bottom-16 left-0 z-10`}
               >
                 <div className="text-white">Filtrer en le saisant </div>
@@ -227,8 +232,8 @@ function PaymentBoard({ paymentData }: { paymentData: paimentEntity[] }) {
                     type="number"
                     className=" outline-none placeholder:font-normal"
                     placeholder="Montant payé"
-                    onChange={(e) => handleFilterChange(e, "paidAmount")}
-                    ref={paidAmountInputRef}
+                    onChange={(e) => handleFilterChange(e, "paid_amount")}
+                    ref={paid_amountInputRef}
                   />
                   DA
                 </div>
@@ -239,13 +244,13 @@ function PaymentBoard({ paymentData }: { paymentData: paimentEntity[] }) {
                 width="12"
                 height="12"
                 className={`inline-block ml-1 ${
-                  activeFilters.paidAmount
+                  activeFilters.paid_amount
                     ? "text-textColor cursor-pointer"
                     : "hidden"
                 }`}
                 onClick={() =>
-                  activeFilters.paidAmount &&
-                  clearFilter("paidAmount", paidAmountInputRef)
+                  activeFilters.paid_amount &&
+                  clearFilter("paid_amount", paid_amountInputRef)
                 }
               />
               <Icon
@@ -255,7 +260,7 @@ function PaymentBoard({ paymentData }: { paymentData: paimentEntity[] }) {
                 className="inline-block ml-1 cursor-pointer hover:text-btnSecondary"
                 onClick={(e) => {
                   e.stopPropagation();
-                  toggleModal(paidAmountModal, setPaidAmountModal);
+                  toggleModal(paid_amountModal, setPaid_amountModal);
                 }}
               />
             </td>
@@ -310,13 +315,13 @@ function PaymentBoard({ paymentData }: { paymentData: paimentEntity[] }) {
             </td>
             <td
               className={`px-4 py-2 border text-nowrap relative ${
-                activeFilters.paymentDate && "border-textColor border"
+                activeFilters.created_at && "border-textColor border"
               }`}
             >
               <div
-                ref={paymentDateRef}
+                ref={created_atRef}
                 className={`bg-secondary ${
-                  paymentDateModal ? "flex" : "hidden"
+                  created_atModal ? "flex" : "hidden"
                 } flex-col gap-2 p-2 absolute -bottom-16 left-0 z-10`}
               >
                 <div className="text-white">Filtrer en le saisant </div>
@@ -325,8 +330,8 @@ function PaymentBoard({ paymentData }: { paymentData: paimentEntity[] }) {
                     type="date"
                     className=" outline-none placeholder:font-normal"
                     placeholder="Date de paiement"
-                    onChange={(e) => handleFilterChange(e, "paymentDate")}
-                    ref={paymentDateInputRef}
+                    onChange={(e) => handleFilterChange(e, "created_at")}
+                    ref={created_atInputRef}
                   />
                 </div>
               </div>
@@ -336,13 +341,13 @@ function PaymentBoard({ paymentData }: { paymentData: paimentEntity[] }) {
                 width="12"
                 height="12"
                 className={`inline-block ml-1 ${
-                  activeFilters.paymentDate
+                  activeFilters.created_at
                     ? "text-textColor cursor-pointer"
                     : "hidden"
                 }`}
                 onClick={() =>
-                  activeFilters.paymentDate &&
-                  clearFilter("paymentDate", paymentDateInputRef)
+                  activeFilters.created_at &&
+                  clearFilter("created_at", created_atInputRef)
                 }
               />
               <Icon
@@ -352,7 +357,7 @@ function PaymentBoard({ paymentData }: { paymentData: paimentEntity[] }) {
                 className="inline-block ml-1 cursor-pointer hover:text-btnSecondary"
                 onClick={(e) => {
                   e.stopPropagation();
-                  toggleModal(paymentDateModal, setPaymentDateModal);
+                  toggleModal(created_atModal, setcreated_atModal);
                 }}
               />
             </td>
@@ -375,7 +380,7 @@ function PaymentBoard({ paymentData }: { paymentData: paimentEntity[] }) {
                 >
                   <option value="">Tous les services</option>
                   {Array.from(
-                    new Set(paymentData.map((p) => p.service.name))
+                    new Set(filteredPaiments.map((p) => p.service.name))
                   ).map((title) => (
                     <option key={title} value={title}>
                       {title}
@@ -411,38 +416,42 @@ function PaymentBoard({ paymentData }: { paymentData: paimentEntity[] }) {
             </td>
             <td
               className={`px-4 py-2 border text-nowrap relative ${
-                activeFilters.status && "border-textColor border"
+                activeFilters.payment_status && "border-textColor border"
               }`}
             >
               <div
-                ref={statusRef}
+                ref={payment_statusRef}
                 className={`bg-secondary ${
-                  statusModal ? "flex" : "hidden"
+                  payment_statusModal ? "flex" : "hidden"
                 } flex-col gap-2 p-2 absolute -bottom-16 left-0 z-10`}
               >
-                <div className="text-white">Filtrer le status </div>
+                <div className="text-white">Filtrer le payment_status </div>
                 <select
                   className="outline-none rounded-md bg-white py-1 px-2"
-                  ref={statusSelectRef}
-                  onChange={(e) => handleFilterChange(e, "status")}
+                  ref={payment_statusSelectRef}
+                  onChange={(e) => handleFilterChange(e, "payment_status")}
                 >
                   <option value="">Tous</option>
-                  <option value="finished">Fini</option>
-                  <option value="pending">Non fini</option>
+                  <option value="COMPLETED">Terminé</option>
+                  <option value="PENDING">En attente</option>
+                  <option value="PROCESSING">En cours</option>
+                  <option value="FAILED">Échoué</option>
+                  <option value="CANCELLED">Annulé</option>
                 </select>
               </div>
-              Status
+              payment_status
               <Icon
                 icon="solar:sort-linear"
                 width="12"
                 height="12"
                 className={`inline-block ml-1 ${
-                  activeFilters.status
+                  activeFilters.payment_status
                     ? "text-textColor cursor-pointer"
                     : "hidden"
                 }`}
                 onClick={() =>
-                  activeFilters.status && clearFilter("status", statusSelectRef)
+                  activeFilters.payment_status &&
+                  clearFilter("payment_status", payment_statusSelectRef)
                 }
               />
               <Icon
@@ -452,65 +461,53 @@ function PaymentBoard({ paymentData }: { paymentData: paimentEntity[] }) {
                 className="inline-block ml-1 cursor-pointer hover:text-btnSecondary"
                 onClick={(e) => {
                   e.stopPropagation();
-                  toggleModal(statusModal, setStatusModal);
+                  toggleModal(payment_statusModal, setpayment_statusModal);
                 }}
               />
             </td>
-            <td className="px-4 py-2 border">Action</td>
           </tr>
         </thead>
-        <tbody>
-          {paimentsToDisplay.map((item) => (
-            <tr
-              onClick={() => navigateToUnderPayment(item.id)}
-              key={item.id}
-              className="text-xs border-b cursor-pointer hover:bg-gray-50 hover:scale-105 transition-all duration-200"
-            >
-              <td className="px-4 py-3 border">{item.id}</td>
-              <td className="px-4 py-3 border">{item.totalAmount}</td>
-              <td className="px-4 py-3 border">{item.paidAmount}</td>
-              <td className="px-4 py-3 border">
-                {item.totalAmount - item.paidAmount}
-              </td>
-              <td className="px-4 py-3 border">{item.paymentDate}</td>
-              <td className="px-4 py-3 border">
-                <div className="border rounded-md py-1 px-2">
-                  {item.service.name}
-                </div>
-              </td>
-              <td className="px-4 py-3 border">
-                <div className="flex items-center gap-2 text-nowrap">
-                  <div
-                    className={`w-2 h-2 ${
-                      item.status == "finished" ? "bg-green-400" : "bg-black/55"
-                    } rounded-full`}
-                  />
-                  {item.status}
-                </div>
-              </td>
-              <td className="px-4 py-3 border">
-                <div className="flex items-center gap-2">
-                  <button className="border border-black/30 flex items-center justify-center px-1 py-1 rounded">
-                    <Icon
-                      icon="ant-design:edit-outlined"
-                      width="16"
-                      height="16"
-                      className="text-black"
+        {!loading && filteredPaiments.length == 0 ? (
+          <div className="w-full text-center py-4">Pas de paiements trouvés</div>
+        ) : (
+          <tbody>
+            {paimentsToDisplay.map((item) => (
+              <tr
+                onClick={() => navigateToUnderPayment(item.id)}
+                key={item.id}
+                className="text-xs border-b cursor-pointer hover:bg-gray-50 hover:scale-105 transition-all duration-200"
+              >
+                <td className="px-4 py-3 border">{item.id}</td>
+                <td className="px-4 py-3 border">{item.total_amount}</td>
+                <td className="px-4 py-3 border">{item.paid_amount}</td>
+                <td className="px-4 py-3 border">
+                  {item.total_amount - item.paid_amount}
+                </td>
+                <td className="px-4 py-3 border">
+                  {item.created_at && item.created_at.split("T")[0]}
+                </td>
+                <td className="px-4 py-3 border">
+                  <div className="border rounded-md py-1 px-2">
+                    {item.service?.name || "—"}
+                  </div>
+                </td>
+                <td className="px-4 py-3 border">
+                  <div className="flex items-center gap-2 text-nowrap">
+                    <div
+                      className={`w-2 h-2 ${
+                        item.payment_status == "COMPLETED"
+                          ? "bg-green-400"
+                          : "bg-black/55"
+                      } rounded-full`}
                     />
-                  </button>
-                  <button className="border border-black/30 flex items-center justify-center px-1 py-1 rounded">
-                    <Icon
-                      icon="mingcute:delete-3-line"
-                      width="16"
-                      height="16"
-                      className="text-black"
-                    />
-                  </button>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
+                    {statusTranslations[item.payment_status] ||
+                      item.payment_status}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        )}
       </table>
       {totalPages > 1 && (
         <div className="flex gap-3 justify-start items-center mt-4">

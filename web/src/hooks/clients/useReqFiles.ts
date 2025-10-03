@@ -63,6 +63,20 @@ function useReqFiles() {
 
   const handleDownload = (fileName: string, fileData: string | File) => {
     if (typeof fileData === "string") {
+      // If backend sent "data:...;base64,xxx", strip metadata
+      const base64 = fileData.includes("base64,")
+        ? fileData.split("base64,")[1]
+        : fileData;
+
+      // Convert base64 → binary
+      const byteCharacters = atob(base64);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+
+      // Detect mime type
       const mimeType = fileName.endsWith(".pdf")
         ? "application/pdf"
         : fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")
@@ -71,17 +85,26 @@ function useReqFiles() {
         ? "image/png"
         : "application/octet-stream";
 
+      // Create blob + object URL
+      const blob = new Blob([byteArray], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+
+      // Trigger download
       const link = document.createElement("a");
-      link.href = `data:${mimeType};base64,${fileData}`;
+      link.href = url;
       link.download = fileName;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+
+      // Revoke
+      URL.revokeObjectURL(url);
     } else if (fileData instanceof File) {
       const reader = new FileReader();
       reader.onload = (e) => {
+        const url = e.target?.result as string;
         const link = document.createElement("a");
-        link.href = e.target?.result as string;
+        link.href = url;
         link.download = fileName;
         document.body.appendChild(link);
         link.click();

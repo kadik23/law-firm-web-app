@@ -1,15 +1,16 @@
 "use client";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import FormModal from "@/components/dashboard/admin/formModal";
 import { useServicesM } from "@/hooks/admin/useServicesM";
 import { useService } from "@/hooks/useService";
 import { AddServiceForm } from "@/components/dashboard/admin/services/AddServiceForm";
+import { LoadingContext } from "@/contexts/LoadingContext";
 
 const ServiceOverview = () => {
   const { id } = useParams() as { id: string };
   const { service, setService, loading } = useService(parseInt(id));
-  const { updateService, deleteServices, toggleSelect,file, setFile } = useServicesM();
+  const { updateService, deleteServices, toggleSelect,file, setFile, loading: updateLoading } = useServicesM(setService);
 
   const handleAddModalClose = () => {
     setAddModalOpen(false);
@@ -17,13 +18,12 @@ const ServiceOverview = () => {
 
   const [addModalOpen, setAddModalOpen] = useState(false);
 
-  if (loading) {
-    return (
-      <div className="h-screen flex items-center justify-center">
-        <h1 className="text-3xl font-bold">Chargement...</h1>
-      </div>
-    );
-  }
+
+  const {setLoading} = useContext(LoadingContext);
+
+  useEffect(() => {
+    setLoading(updateLoading);
+  }, [updateLoading]);
 
   if (!service)
     return (
@@ -116,10 +116,14 @@ const ServiceOverview = () => {
         <AddServiceForm
           file={file}
           setFile={setFile}
-          onSubmit={(data) => updateService(parseInt(id), data, service)}
+          onSubmit={(data) => {
+            updateService(parseInt(id), data, service);
+            setAddModalOpen(false);
+          }}
           isUpdate={true}
           service={service}
           setService={setService}
+          loading={loading}
         />
       </FormModal>
     </div>

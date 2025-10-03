@@ -69,7 +69,7 @@ const PlanningPage = () => {
       .map((slot) => {
         const start = parse(slot.startTime, "HH:mm", day);
         const end = parse(slot.endTime, "HH:mm", day);
-        return { start, end, type: "free" as const, title: "Available" };
+        return { start, end, type: "free" as const, title: "Disponible" };
       });
 
     const freeSlots = availableSlots.filter(

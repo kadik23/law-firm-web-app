@@ -1,6 +1,6 @@
 interface NotificationType {
   id: number;
-  type: "Comments" | "Consultation" | "Documents" | "Blogs";
+  type: "Comments" | "Consultation" | "Documents" | "Blogs" | "Payment";
   description: string;
   userId: number;
   entityId: number;

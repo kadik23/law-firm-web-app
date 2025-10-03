@@ -1,5 +1,5 @@
 import { db } from "@/models"
-import { Model, ModelCtor } from "sequelize";
+import { Model, ModelCtor, Transaction } from "sequelize";
 import { INotification } from "@/interfaces/Notification";
 import { IConnectedUser } from "@/interfaces/ConnectedUser";
 import { io } from "@/server";
@@ -12,15 +12,19 @@ export async function createNotification(
   description: string,
   userId: number,
   entityId: number,
-  fromUserId?: number
+  fromUserId?: number,
+  transaction?: Transaction,
 ): Promise<Model<INotification>> {
-  const newNotif = await notif.create({
-    type,
-    description,
-    userId,
-    entityId,
-    isRead: false,
-  });
+  const newNotif = await notif.create(
+    {
+      type,
+      description,
+      userId,
+      entityId,
+      isRead: false,
+    },
+    {transaction: transaction}
+  );
   if (userId) {
     try {
       // Find the connected user's socket ID

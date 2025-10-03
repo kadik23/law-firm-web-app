@@ -129,7 +129,7 @@ function FilesProcessing() {
                       Fichiers
                     </Link>
                     <Link
-                      href={`/admin/dashboard/clients/files_proccessing/${dossier.User?.id}`}
+                      href={`/admin/dashboard/clients/${dossier.User?.id}`}
                       className="text-gray-600 text-sm hover:text-gray-800 font-semibold"
                     >
                       Voir le profil

@@ -1,20 +1,17 @@
 "use client";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import BLogInfromation from "@/components/blog/blogInfromation";
 import useBlog from "@/hooks/useBlog";
 import BlogsHeader from "@/components/dashboard/admin/blogs/blogsHeader";
-import { AddBlogForm } from "@/components/dashboard/admin/AddBlogForm";
+import { AddBlogForm } from "@/components/dashboard/admin/blogs/AddBlogForm";
 import FormModal from "@/components/dashboard/admin/formModal";
 import { useBlogsM } from "@/hooks/admin/useBlogsM";
+import { LoadingContext } from "@/contexts/LoadingContext";
 
 const BlogOverview = () => {
   const { id } = useParams() as { id: string };
-  const {
-    file,
-    setFile,
-    updateBlog
-  } = useBlogsM();
+  const { file, setFile, updateBlog, loading: updateLoading } = useBlogsM();
   const {
     fetchBlog,
     blog,
@@ -38,13 +35,11 @@ const BlogOverview = () => {
 
   const [addModalOpen, setAddModalOpen] = useState(false);
 
-  if (loading) {
-    return (
-      <div className="h-screen flex items-center justify-center">
-        <h1 className="text-3xl font-bold">Chargement...</h1>
-      </div>
-    );
-  }
+  const { setLoading } = useContext(LoadingContext);
+
+  useEffect(() => {
+    setLoading(updateLoading);
+  }, [updateLoading]);
 
   if (!blog)
     return (
@@ -79,10 +74,14 @@ const BlogOverview = () => {
         <AddBlogForm
           file={file}
           setFile={setFile}
-          onSubmit={(data) => updateBlog(parseInt(id), data, blog)}
+          onSubmit={(data) => {
+            updateBlog(parseInt(id), data, blog);
+            setAddModalOpen(false);
+          }}
           isUpdate={true}
           blog={blog}
           setBlog={setBlog}
+          loading={loading}
         />
       </FormModal>
     </div>

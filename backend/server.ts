@@ -10,13 +10,24 @@ import cookieParser from "cookie-parser";
 import userRouter from "./routes/UsersRouter";
 import adminRouter from "./routes/AdminRouter";
 import attorneyRouter from "./routes/AttorneyRouter";
+import paymentRouter from "./routes/PaymentRouter";
+import filesRouter from "./routes/FilesRouter";
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { db } from "./models";
+import bodyParser from "body-parser";
 const connected_users = db.connectedUsers;
 
 const app = express();
 app.use(cookieParser());
+
+app.use(
+  bodyParser.json({
+    verify: (req: any, res: any, buf: any) => {
+      (req as any).rawBody = buf.toString();
+    },
+  })
+);
 
 const swaggerOptions = {
   definition: {
@@ -82,7 +93,6 @@ console.log('CORS Configuration:', {
 });
 
 app.use(cors(corsOptions));
-app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // Serve static files from the correct uploads directory
 const isProduction = process.env.NODE_ENV === 'production';
@@ -115,6 +125,8 @@ app.get("/debug-auth", (req, res) => {
 app.use("/user", userRouter);
 app.use("/admin", adminRouter);
 app.use("/attorney", attorneyRouter);
+app.use("/api/payments", paymentRouter);
+app.use("/files", filesRouter);
 
 const PORT = process.env.PORT || 5000;
 
@@ -135,11 +147,9 @@ const io = new Server(server, {
   }
 });
 
-// Socket.IO connection handling
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);
 
-  // Register user with their userId
   socket.on("register", async (userId) => {
     try {
       const numericUserId = parseInt(userId, 10);
@@ -154,7 +164,7 @@ io.on("connection", (socket) => {
       // Insert the new socket
       await connected_users.create({
         user_id: numericUserId,
-        socket_id: socket.id // Store as string
+        socket_id: socket.id
       });
 
       console.log(`User ${userId} registered with socket ID: ${socket.id}`);
@@ -165,7 +175,6 @@ io.on("connection", (socket) => {
     }
   });
 
-  // Handle user disconnection
   socket.on("disconnect", async () => {
     try {
       const deletedRowCount = await connected_users.destroy({
@@ -183,7 +192,6 @@ io.on("connection", (socket) => {
   });
 });
 
-// Export io for use in other files
 export { io };
 
 server.listen(PORT, () => {

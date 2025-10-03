@@ -1,12 +1,10 @@
 import { Request, Response } from 'express';
 import { db } from '@/models/index';
-import { upload } from '@/middlewares/FilesMiddleware';
+import { upload, uploadToDrive, getFileBase64FromDrive, deleteFileFromDrive} from '@/middlewares/FilesMiddleware';
 import { Op, Model, ModelCtor } from 'sequelize';
 import { body, validationResult, ValidationError, Result } from 'express-validator';
 import { IService } from '@/interfaces/Service';
 import fs from 'fs';
-import path from 'path';
-import { getImagePath } from '@/utils/getImagePath';
 import { imageToBase64DataUri } from '@/utils/imageUtils';
 
 const Service: ModelCtor<Model<IService>> = db.services;
@@ -128,6 +126,11 @@ export const createService = async (req: Request, res: Response): Promise<void> 
         res.status(400).json({ error: 'Cover image is required.' });
         return;
       }
+      const fileId = await uploadToDrive(
+        req.file.path,
+        req.file.originalname,
+        req.file.mimetype
+      );
       const { name, description, requestedFiles, price } = req.body;
       const filePath = req.file.path;
       const createdBy = (req as any).user?.id || 'anonymous';
@@ -138,6 +141,7 @@ export const createService = async (req: Request, res: Response): Promise<void> 
         coverImage: filePath,
         price,
         createdBy,
+        file_id: fileId
       } as IService);
       const base64Image = imageToBase64DataUri(filePath);
       
@@ -207,15 +211,34 @@ export const createService = async (req: Request, res: Response): Promise<void> 
  *                   type: string
  *                   example: "Error message here"
  */
-export const deleteServices = async (req: Request, res: Response): Promise<void> => {
+export const deleteServices = async (req: Request, res: Response) => {
   try {
     const { ids } = req.body;
-    const result = await Service.destroy({
+
+    const services = await Service.findAll({
       where: { id: { [Op.in]: ids } },
     });
-    res.status(200).json({ success: true, message: `${result} services deleted` });
-  } catch (error: any) {
-    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+
+    if (services.length === 0) {
+      res.status(404).json({ message: "No services found" });
+    }
+
+    await Promise.all(
+      services.map(async (service) => {
+        if (service.getDataValue('file_id') && service.getDataValue('file_id') !== '') {
+          await deleteFileFromDrive(service.getDataValue('file_id'));
+        }
+      })
+    );
+
+    await Service.destroy({
+      where: { id: { [Op.in]: ids } },
+    });
+
+    res.json({ message: "Service and its image deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -251,14 +274,21 @@ export const updateService= async (req: Request, res: Response)=>{
               return res.status(404).json({ error: 'Service not found' });
           }
 
-          if (coverImage) {
+          let fileId
+          if (coverImage && req.file) {
               deleteFile(service.coverImage);
+              if (service.file_id && service.file_id !== '') await deleteFileFromDrive(service.file_id);
+              fileId  = await uploadToDrive(
+                req.file.path,
+                req.file.originalname,
+                req.file.mimetype
+              );
           }
 
           const imagePath = coverImage ? coverImage.path : service.coverImage;
 
           const updatedService = await Service.update(
-              { name, description, requestedFiles, coverImage: imagePath, price },
+              { name, description, requestedFiles, coverImage: imagePath, file_id: fileId, price },
               { where: { id: id } }
           );
           res.status(200).json({ message: 'Service updated successfully', updatedService });
@@ -335,7 +365,6 @@ export const getAdminServices = async (req: Request, res: Response) => {
     const offset = (page - 1) * limit;
 
     const totalServices = await Service.count();
-
     const totalPages = Math.ceil(totalServices / limit);
 
     let services = await Service.findAll({
@@ -348,8 +377,11 @@ export const getAdminServices = async (req: Request, res: Response) => {
     const servicesWithImages = await Promise.all(
       services.map(async (service) => {
         const serviceData = service.toJSON() as IService;
-        const filePath = getImagePath(serviceData.coverImage);
-        const base64Image = imageToBase64DataUri(filePath);
+
+        let base64Image = null;
+        if (serviceData.file_id && serviceData.file_id !== '') {
+          base64Image = await getFileBase64FromDrive(serviceData.file_id);
+        }
 
         return {
           ...serviceData,

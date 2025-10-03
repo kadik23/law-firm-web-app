@@ -3,7 +3,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAttorneyBlogs } from "@/hooks/attorney/useAttorneyBlogs";
 import FormModal from "@/components/dashboard/admin/formModal";
-import { AddBlogForm } from "@/components/dashboard/admin/AddBlogForm";
+import { AddBlogForm } from "@/components/dashboard/admin/blogs/AddBlogForm";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import axios from "@/lib/utils/axiosClient";
 
@@ -104,6 +104,7 @@ const BlogDetails = () => {
           isUpdate={true}
           blog={blog}
           setBlog={setBlog}
+          loading={loading}
         />
       </FormModal>
     </div>

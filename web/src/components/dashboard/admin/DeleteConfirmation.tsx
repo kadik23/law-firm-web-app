@@ -7,6 +7,7 @@ type DeleteConfirmationProps = {
       }[];
   onCancel: () => void;
   onConfirm: () => void;
+  loading: boolean;
   itemType?: string;
 };
 
@@ -15,6 +16,7 @@ export const DeleteConfirmation = ({
   onCancel,
   onConfirm,
   itemType = "lawyer",
+  loading = false,
 }: DeleteConfirmationProps) => {
   return (
     <>
@@ -45,6 +47,7 @@ export const DeleteConfirmation = ({
         </button>
         <button
           type="button"
+          disabled={loading}
           onClick={onConfirm}
           className="bg-textColor text-white w-full font-bold py-2 px-14 rounded-md text-sm"
         >

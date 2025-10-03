@@ -1,13 +1,12 @@
 import dotenv from 'dotenv';
 dotenv.config();
 import { db } from '@/models/index';
-import { resolve } from 'path';
-import fs, { existsSync, readFileSync } from 'fs';
 import { Request, Response } from 'express';
 import { Model, ModelCtor } from 'sequelize';
 import { IBlog } from '@/interfaces/Blog';
 import { ILike } from '@/interfaces/Like';
 import { Op } from 'sequelize';
+import { getFileBase64FromDrive} from '@/middlewares/FilesMiddleware';
 import { imageToBase64DataUri } from '@/utils/imageUtils';
 const blogs: ModelCtor<Model<IBlog>> = db.blogs;
 const like: ModelCtor<Model<ILike>> = db.like;
@@ -65,8 +64,10 @@ const getAllBlogs = async (req: Request, res: Response): Promise<void> => {
             offset: offset,
         });
         const updatedBlogsList: any[] = await Promise.all(blogsList.map(async (blog: Model<IBlog>) => {
-            const filePath = resolve(__dirname, '..', '..', blog.getDataValue('image'));
-            const base64Image = imageToBase64DataUri(filePath);
+            let base64Image = null;
+            if (blog.getDataValue("file_id") && blog.getDataValue("file_id") !== '') {
+                base64Image = await getFileBase64FromDrive(blog.getDataValue("file_id"));
+            }
             return {
                 ...blog.toJSON(),
                 image: base64Image
@@ -126,12 +127,10 @@ const getBlogById= async (req: Request, res: Response): Promise<void> => {
             res.status(404).json({ message: 'Blog not found' });
             return;
         }
-        const filePath = resolve(__dirname, '..', '..', blog.getDataValue('image'));
 
         let base64Image = null;
-        if (existsSync(filePath)) {
-            const fileData = readFileSync(filePath);
-            base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
+        if (blog.getDataValue("file_id") && blog.getDataValue("file_id") !== '') {
+            base64Image = await getFileBase64FromDrive(blog.getDataValue("file_id"));
         }
         res.status(200).send({
             ...blog.toJSON(),
@@ -393,11 +392,9 @@ const sortBlogs = async (req: Request, res: Response): Promise<void> => {
             order: order.length ? order : [["createdAt", "DESC"]]
         });
         const updatedBlogsList = await Promise.all(blogsList.map(async (blog: Model<IBlog>) => {
-            const filePath = resolve(__dirname, '..', '..', blog.getDataValue('image'));
-            let base64Image: string | null = null;
-            if (fs.existsSync(filePath)) {
-                const fileData = fs.readFileSync(filePath);
-                base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
+            let base64Image = null;
+            if (blog.getDataValue("file_id") && blog.getDataValue("file_id") !== '') {
+                base64Image = await getFileBase64FromDrive(blog.getDataValue("file_id"));
             }
             return {
                 ...blog.toJSON(),

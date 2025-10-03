@@ -1,6 +1,6 @@
 "use client";
 import { Dispatch, SetStateAction, useEffect, useState, useRef } from "react";
-import FileUpload from "./FileUpload";
+import FileUpload from "../FileUpload";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import useBlogForm from "@/hooks/hooksForms/useBlogForm";
 import { DevTool } from "@hookform/devtools";
@@ -15,6 +15,7 @@ type AddBlogFormProps = {
   isUpdate: boolean;
   blog?: Blog;
   setBlog?: Dispatch<SetStateAction<Blog | null | undefined>>;
+  loading: boolean
 };
 
 export const AddBlogForm = ({
@@ -24,6 +25,7 @@ export const AddBlogForm = ({
   blog,
   isUpdate,
   setBlog,
+  loading
 }: AddBlogFormProps) => {
   const [isDisabled, setIsDisabled] = useState(true);
   const [isFocused, setIsFocused] = useState(false);
@@ -58,7 +60,9 @@ export const AddBlogForm = ({
       isInitialLoad.current = false;
     }
   }, [blog, isUpdate]);
-
+  
+  const fileChanged = !!file;
+  
   const formValues = watch();
   useEffect(() => {
     if (isUpdate) {
@@ -67,7 +71,7 @@ export const AddBlogForm = ({
         formValues.readingDuration !== oldBlogDataRef.current?.readingDuration ||
         formValues.categoryId !== oldBlogDataRef.current?.categoryId ||
         formValues.body !== oldBlogDataRef.current?.body ||
-        file !== prevFileRef.current;
+        fileChanged;
 
       setIsDisabled(!hasChanges);
     } else {
@@ -111,7 +115,7 @@ export const AddBlogForm = ({
     <form onSubmit={handleSubmit(onSubmit)}>
       {process.env.NODE_ENV === "development" && <DevTool control={control} />}
       <div className="pb-4">
-        <FileUpload file={file} setFile={setFile} />
+        <FileUpload previewSrc={blog?.image} file={file} setFile={setFile} />
       </div>
       <div className="flex flex-col gap-4">
         <span className="text-white font-semibold text-sm">
@@ -157,7 +161,7 @@ export const AddBlogForm = ({
           />
 
           <Icon
-            icon="mdi:clock-outline"
+            icon="entypo:text"
             className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-2xl pointer-events-none 
               ${isFocused ? "text-black" : "text-white"}`}
           />
@@ -194,9 +198,9 @@ export const AddBlogForm = ({
       {isUpdate ? (
         <button
           type="submit"
-          disabled={isDisabled}
+          disabled={isDisabled || loading}
           className={`${
-            isDisabled ? "btn_desabled active:scale-100" : "btn bg-textColor"
+            isDisabled || loading ? "btn_desabled active:scale-100" : "btn bg-textColor"
           } text-sm rounded-md p-2 btn font-semibold shadow-lg w-full mt-8`}
         >
           Mettre a jour
@@ -204,9 +208,9 @@ export const AddBlogForm = ({
       ) : (
         <button
           type="submit"
-          disabled={isDisabled}
+          disabled={isDisabled || loading}
           className={`${
-            isDisabled ? "btn_desabled active:scale-100" : "btn bg-textColor"
+            isDisabled || loading? "btn_desabled active:scale-100" : "btn bg-textColor"
           } text-sm rounded-md p-2 btn font-semibold shadow-lg w-full mt-8`}
         >
           Ajouter

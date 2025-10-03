@@ -18,7 +18,11 @@ import ServiceFilesUploadedFactory from './service_files_uploaded';
 import NotificationFactory from './Notifications';
 import ConnectedUserFactory from './ConnectedUsers';
 import AvailableSlotFactory from './AvailableSlot';
+import PaymentFactory from './Payment';
+import PaymentTransactionFactory from './PaymentTransaction';
+import PaymentMethodFactory from './PaymentMethod';
 import { DB } from '../interfaces/DB';
+import TokenFactory from './Token';
 
 const sequelizeOptions: any = {
     host: dbConfig.HOST,
@@ -72,7 +76,10 @@ db.service_files_uploaded = ServiceFilesUploadedFactory(sequelize, DataTypes);
 db.notifications = NotificationFactory(sequelize, DataTypes);
 db.connectedUsers = ConnectedUserFactory(sequelize, DataTypes);
 db.AvailableSlot = AvailableSlotFactory(sequelize, DataTypes);
-
+db.payments = PaymentFactory(sequelize, DataTypes);
+db.payment_transactions = PaymentTransactionFactory(sequelize, DataTypes);
+db.payment_methods = PaymentMethodFactory(sequelize, DataTypes);
+db.tokens = TokenFactory(sequelize, DataTypes);
 
 
 db.files.belongsTo(db.users, {
@@ -207,6 +214,91 @@ db.request_service.belongsTo(db.services, {
 db.services.hasMany(db.request_service, {
   foreignKey: 'serviceId',
   as: 'serviceRequests',
+});
+
+// Payment relationships
+db.payments.belongsTo(db.users, {
+  foreignKey: 'client_id',
+  as: 'client',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
+
+db.payments.belongsTo(db.services, {
+  foreignKey: 'service_id',
+  as: 'service',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
+
+db.payments.belongsTo(db.request_service, {
+  foreignKey: 'request_service_id',
+  as: 'requestService',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
+
+db.problems.belongsTo(db.categories, {
+  foreignKey: 'category_id',
+  as: 'category',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
+
+db.categories.hasMany(db.problems, {
+  foreignKey: 'category_id',
+  as: 'problems',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
+
+db.problems.belongsTo(db.services, {
+  foreignKey: 'service_id',
+  as: 'service',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
+
+db.services.hasMany(db.problems, {
+  foreignKey: 'service_id',
+  as: 'problems',
+  onDelete: 'CASCADE',  
+  onUpdate: 'CASCADE',
+});
+
+db.payment_transactions.belongsTo(db.payments, {
+  foreignKey: 'payment_id',
+  as: 'payment',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
+
+db.payments.hasMany(db.payment_transactions, {
+  foreignKey: 'payment_id',
+  as: 'transactions',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
+
+db.users.hasMany(db.payments, {
+  foreignKey: 'client_id',
+  as: 'payments',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
+
+db.services.hasMany(db.payments, {
+  foreignKey: 'service_id',
+  as: 'payments',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
+
+db.request_service.hasMany(db.payments, {
+  foreignKey: 'request_service_id',
+  as: 'payments',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
 });
 
 Object.keys(db).forEach((modelName) => {

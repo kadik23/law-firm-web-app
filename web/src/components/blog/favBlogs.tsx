@@ -1,5 +1,5 @@
 "use client";
-import usePagination from "@/hooks/usePagination ";
+import usePagination from "@/hooks/usePagination";
 import BlogCard from "./blogCard";
 import { useState, useEffect } from "react";
 
@@ -49,7 +49,7 @@ const FavBlogs: React.FC<FavBlogsProps> = ({ blogs, signIn }) => {
               onClick={goToPreviousPage}
               className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md"
             >
-              Previous
+              Précédente
             </button>
           )}
 
@@ -70,13 +70,12 @@ const FavBlogs: React.FC<FavBlogsProps> = ({ blogs, signIn }) => {
             ))}
           </div>
 
-          {/* Next Button */}
           {currentPage < totalPages && (
             <button
               onClick={goToNextPage}
               className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md"
             >
-              Next
+              Suivante
             </button>
           )}
         </div>

@@ -5,7 +5,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import FileUpload from "./FileUpload";
+import FileUpload from "../FileUpload";
 import { DevTool } from "@hookform/devtools";
 import useLawyerForm from "@/hooks/hooksForms/useLawyerForm";
 
@@ -13,12 +13,14 @@ type AddAvocatFormProps = {
   onSubmit: (data: LawyerFormData) => void;
   file: File | null;
   setFile: Dispatch<SetStateAction<File | null>>;
+  loading: boolean;
 };
 
 export const AddAvocatForm = ({
   setFile,
   file,
   onSubmit,
+  loading
 }: AddAvocatFormProps) => {
   const [isDisabled, setIsDisabled] = useState(true);
   const {
@@ -183,9 +185,9 @@ export const AddAvocatForm = ({
 
       <button
         type="submit"
-        disabled={isDisabled}
+        disabled={isDisabled || loading}
         className={`${
-          isDisabled ? "btn_desabled active:scale-100" : "btn bg-textColor"
+          isDisabled || loading ? "btn_desabled active:scale-100" : "btn bg-textColor"
         } text-sm rounded-md p-2 btn font-semibold shadow-lg col-span-2 w-full`}
       >
         Ajouter

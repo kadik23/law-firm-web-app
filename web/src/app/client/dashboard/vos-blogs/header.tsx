@@ -1,6 +1,7 @@
+import { LoadingContext } from "@/contexts/LoadingContext";
 import { useFavorites } from "@/hooks/clients/useFavourites";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 export const Header = ({ 
     totalBlogs, 
@@ -9,7 +10,7 @@ export const Header = ({
     totalBlogs: number;
     onSearch: (query: string) => void;
 }) => {
-    const { removeAllFavorites } = useFavorites();
+    const { removeAllFavorites, loading } = useFavorites();
     const [searchQuery, setSearchQuery] = useState("");
 
     const handleDeleteAll = async () => {
@@ -27,12 +28,18 @@ export const Header = ({
         onSearch(query);
     };
 
+  const {setLoading} = useContext(LoadingContext);
+
+  useEffect(() => {
+    setLoading(loading);
+  }, [loading]);
+
     return (
         <div>
             <div className="flex items-center justify-between">
                 <div className="flex gap-2 items-center">
                     <img src="/images/Blogs.svg" alt="" />
-                    <span className="text-secondary text-2xl md:text-3xl font-semibold">Vos blogs</span>
+                    <span className="text-secondary text-2xl md:text-3xl font-semibold">Vos blogs préférés</span>
                 </div>
                 <div className="flex items-center text-secondary gap-2 font-semibold">
                     <img src="/images/Blogs.svg" width={25} alt="" />
@@ -69,6 +76,7 @@ export const Header = ({
                     onClick={handleDeleteAll}
                     className="bg-btnSecondary text-white hover:opacity-75 font-semibold px-4 py-1.5 rounded-md
                     flex items-center gap-1"
+                    disabled={totalBlogs === 0 || loading}
                 >
                     <Icon
                         icon="mdi:delete"

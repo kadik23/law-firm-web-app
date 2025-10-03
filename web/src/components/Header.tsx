@@ -101,7 +101,7 @@ function Header() {
           0 26 45 23 45
         </div>
         <div className="flex gap-3 items-center text-white">
-          <span className="text-sm">Social Media</span>
+          <span className="text-sm">Réseaux sociaux</span>
           {/* Facebook */}
           <Icon
             icon="ic:outline-facebook"

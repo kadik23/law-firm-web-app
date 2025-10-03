@@ -1,13 +1,12 @@
 import dotenv from 'dotenv';
 dotenv.config();
 import { db } from '@/models/index';
-import { resolve } from 'path';
-import fs from 'fs';
 import { Op, Model, ModelCtor } from 'sequelize';
 import { Request, Response } from 'express';
 import { IUser } from '@/interfaces/User';
 import { IBlog } from '@/interfaces/Blog';
 import { IFavorite } from '@/interfaces/Favorite';
+import { getFileBase64FromDrive } from '@/middlewares/FilesMiddleware';
 /**
  * @swagger
  * /user/favorites:
@@ -153,7 +152,7 @@ const GetAllFavoriteBlogs = async (req: Request, res: Response): Promise<void> =
         {
           model: blogs,
           as: "FavoriteBlogs",
-          attributes: ["id", "title", "body","image","likes", "createdAt"],
+          attributes: ["id", "title", "file_id", "body","image","likes", "createdAt"],
           through: { attributes: [] },
         },
       ],
@@ -165,15 +164,14 @@ const GetAllFavoriteBlogs = async (req: Request, res: Response): Promise<void> =
       return;
     }
     (favBlogs as any).FavoriteBlogs = await Promise.all((favBlogs as any).FavoriteBlogs.map( async (blog: Model<IBlog>) => {
-      const filePath = resolve(__dirname, '..', '..', blog.getDataValue('image'));
-      let base64Image: string | null = null;
-      if (fs.existsSync(filePath)) {
-        const fileData = fs.readFileSync(filePath);
-        base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
+
+      let base64Image = null;
+      if (blog.getDataValue("file_id") && blog.getDataValue("file_id") !== '') {
+          base64Image = await getFileBase64FromDrive(blog.getDataValue("file_id"));
       }
       return {
-        ...blog.toJSON(),
-        image: base64Image
+          ...blog.toJSON(),
+          image: base64Image
       };
     }));
     res.status(200).json({
@@ -410,11 +408,9 @@ const SearchFavoriteBlogs = async (req: Request, res: Response): Promise<void> =
     });
     let favoriteBlogs = rows.map((favorite: any) => favorite.blog).filter(Boolean);
     favoriteBlogs = await Promise.all(favoriteBlogs.map(async (blog: Model<IBlog>) => {
-      const filePath = resolve(__dirname, '..', '..', blog.getDataValue('image'));
-      let base64Image: string | null = null;
-      if (fs.existsSync(filePath)) {
-        const fileData = fs.readFileSync(filePath);
-        base64Image = `data:image/png;base64,${fileData.toString('base64')}`;
+      let base64Image = null;
+      if (blog.getDataValue("file_id") && blog.getDataValue("file_id") !== '') {
+        base64Image = await getFileBase64FromDrive(blog.getDataValue("file_id"));
       }
       return {
         ...blog.toJSON(),

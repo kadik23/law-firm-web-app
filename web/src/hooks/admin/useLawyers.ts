@@ -89,6 +89,7 @@ export const useAvocats = () => {
   };
 
   const deleteAvocats = async () => {
+    setLoading(true);
     try {
       const response = await axios.delete("/admin/attorney/delete", {
         data: {
@@ -108,11 +109,14 @@ export const useAvocats = () => {
     } catch (error: unknown) {
       console.error("Error adding lawyer:", error);
       showAlert("error", "Erreur de supprimer des avocats", "Une erreur est survenue");
+    } finally {
+      setLoading(false);
     }
   };
 
   const addAvocat = async (data: LawyerFormData, onSuccess?: () => void) => {
     try {
+      setLoading(true);
       const formData = new FormData();
       const formattedDate = new Date().toISOString().split("T")[0];
 
@@ -165,7 +169,7 @@ export const useAvocats = () => {
           email: data.email,
           password: data.password,
           linkedin_url: data.linkedin_url,
-          picture: response.data.attorney.picture || "/images/avocatImg.png",
+          picture: response.data.attorney.attorney.picture || "/images/avocatImg.png",
           status: data.status,
           certificats: data.certificats,
           updatedAt: new Date().toISOString(),
@@ -201,9 +205,22 @@ export const useAvocats = () => {
       } else {
         showAlert("error", "Erreur d'ajout d'avocat", response.data);
       }
-    } catch (error: unknown) {
-      console.error("Error adding lawyer:", error);
-      showAlert("error", "Erreur d'ajout d'avocat", "Une erreur est survenue");
+    }  catch (error: unknown) {
+      if (isAxiosError(error)) {
+        const backendMessage =
+          error.response?.data?.error || "Une erreur est survenue";
+        console.error("Axios error:", backendMessage, error.response?.status);
+
+        showAlert("error", "Erreur d'ajout d'avocat", backendMessage);
+      } else if (error instanceof Error) {
+        console.error("JS error:", error.message);
+        showAlert("error", "Erreur d'ajout d'avocat", error.message);
+      } else {
+        console.error("Unknown error:", error);
+        showAlert("error", "Erreur d'ajout d'avocat", "Une erreur est survenue");
+      }
+    } finally{
+      setLoading(false)
     }
   };
 

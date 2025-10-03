@@ -49,7 +49,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setLoading(false)
         router.push("/")}, 2100);
     } catch (err: unknown) {
-      showAlert("error", "Oh claquement !", err as string);
+      showAlert("error", "Oh claquement !", 'Une erreur est survenue');
       console.error("An unexpected error occurred during logout: ", err);
     }
   };

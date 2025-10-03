@@ -34,13 +34,13 @@ function OurServices() {
           Nos Services
         </div>
         <div className="text-sm font-light text-center md:text-start text-opacity-50 mb-8">
-          Our corporate law services assist businesses of all sizes with legal
-          guidance throughout their
+          Nos services en droit des sociétés accompagnent les entreprises de toutes tailles
+          avec des conseils juridiques tout au long de leur
           <br className="hidden md:block" />
-          lifecycle. From incorporation to mergers and acquisitions, we offer
-          comprehensive legal
+          cycle de vie. De la création à la fusion-acquisition, nous offrons une assistance
+          juridique complète
           <br className="hidden md:block" />
-          support tailored to the specific needs of votre business.
+          adaptée aux besoins spécifiques de votre entreprise.
         </div>
       </div>
 

@@ -3,7 +3,7 @@ import { useState } from "react";
 import Modal from "@/components/Modal";
 import { DeleteConfirmation } from "@/components/dashboard/admin/DeleteConfirmation";
 import FormModal from "@/components/dashboard/admin/formModal";
-import { AddBlogForm } from "@/components/dashboard/admin/AddBlogForm";
+import { AddBlogForm } from "@/components/dashboard/admin/blogs/AddBlogForm";
 import BlogsWrapper from "@/components/BlogsWrapper";
 import { useAttorneyBlogs } from "@/hooks/attorney/useAttorneyBlogs";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -186,8 +186,12 @@ const InPage = () => {
         <AddBlogForm
           file={file}
           setFile={setFile}
-          onSubmit={(data) => addBlog(data, () => setAddModalOpen(false))}
+          onSubmit={(data) => {
+            addBlog(data, () => setAddModalOpen(false));
+            setAddModalOpen(false);
+          }}
           isUpdate={false}
+          loading={loading}
         />
       </FormModal>
 
@@ -204,7 +208,7 @@ const InPage = () => {
           <AddBlogForm
             file={file}
             setFile={setFile}
-            onSubmit={(data) =>
+            onSubmit={(data) =>{
               updateBlog(
                 editingBlog.id as number,
                 data,
@@ -214,10 +218,12 @@ const InPage = () => {
                   fetchBlogs(currentPage, status);
                 }
               )
-            }
+              setEditModalOpen(false);
+            }}
             isUpdate={true}
             blog={editingBlog}
             setBlog={() => {}}
+            loading={loading}
           />
         )}
       </FormModal>
@@ -236,6 +242,7 @@ const InPage = () => {
             deleteBlogs();
             setDeleteModalOpen(false);
           }}
+          loading={loading}
         />
       </Modal>
     </div>

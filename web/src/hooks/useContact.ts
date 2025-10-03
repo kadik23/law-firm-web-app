@@ -24,6 +24,7 @@ function useContactForm() {
     watch,
   } = form;
   const onsubmit = async (data: ContactUs) => {
+    setIsDisabled(true);
     try {
       console.log("first submit ", data);
       const response = await axiosClient.post("/admin/contactus", {
@@ -33,12 +34,14 @@ function useContactForm() {
         message: data.message,
       });
       if (response.status == 200) {
-        showAlert("success", "Submitted Successfully!", "Your request was successfully submitted.")
+        showAlert("success", "Soumis avec succès!", "Votre demande a été soumise avec succès.")
       } else {
         alert(response.data);
       }
     } catch (err) {
       console.log(err);
+    } finally {
+      setIsDisabled(false);
     }
   };
   const validateForm = () => {
@@ -61,7 +64,7 @@ function useContactForm() {
   };
   useEffect(() => {
     validateForm();
-  }, [watch]);
+  }, [isValid]);
   return {
     register,
     control,

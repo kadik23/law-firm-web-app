@@ -1,12 +1,13 @@
 "use client";
-import { AddAvocatForm } from "@/components/dashboard/admin/AddAvocatForm";
-import AvocatCard from "@/components/dashboard/admin/avocatCard";
+import { AddAvocatForm } from "@/components/dashboard/admin/avocats/AddAvocatForm";
+import AvocatCard from "@/components/dashboard/admin/avocats/avocatCard";
 import { DeleteConfirmation } from "@/components/dashboard/admin/DeleteConfirmation";
 import FormModal from "@/components/dashboard/admin/formModal";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import Modal from "@/components/Modal";
+import { LoadingContext } from "@/contexts/LoadingContext";
 import { useAvocats } from "@/hooks/admin/useLawyers";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 const Avocats = () => {
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -46,6 +47,12 @@ const Avocats = () => {
     }
   };
 
+  const {setLoading} = useContext(LoadingContext);
+
+  useEffect(() => {
+    setLoading(loading);
+  }, [loading]);
+
   return (
     <div>
       <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center justify-between">
@@ -58,7 +65,7 @@ const Avocats = () => {
               onChange={toggleSelectAll}
               className="cursor-pointer"
             />
-            Select All
+            Sélectionner tout
           </label>
 
           <button
@@ -109,7 +116,7 @@ const Avocats = () => {
                 onClick={() => handlePageChange(currentPage - 1)}
                 className="px-4 py-2 bg-btnSecondary text-white rounded-md"
               >
-                Previous
+                Précédente
               </button>
             )}
 
@@ -136,7 +143,7 @@ const Avocats = () => {
                 onClick={() => handlePageChange(currentPage + 1)}
                 className="px-4 py-2 bg-btnSecondary text-white rounded-md"
               >
-                Next
+                Suivante
               </button>
             )}
           </div>
@@ -155,6 +162,7 @@ const Avocats = () => {
           file={file}
           setFile={setFile}
           onSubmit={(data) => addAvocat(data, () => setAddModalOpen(false))}
+          loading={loading}
         />
       </FormModal>
 
@@ -170,6 +178,7 @@ const Avocats = () => {
             deleteAvocats();
             handleDeleteModalClose();
           }}
+          loading={loading}
         />
       </Modal>
     </div>

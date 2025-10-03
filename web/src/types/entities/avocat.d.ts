@@ -11,6 +11,7 @@ interface avocatEntity{
     createdAt: string;
     updatedAt: string;
     picture: string | File;
+    User?: User;
 }
 
 type LawyerFormData = Omit<

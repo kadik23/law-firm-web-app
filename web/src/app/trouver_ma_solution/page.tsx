@@ -123,10 +123,7 @@ function Page() {
             Nos Services
           </div>
           <div className="text-sm font-light text-center md:text-start text-opacity-50 mb-8">
-            Our corporate law services assist businesses of all sizes with legal
-            guidance throughout their lifecycle. From incorporation to mergers
-            and acquisitions, we offer comprehensive legal support tailored to
-            the specific needs of your business.
+            Nos services de droit des sociétés accompagnent les entreprises de toutes tailles tout au long de leur cycle de vie. De la création d{"'"}entreprise aux fusions et acquisitions, nous offrons un accompagnement juridique complet et adapté aux besoins spécifiques de votre entreprise.
           </div>
         </div>
 

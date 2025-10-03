@@ -163,6 +163,18 @@ adminRouter.put(
   AssignedServices.updateFileStatus
 );
 
+adminRouter.get(
+  "/assigned_services/clients",
+  authMiddleware(["admin"]),
+  AssignedServices.getClients
+);
+
+adminRouter.get(
+  "/assigned_services/client/:id",
+  authMiddleware(["admin"]),
+  AssignedServices.getClientById
+);
+
 adminRouter.put(
   "/assigned_services/folder_status/:requestServiceId",
   authMiddleware(["admin"]),

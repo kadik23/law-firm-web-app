@@ -1,7 +1,6 @@
 import { db } from '@/models/index';
 import path from 'path';
 import fs from 'fs';
-import multer from 'multer';
 import { Request, Response } from 'express';
 import { Model, ModelCtor, Op } from 'sequelize';
 import { IService } from '@/interfaces/Service';
@@ -9,14 +8,29 @@ import { IUser } from '@/interfaces/User';
 import { IProblem } from '@/interfaces/Problem';
 import { IServiceFilesUploaded } from '@/interfaces/ServiceFilesUploaded';
 import { createNotification } from '../createNotification';
-import { imageToBase64DataUri } from '@/utils/imageUtils';
-import { getImagePath } from '@/utils/getImagePath';
-
+import { deleteFileFromDrive, getFileBase64FromDrive, upload, uploadToDrive } from '@/middlewares/FilesMiddleware';
 const Service: ModelCtor<Model<IService>> = db.services;
 const RequestService = db.request_service;
 const ServiceFilesUploaded: ModelCtor<Model<IServiceFilesUploaded>> = db.service_files_uploaded;
 const User: ModelCtor<Model<IUser>> = db.users;
 const Problem: ModelCtor<Model<IProblem>> = db.problems;
+const UPLOADS_DIR = path.join(__dirname, "../../uploads");
+
+interface AssignedServiceResponse {
+  id: number;
+  request_service_id: number;
+  name: string;
+  description: string;
+  requestedFiles: string[];
+  coverImage: string | null;
+  price: number;
+  status: string;
+  is_paid: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  requestCreatedAt: Date;
+  requestUpdatedAt: Date;
+}
 
 /**
  * @swagger
@@ -80,6 +94,7 @@ const getAllServices = async (req: Request, res: Response): Promise<void> => {
         "requestedFiles",
         "coverImage",
         "price",
+        "file_id",
         "createdBy",
         "createdAt",
         "updatedAt",
@@ -89,12 +104,14 @@ const getAllServices = async (req: Request, res: Response): Promise<void> => {
     if (services) {
       const resultList: any[] = await Promise.all(
         services.map(async (service: Model<IService>) => {
-          const filePath = getImagePath(service.getDataValue('coverImage'));
-          const base64Image = imageToBase64DataUri(filePath);
-          return {
-            ...service.toJSON(),
-            coverImage: base64Image,
-          };
+            let base64Image = null;
+            if (service.getDataValue("file_id") && service.getDataValue("file_id") !== '') {
+                base64Image = await getFileBase64FromDrive(service.getDataValue("file_id"));
+            }
+            return {
+              ...service.toJSON(),
+              coverImage: base64Image,
+            };
         })
       );
       res.status(200).json(resultList);
@@ -176,8 +193,10 @@ const getOneService = async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
     const service = await Service.findOne({ where: { id } });
     if (service) {
-      const filePath = getImagePath(service.getDataValue('coverImage'));
-      const base64Image = imageToBase64DataUri(filePath);
+      let base64Image = null;
+      if (service.getDataValue("file_id") && service.getDataValue("file_id") !== '') {
+          base64Image = await getFileBase64FromDrive(service.getDataValue("file_id"));
+      }
       res.status(200).json({
         ...service.toJSON(),
         coverImage: base64Image,
@@ -327,12 +346,11 @@ const deleteServiceFiles = async (req: Request, res: Response): Promise<void> =>
       res.status(404).json({ message: "No files found for the specified service ID uploaded by the current user" });
       return;
     }
-    filesToDelete.forEach((file: Model<any>) => {
-      const filePath = getImagePath(file.getDataValue('file_name'));
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
+    await Promise.all(filesToDelete.map(async (file: Model<any>) => {
+      if (file.getDataValue('file_id') && file.getDataValue('file_id') !== '') {
+        await deleteFileFromDrive(file.getDataValue('file_id'));
       }
-    });
+    }));
     const deletedCount = await ServiceFilesUploaded.destroy({ where: { request_service_id } });
     res.status(200).json({ message: `Deleted ${deletedCount} files for service ID ${request_service_id} uploaded by user ${userId}.` });
   } catch (error: any) {
@@ -405,13 +423,27 @@ const updateServiceFile = async (req: Request, res: Response): Promise<void> => 
       return;
     }
 
-    if (!req.files || req.files.length === 0) {
+    if (!req.files || (req.files as Express.Multer.File[]).length === 0) {
       res.status(400).json({ error: "New files are required" });
       return;
     }
 
+    // Parse ids: allow "1" or "1,2,3"
+    const ids = String(uploaded_file_id)
+      .split(",")
+      .map((x) => x.trim())
+      .filter(Boolean)
+      .map((x) => Number(x))
+      .filter((x) => !Number.isNaN(x));
+
+    if (ids.length === 0) {
+      res.status(400).json({ error: "Invalid uploaded_file_id" });
+      return;
+    }
+
+    // Fetch the file records (order is important to align with req.files)
     const fileRecords = await ServiceFilesUploaded.findAll({
-      where: { id: uploaded_file_id },
+      where: { id: { [Op.in]: ids } },
       order: [["createdAt", "ASC"]],
     });
 
@@ -420,115 +452,164 @@ const updateServiceFile = async (req: Request, res: Response): Promise<void> => 
       return;
     }
 
-    await Promise.all((req.files as Express.Multer.File[]).map(async (file: Express.Multer.File, index: number) => {
-        const fileRecord = fileRecords[index];
-        const fileExt = path.extname(file.originalname);
-      const newFileName = `requestService_${fileRecords[0].getDataValue('id')}_file_${uploaded_file_id}${fileExt}`;
-        const newFilePath = path.join(__dirname, "../../uploads", newFileName);
-        const oldFilePath = path.join(
-          __dirname,
-          "../../uploads",
-        fileRecord.getDataValue('file_name')
-        );
-        if (fs.existsSync(oldFilePath)) {
-          fs.unlinkSync(oldFilePath);
-        }
-        fs.renameSync(file.path, newFilePath);
-      fileRecord.setDataValue('file_name', newFileName);
-        await fileRecord.save();
-    }));
-
-    const allFilesUploaded = await verifyAllFilesUploaded(
-      fileRecords[0].getDataValue('request_service_id')
-    );
-      let serviceId: number | undefined;
-      const requestServiceId = fileRecords[0].getDataValue('request_service_id');
-      if (requestServiceId) {
-        const requestService = await RequestService.findByPk(requestServiceId);
-        if (requestService) {
-          const rawServiceId = requestService.getDataValue('serviceId');
-          if (typeof rawServiceId === 'string') {
-            const parsed = parseInt(rawServiceId, 10);
-            if (!isNaN(parsed)) serviceId = parsed;
-          } else if (typeof rawServiceId === 'number') {
-            serviceId = rawServiceId;
-          }
-        }
-      }
-      let serviceName = "Service";
-      if (serviceId) {
-        const service = await Service.findByPk(serviceId);
-        if (service) {
-          serviceName = service.getDataValue('name');
-        }
-      }
-      await ServiceFilesUploaded.update({
-        status: "Pending",
-        rejection_reason: null
-      }, {
-        where: {
-          request_service_id: fileRecords[0].getDataValue('request_service_id'),
-          id: {
-            [Op.in]: fileRecords.map((f: Model<any>) => f.getDataValue('id'))
-          }
-        }
+    // Ensure same count if you expect a 1-to-1 mapping
+    const files = req.files as Express.Multer.File[];
+    if (files.length !== fileRecords.length) {
+      res.status(400).json({
+        error: `Files count (${files.length}) does not match record count (${fileRecords.length}).`,
       });
-      await createNotification(
-        "Documents",
-        `Tous les documents ont été ajoutés pour la demande ${serviceName}`,
-        2,
-        Number(fileRecords[0].getDataValue('request_service_id')),
-        req?.user?.id as number,
-      );
+      return;
+    }
+
+    // Make sure uploads dir exists
+    if (!fs.existsSync(UPLOADS_DIR)) {
+      fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+    }
+
+    // Replace each file:
+    await Promise.all(
+      files.map(async (file: Express.Multer.File, index: number) => {
+        const record = fileRecords[index];
+
+        // Old local file (if you were storing names before)
+        const oldLocalName = record.getDataValue("file_name") as string | null;
+        const oldLocalPath =
+          oldLocalName ? path.join(UPLOADS_DIR, oldLocalName) : null;
+
+        // Old Drive file (if present)
+        const oldDriveFileId = record.getDataValue("file_id") as string | null;
+
+        // Use a consistent new local temp name (kept only until Drive upload)
+        const fileExt = path.extname(file.originalname);
+        const newFileName = `requestService_${record.getDataValue("id")}_file_${record.getDataValue("id")}${fileExt}`;
+        const newFilePath = path.join(UPLOADS_DIR, newFileName);
+
+        // Remove old local file if it exists (you are moving to Drive-first approach)
+        try {
+          if (oldLocalPath && fs.existsSync(oldLocalPath)) {
+            fs.unlinkSync(oldLocalPath);
+          }
+        } catch (e) {
+          // non-fatal
+          console.warn(`Could not remove old local file ${oldLocalPath}`, e);
+        }
+
+        // Move multer temp file to our canonical name (still local temp)
+        fs.renameSync(file.path, newFilePath);
+
+        // Upload to Drive from local temp
+        let newDriveFileId: string;
+        try {
+          newDriveFileId = await uploadToDrive(newFilePath, file.originalname, file.mimetype);
+        } finally {
+          // Always remove the local temp file after upload attempt
+          try {
+            if (fs.existsSync(newFilePath)) fs.unlinkSync(newFilePath);
+          } catch (e) {
+            console.warn(`Could not remove temp file ${newFilePath}`, e);
+          }
+        }
+
+        // Delete old Drive file if it existed
+        if (oldDriveFileId) {
+          try {
+            await deleteFileFromDrive(oldDriveFileId);
+          } catch (e) {
+            // non-fatal, just log
+            console.warn(`Could not delete old Drive file ${oldDriveFileId}`, e);
+          }
+        }
+
+        // Update DB record: keep the new logical file name + Drive ID
+        record.set("file_name", newFileName); // keep for history if you want
+        record.set("file_id", newDriveFileId); // primary source of truth
+        await record.save();
+      })
+    );
+
+    // All files belong to the same request_service_id
+    const requestServiceId = fileRecords[0].getDataValue("request_service_id");
+
+    const allFilesUploaded = await verifyAllFilesUploaded(requestServiceId);
+
+    // Resolve serviceId -> serviceName (unchanged)
+    let serviceId: number | undefined;
+    if (requestServiceId) {
+      const requestService = await RequestService.findByPk(requestServiceId);
+      if (requestService) {
+        const rawServiceId = requestService.getDataValue("serviceId");
+        if (typeof rawServiceId === "string") {
+          const parsed = parseInt(rawServiceId, 10);
+          if (!isNaN(parsed)) serviceId = parsed;
+        } else if (typeof rawServiceId === "number") {
+          serviceId = rawServiceId;
+        }
+      }
+    }
+
+    let serviceName = "Service";
+    if (serviceId) {
+      const service = await Service.findByPk(serviceId);
+      if (service) {
+        serviceName = service.getDataValue("name");
+      }
+    }
+
+    // Reset status for the updated files
+    await ServiceFilesUploaded.update(
+      { status: "Pending", rejection_reason: null },
+      {
+        where: {
+          request_service_id: requestServiceId,
+          id: { [Op.in]: fileRecords.map((f: Model<any>) => f.getDataValue("id")) },
+        },
+      }
+    );
+
+    await createNotification(
+      "Documents",
+      `Tous les documents ont été ajoutés pour la demande ${serviceName}`,
+      2,
+      Number(requestServiceId),
+      req?.user?.id as number
+    );
+
     res.status(200).json({
       message: "Files updated successfully",
       updatedFiles: fileRecords.map((f: Model<any>) => ({
-        id: f.getDataValue('id'),
-        file_name: f.getDataValue('file_name'),
+        id: f.getDataValue("id"),
+        file_name: f.getDataValue("file_name"),
+        file_id: f.getDataValue("file_id"),
       })),
       allFilesUploaded,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error updating service files:", error);
-    res.status(500).json({ error: "Internal server error: " + (error as any).message });
-    return;
+    res
+      .status(500)
+      .json({ error: "Internal server error: " + (error?.message || "unknown") });
   }
 };
 
-// Define a type for the assigned service response
-interface AssignedServiceResponse {
-  id: number;
-  request_service_id: number;
-  name: string;
-  description: string;
-  requestedFiles: string[];
-  coverImage: string | null;
-  price: number;
-  status: string;
-  is_paid: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  requestCreatedAt: Date;
-  requestUpdatedAt: Date;
-}
-
 const verifyAllFilesUploaded = async (requestServiceId: string | number) => {
-  const idNum = typeof requestServiceId === 'string' ? parseInt(requestServiceId, 10) : requestServiceId;
+  const idNum = typeof requestServiceId === "string" ? parseInt(requestServiceId, 10) : requestServiceId;
   const requestService = await RequestService.findByPk(idNum);
   if (!requestService) return false;
-  const requestedFilesRaw = (requestService.get('requestedFiles') as any) as string | string[] | undefined;
+
+  const requestedFilesRaw = requestService.get("requestedFiles") as string | string[] | undefined;
   if (!requestedFilesRaw) return false;
+
   let expectedFiles: string[];
   try {
-    expectedFiles = Array.isArray(requestedFilesRaw)
-      ? requestedFilesRaw
-      : JSON.parse(requestedFilesRaw as string);
-  } catch (err) {
+    expectedFiles = Array.isArray(requestedFilesRaw) ? requestedFilesRaw : JSON.parse(requestedFilesRaw as string);
+  } catch {
     return false;
   }
+
   const uploadedFiles = await ServiceFilesUploaded.findAll({
     where: { request_service_id: idNum },
   });
+
   return uploadedFiles.length === expectedFiles.length;
 };
 /**
@@ -585,9 +666,6 @@ const verifyAllFilesUploaded = async (requestServiceId: string | number) => {
  *       500:
  *         description: Internal server error.
  */
-
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
 
 const uploadServiceFiles = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -660,37 +738,20 @@ const uploadServiceFiles = async (req: Request, res: Response): Promise<void> =>
       }
 
       const uploadedFiles = await Promise.all((req.files as Express.Multer.File[]).map(async (file: Express.Multer.File, index: number) => {
-          const serviceFileUpload = await ServiceFilesUploaded.create({
+        const fileId = await uploadToDrive(
+          file.path,
+          file.originalname,
+          file.mimetype
+        );
+        const serviceFileUpload = await ServiceFilesUploaded.create({
           request_service_id: Number(request_service_id),
-            file_name: file.originalname,
-            status: "Pending",
-          });
-
-          const fileExt = path.extname(file.originalname);
-
-        const newFileName = `requestService_${request_service_id}_file_${serviceFileUpload.getDataValue('id')}${fileExt}`;
-
-          const uploadDir = path.join(__dirname, "../../uploads");
-          if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-          }
-
-          const filePath = path.join(uploadDir, newFileName);
-
-          fs.writeFileSync(filePath, file.buffer);
-
-          await serviceFileUpload.update({
-            file_name: newFileName,
-          });
-
-          return serviceFileUpload;
-      }));
-
-      await Promise.all(uploadedFiles.map(async (file) => {
-        await file.update({
+          file_name: file.originalname,
           status: "Pending",
+          file_id: fileId,
           rejection_reason: null
         });
+
+        return serviceFileUpload;
       }));
       
       await createNotification(
@@ -782,13 +843,10 @@ const getServiceFiles = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const filesWithBase64 = files.map((file: Model<any>) => {
-      const filePath = path.join(__dirname, "../../uploads", file.getDataValue('file_name'));
+    const filesWithBase64 = await Promise.all(files.map(async (file: Model<any>) => {
       let base64Data = null;
-
-      if (fs.existsSync(filePath)) {
-        const fileBuffer = fs.readFileSync(filePath);
-        base64Data = fileBuffer.toString("base64");
+      if (file.getDataValue('file_id') && file.getDataValue('file_id') !== '') {
+        base64Data = await getFileBase64FromDrive(file.getDataValue('file_id'));
       }
 
       return {
@@ -798,7 +856,7 @@ const getServiceFiles = async (req: Request, res: Response): Promise<void> => {
         status: file.getDataValue('status'),
         rejection_reason: file.getDataValue('rejection_reason')
       };
-    });
+    }));
 
     res.status(200).json({
       count: files.length,
@@ -829,9 +887,10 @@ const getAllServicesByProblem = async (req: Request, res: Response): Promise<voi
     });
     if (services) {
       const servicesWithImages = await Promise.all(services.map(async (service: Model<IService>) => {
-        const filePath = getImagePath(service.getDataValue('coverImage'));
-        const base64Image = imageToBase64DataUri(filePath);
-
+        let base64Image = null;
+        if (service.getDataValue("file_id") && service.getDataValue("file_id") !== '') {
+            base64Image = await getFileBase64FromDrive(service.getDataValue("file_id"));
+        }
         return {
           ...service.toJSON(),
           coverImage: base64Image
@@ -982,7 +1041,7 @@ const getAssignedServices = async (req: Request, res: Response): Promise<void> =
         {
           model: Service,
           as: 'service', 
-          attributes: ['id', 'name', 'description', 'requestedFiles', 'coverImage', 'price', 'createdAt', 'updatedAt'],
+          attributes: ['id', 'name', 'description', 'requestedFiles', 'coverImage', 'price', 'createdAt', 'updatedAt', 'file_id'],
           required: true
         }
       ],
@@ -999,14 +1058,9 @@ const getAssignedServices = async (req: Request, res: Response): Promise<void> =
           console.warn(`No service found for request ${request.getDataValue('id')}`);
           return null;
         }
-        let base64Image: string | null = null;
-        if (service.getDataValue('coverImage')) {
-          try {
-            const filePath = getImagePath(service.getDataValue('coverImage'));
-            base64Image = imageToBase64DataUri(filePath);
-          } catch (fileError) {
-            console.error(`Error processing cover image for service ${service.getDataValue('id')}:`, fileError);
-          }
+        let base64Image = null;
+        if (service.getDataValue('file_id') && service.getDataValue('file_id') !== '') {
+          base64Image = await getFileBase64FromDrive(service.getDataValue('file_id'));
         }
         return {
           id: service.getDataValue('id'),

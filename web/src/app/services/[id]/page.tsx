@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Image from "next/image";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
 import useCarousel from "@/hooks/useCarousel";
@@ -19,6 +19,7 @@ import Signup from "@/components/Signup";
 import Signin from "@/components/Signin";
 import { useAssignService } from "@/hooks/clients/useAssignService";
 import Link from "next/link";
+import { LoadingContext } from "@/contexts/LoadingContext";
 
 function Page() {
   const { id } = useParams();
@@ -57,13 +58,19 @@ function Page() {
     deleteMyTestimonial,
   } = useTestimony();
 
-  const { assignService } = useAssignService(parseInt(id as string));
+  const { assignService, loading } = useAssignService(parseInt(id as string));
   const router = useRouter();
 
   const addEmoji = (emoji: string) => {
     setComment((prev) => prev + emoji);
     setShowEmojis(false);
   };
+
+    const {setLoading} = useContext(LoadingContext);
+  
+    useEffect(() => {
+      setLoading(loading);
+    }, [loading]);
 
   const {
     currentIndex: currentServiceIndex,
@@ -187,16 +194,17 @@ function Page() {
         )}
         {service && (
           <div className="flex flex-col md:flex-row gap-8 md:gap-16">
-            <Image
-              src={service?.coverImage || `/images/serviceImg.png`}
-              alt="service"
-              layout="responsive"
-              width={32}
-              height={32}
-              className="rounded-lg"
-              priority
-            />
-            <div className="bg-third rounded-lg p-4 md:p-8 flex flex-col gap-8 justify-between">
+            <div className="md:w-1/2 w-full">
+              <Image
+                src={service?.coverImage || `/images/serviceImg.png`}
+                alt="service"
+                width={600}
+                height={400}
+                className="rounded-lg object-cover w-full h-auto"
+                priority
+              />
+            </div>
+            <div className="md:w-1/2 w-full bg-third rounded-lg p-4 md:p-8 flex flex-col gap-8 justify-between">
               <div className="font-semibold text-lg md:text-xl flex justify-between items-center">
                 <div>Prix</div>
                 <div>DA {service?.price}</div>
@@ -209,15 +217,12 @@ function Page() {
                   <div className="grid grid-cols-1 md:grid-cols-2 text-sm md:text-base">
                     {service.requestedFiles.map((file, index) => (
                       <div key={index}>
-                        <span className="font-semibold">{index + 1} </span> -{" "}
-                        {file}
+                        <span className="font-semibold">{index + 1} </span> - {file}
                       </div>
                     ))}
                   </div>
                 )}
-                <div className="text-sm md:text-base">
-                  {service?.description}
-                </div>
+                <div className="text-sm md:text-base">{service?.description}</div>
               </div>
               <div className="flex flex-col md:flex-row gap-2">
                 <button
@@ -225,10 +230,9 @@ function Page() {
                     if (AuthUSER && AuthUSER.type === "client") {
                       assignService();
                       setTimeout(
-                        () => (
+                        () =>
                           router.push(`/${AuthUSER.type}/dashboard/services`),
-                          2100
-                        )
+                        2100
                       );
                     } else if (AuthUSER && AuthUSER.type === "admin") {
                       showAlert(
@@ -240,18 +244,17 @@ function Page() {
                       setSignupModalOpen(true);
                     }
                   }}
+                  disabled={loading}
                   className="btn text-xs md:text-sm bg-primary text-white py-2 px-4 rounded-md"
                 >
                   Commencer votre dossier
                 </button>
                 {!AuthUSER && (
                   <button
-                    onClick={() => {
-                      setSigninModalOpen(true);
-                    }}
+                    onClick={() => setSigninModalOpen(true)}
                     className="btn text-xs md:text-sm bg-primary text-white py-2 px-4 rounded-md"
                   >
-                    Consultaion initiale gratuite
+                    Consultation initiale gratuite
                   </button>
                 )}
                 {AuthUSER && AuthUSER.type === "client" && (
@@ -259,7 +262,7 @@ function Page() {
                     href={`/dashboard/${AuthUSER.type}/services`}
                     className="btn text-xs md:text-sm bg-primary text-white py-2 px-4 rounded-md"
                   >
-                    Consultaion initiale gratuite
+                    Consultation initiale gratuite
                   </Link>
                 )}
               </div>
@@ -453,13 +456,13 @@ function Page() {
             Nos Services
           </div>
           <div className="text-sm font-light text-center md:text-start text-opacity-50 mb-8">
-            Our corporate law services assist businesses of all sizes with legal
-            guidance throughout their
+            Nos services en droit des sociétés accompagnent les entreprises de toutes tailles
+            avec des conseils juridiques tout au long de leur
             <br className="hidden md:block" />
-            lifecycle. From incorporation to mergers and acquisitions, we offer
-            comprehensive legal
+            cycle de vie. De la création à la fusion-acquisition, nous offrons une assistance
+            juridique complète
             <br className="hidden md:block" />
-            support tailored to the specific needs of your business.
+            adaptée aux besoins spécifiques de votre entreprise.
           </div>
         </div>
         {ServicesLoadingChecker()}

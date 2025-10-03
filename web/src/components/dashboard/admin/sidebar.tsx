@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 const Sidebar = () => {
   const pathname = usePathname() || "";
-  const { logout } = useAuth();
+  const { logout, loading } = useAuth();
 
   const routes = [
     {
@@ -116,11 +116,12 @@ const Sidebar = () => {
         {renderRoutes(routes.slice(9))}
       </ul>
       <button
+        disabled={loading}
         onClick={logout}
         className="flex items-center gap-3 font-semibold text-black py-2 px-3 hover:bg-[#34495E] hover:text-white rounded-md mx-6 transition-all duration-300"
       >
         <Icon icon="ic:round-logout" width="24" height="24" />
-        <span>Logout</span>
+        <span>Déconnexion</span>
       </button>
     </div>
   );

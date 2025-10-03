@@ -25,6 +25,10 @@ const ServiceFactory = (sequelize: Sequelize, DataTypes: typeof SequelizeDataTyp
       type: DataTypes.TEXT,
       allowNull: false,
     },
+    file_id: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     price: {
       type: DataTypes.FLOAT,
       allowNull: false,

@@ -5,4 +5,5 @@ export interface IAttorney {
   linkedin_url?: string;
   date_membership: Date;
   picture_path: string;
+  file_id: string;
 } 

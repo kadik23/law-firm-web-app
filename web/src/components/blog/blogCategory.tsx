@@ -20,7 +20,7 @@ const BlogCategory = ({
             selectedCategory === null ? "text-primary font-bold" : ""
           }`}
         >
-          All
+          Toute
         </div>
         <div
           className={`w-4 h-[3px] rounded-lg bg-primary transition-all ${

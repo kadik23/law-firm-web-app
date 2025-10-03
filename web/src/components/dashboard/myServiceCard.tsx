@@ -8,16 +8,21 @@ type MyServiceCardProps = {
   remService: (id: number) => void;
 };
 function Myservice({ service, remService }: MyServiceCardProps) {
+    const isValidCover =
+  typeof service.coverImage === "string" &&
+  service.coverImage.trim() !== "" &&
+  (service.coverImage.startsWith("http") || service.coverImage.startsWith("/") || service.coverImage.startsWith("data:image"));
+
+  const safeCoverImage = isValidCover ? service.coverImage : "/images/default-service.png";
+
   return (
     <div className="rounded-xl shadow-md relative">
       <Image
-        src={`${service.coverImage}`}
+        src={safeCoverImage}
         alt="service"
-        layout="responsive"
-        width={75}
-        height={25}
-        className="rounded-t-xl"
-        priority
+        width={500}
+        height={300}
+        className="rounded-t-xl w-full h-36 sm:h-49 md:h-48 lg:h-52 object-cover"
       />
       <div className="flex justify-between w-full p-2">
         <div className="font-semibold text-lg">{service.name}</div>

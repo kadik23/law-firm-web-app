@@ -180,8 +180,9 @@ function DossierClientPage() {
                     handleReasonSubmit(file.id, file.rejection_reason || "")
                   }
                   className="bg-primary transition-all duration-200 active:scale-105 py-2 px-4 hover:opacity-75 text-white rounded-lg"
+                  disabled={loading}
                 >
-                  Submit
+                  Soumettre
                 </button>
               </div>
             )}

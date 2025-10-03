@@ -5,6 +5,7 @@ export interface IBlog {
   body: string;
   readingDuration: number;
   image: string;
+  file_id: string;
   categoryId: number;
   userId: number;
   accepted: boolean;

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useAlert } from "@/contexts/AlertContext";
 
 export const useAssignService = (serviceId?: number) => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [assignServices, setassignServices] = useState<serviceEntity[]>([]);
   const { showAlert } = useAlert();
   const [service, setService] = useState<serviceEntity | null>(null);
@@ -42,6 +42,7 @@ export const useAssignService = (serviceId?: number) => {
 };
 
   const assignService = async () => {
+    setLoading(true);
     try {
       const response = await axios.post("/user/services/assign_client", {
         serviceId: serviceId,
@@ -65,6 +66,7 @@ export const useAssignService = (serviceId?: number) => {
   };
 
   const remAssignService = async (remove_assign_client: number) => {
+    setLoading(true);
     try {
       const response = await axios.delete(
         `/user/services/remove_assign_client/${remove_assign_client}`
@@ -85,10 +87,13 @@ export const useAssignService = (serviceId?: number) => {
       } else {
         console.error("An unexpected error occurred:", err);
       }
+    } finally {
+      setLoading(false)
     }
   };
 
   const remAssignServiceAll = async () => {
+    setLoading(true)
     try {
       const response = await axios.delete(
         `/user/services/remove_all_assign_client`
@@ -107,6 +112,8 @@ export const useAssignService = (serviceId?: number) => {
       } else {
         console.error("An unexpected error occurred:", err);
       }
+    } finally{
+      setLoading(false)
     }
   };
 

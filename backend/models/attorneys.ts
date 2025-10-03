@@ -33,7 +33,12 @@ const AttorneyFactory = (sequelize: Sequelize, DataTypes: typeof SequelizeDataTy
     picture_path: {
       type: DataTypes.STRING(200),
       allowNull: false
+    },
+    file_id: {
+      type: DataTypes.STRING,
+      allowNull: true
     }
+    
   });
   return Attorney;
 };

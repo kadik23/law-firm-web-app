@@ -3,7 +3,7 @@ dotenv.config();
 import { db } from "@/models"
 import path from "path";
 import fs from "fs";
-import { upload } from "@/middlewares/FilesMiddleware";
+import { getFileBase64FromDrive, upload } from "@/middlewares/FilesMiddleware";
 import { body, validationResult } from "express-validator";
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
@@ -42,26 +42,23 @@ const getAllAttorneys = async (
   res: Response
 ): Promise<void> => {
   try {
-    let attorneyList = await attorneys.findAll();
+    let attorneyList = await attorneys.findAll({
+       include: [
+        {
+          model: User,
+          as: "User",
+          attributes: ["id", "name", "email", "surname"],
+        },
+      ],
+    });
 
     if (attorneyList) {
       const resultList: any[] = await Promise.all(
         attorneyList.map(async (attorney: Model<IAttorney>) => {
-          const filePath = path.resolve(
-            __dirname,
-            "..",
-            "..",
-            attorney.getDataValue('picture_path')
-          );
-
-          let base64Image: string | null = null;
-          if (fs.existsSync(filePath)) {
-            const fileData = fs.readFileSync(filePath);
-            base64Image = `data:image/png;base64,${fileData.toString(
-              "base64"
-            )}`;
+          let base64Image = null;
+          if (attorney.getDataValue("file_id") && attorney.getDataValue("file_id") !== '') {
+              base64Image = await getFileBase64FromDrive(attorney.getDataValue("file_id"));
           }
-
           return {
             ...attorney.toJSON(),
             picture: base64Image,

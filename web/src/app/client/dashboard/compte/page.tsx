@@ -1,5 +1,4 @@
 "use client";
-import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -27,20 +26,15 @@ const Account = () => {
     { label: "Pays", value: user?.pays },
     { label: "Âge", value: user?.age },
     { label: "Ville", value: user?.ville },
-    { label: "Numéro de téléphone", value: user?.phone_number },
+    { label: "Numéro de téléphone", value: "0"+user?.phone_number },
   ];
 
   return (
     <div className="flex flex-col gap-10 w-full md:px-0 px-8">
       <div className="flex items-center gap-4">
-        <Image
-          src={"/images/profile.png"}
-          alt="Profile Picture"
-          className="rounded-full"
-          style={{ objectFit: "cover" }}
-          width={50}
-          height={50}
-        />
+        <button className="bg-secondary capitalize w-12 h-12 rounded-full text-center text-lg p-2 btn font-semibold shadow-lg">
+          {user?.name[0]}
+        </button>
         <div className="flex flex-col gap-1">
           <span className="font-semibold">
             {`${user?.name} ${user?.surname}`}

@@ -1,9 +1,10 @@
 import axios from "@/lib/utils/axiosClient";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { isAxiosError } from "axios";
 import { useAlert } from "@/contexts/AlertContext";
+import { arraysEqual } from "@/lib/utils/arrayEqual";
 
-export const useServicesM = () => {
+export const useServicesM = (setService: Dispatch<SetStateAction<serviceEntity | null>> | null) => {
   const [services, setServices] = useState<
     (serviceEntity & { selected?: boolean })[]
   >([]);
@@ -58,6 +59,7 @@ export const useServicesM = () => {
   };
 
   const deleteServices = async () => {
+    setLoading(true);
     try {
       const response = await axios.delete("/admin/services/delete", {
         data: {
@@ -77,10 +79,13 @@ export const useServicesM = () => {
     } catch (error: unknown) {
       console.error("Error adding service:", error);
       showAlert("error", "Erreur de supprimer des services", "Une erreur est survenue");
+    } finally {
+      setLoading(false);
     }
   };
 
   const addService = async (data: ServiceFormData, onSuccess?: () => void) => {
+    setLoading(true);
     try {
       const formData = new FormData();
 
@@ -134,6 +139,8 @@ export const useServicesM = () => {
     } catch (error: unknown) {
       console.error("Error adding lawyer:", error);
       showAlert("error", "Erreur d'ajout de service", "Une erreur est survenue");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -156,8 +163,8 @@ export const useServicesM = () => {
         formData.append("description", data.description);
       if (data.price && oldServiceData.price !== data.price)
         formData.append("price", data.price.toString());
-      
-      if (data.requestedFiles && oldServiceData.requestedFiles !== data.requestedFiles) {
+
+      if (data.requestedFiles && !arraysEqual(oldServiceData.requestedFiles, data.requestedFiles)) {
         data.requestedFiles.forEach((fileName, index) => {
           formData.append(`requestedFiles[${index}]`, fileName);
         });
@@ -174,6 +181,31 @@ export const useServicesM = () => {
       });
 
       if (response.status === 200) {
+      setServices(prev =>
+          prev.map(s =>
+            s.id === serviceId
+              ? {
+                  ...s,
+                  name: data.name,
+                  description: data.description,
+                  price: data.price,
+                  requestedFiles: data.requestedFiles,
+                  coverImage: file ? URL.createObjectURL(file) : s.coverImage,
+                }
+              : s
+          )
+        )
+        if( setService ){
+          setService(prev => prev && ({
+            ...prev!,
+            name: data.name,
+            description: data.description,
+            price: data.price,
+            requestedFiles: data.requestedFiles,
+            coverImage: file ? URL.createObjectURL(file) : prev.coverImage,
+          }));
+        }
+
         showAlert("success", "Service mis à jour avec succès", "...");
         setFile(null);
         if (onSuccess) {
@@ -193,10 +225,9 @@ export const useServicesM = () => {
         showAlert(
           "error",
           "Erreur de mise à jour du service",
-          error.response?.data?.message ||
-            error.message ||
-            "Une erreur est survenue"
+          "Une erreur est survenue"
         );
+        console.log(error.response?.data?.message)
       } else {
         showAlert(
           "error",

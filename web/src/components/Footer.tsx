@@ -31,7 +31,7 @@ function Footer() {
                         </div>
                     </div>
                     <div className='flex gap-4 flex-col md:flex-row'>
-                        <div className='hidden md:block'>Social Media</div>
+                        <div className='hidden md:block'>Réseaux sociaux</div>
                         <div className='flex gap-2 items-center mt-4 md:mt-0'>
                             <Icon icon="devicon-plain:facebook" width="20" height="20" /> 
                             <Icon icon="ic:sharp-whatsapp" width="20" height="20" />
@@ -40,16 +40,16 @@ function Footer() {
                     </div>
                 </div>
                 <div className='flex flex-col gap-2 text-xs md:text-sm text-start order-2 md:order-3'>
-                    <a href='#Home'>HOME</a>
+                    <a href='#Home'>Accueil</a>
                     <a href='#A Propos'>A PROPOS</a>
                     <a href='#Nos services'>Nos services</a>
-                    <a href='#nos avocats'>nos avocats</a>
-                    <a href='#l’avis de nos clients'>l’avis de nos clients</a>
+                    <a href='#nos avocats'>Nos avocats</a>
+                    <a href='#l’avis de nos clients'>L’avis de nos clients</a>
                 </div>
             </div>
             <div className='text-sm'>
                 <hr className='my-4'/>
-                <div className='text-center text-sm md:text-base font-thin text-nowrap'>© 2025 LawSite, All rights reserved.</div>
+                <div className='text-center text-sm md:text-base font-thin text-nowrap'>© 2025 LawSite, Tous droits réservés.</div>
             </div>
         </div>
     )

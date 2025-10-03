@@ -7,7 +7,6 @@ export const useServices = () => {
   const [error, setError] = useState<string | null>(null);
   const fetchServices = async () => {
     try {
-      setLoading(true);
       const response = await axios.get("/user/services");
       setServices(response.data);
     } catch (err) {

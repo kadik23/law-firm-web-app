@@ -8,6 +8,7 @@ export const useFilesProccessing = () => {
   const [assignedServices, setAssignedServices] = useState<
     AssignedServicesEntity[] | []
   >([]);
+  const [clients, setClients] = useState<User[] | []>([]);
   const [pendingFolderStatus, setPendingFolderStatus] = useState<string | null>(
     null
   );
@@ -55,6 +56,23 @@ export const useFilesProccessing = () => {
     }
   };
 
+  const fetchClients = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`/admin/assigned_services/clients`);
+      setClients(response.data);
+    } catch (err: unknown) {
+      if (isAxiosError(err) && err.response?.status === 401) {
+        console.warn("Users not found");
+      } else {
+        console.error("An unexpected error occurred:", err);
+      }
+      setClients([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const updateFolderStatus = async (
     requestServiceId: number,
     status: string
@@ -90,5 +108,7 @@ export const useFilesProccessing = () => {
     showAlert,
     updateFileStatus,
     updateFolderStatus,
+    clients,
+    fetchClients,
   };
 };

@@ -27,7 +27,7 @@ const FilterControls = ({
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   const postTimeOptions = ["Tous", "Aujourde'hui", "7 dernier jours", "30 dernier jours", "cette annee (2025)", "cette annee (2024)"];
-  const notificationTypeOptions = ["Tous", "Commentaires", "Consultations", "Documents"];
+  const notificationTypeOptions = ["Tous", "Commentaires", "Consultations", "Documents", "Paiments"];
   const consultationTypes = ["Tous", "Acceptée", "Refusée"];
 
   const handleToggle = (dropdownId: string) => {

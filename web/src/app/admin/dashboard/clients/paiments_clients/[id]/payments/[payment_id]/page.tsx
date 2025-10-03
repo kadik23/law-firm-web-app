@@ -1,0 +1,56 @@
+"use client";
+import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
+import React, { useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import UnderPaymentBoard from "@/components/dashboard/client/UnderPaymentsBoard";
+import useUnderPayments from "@/hooks/clients/useUnderPayments";
+
+function Page() {
+  const params = useParams();
+  const id = params.id;
+  const router = useRouter();
+  const {getCount, count} = useUnderPayments();
+
+  const navigateToPayments = () => {
+    router.back();
+  };
+
+  useEffect(() => {
+    getCount(Number(id));
+  }, []);
+
+  return (
+    <>
+      <div className="flex flex-col md:flex-row gap-2 justify-between">
+        <div className="flex items-center gap-2">
+          <Icon icon="ic:twotone-payments" width="36" height="36" />
+          <div className="text-xl font-extrabold">Sous paiements</div>
+        </div>
+        <div className="bg-secondary rounded-lg py-2 px-4 text-white flex gap-2 items-center w-full md:w-fit text-xs md:text-base">
+          <Icon icon="ic:twotone-payments" width="24" height="24" />{" "}
+          <div className="font-semibold flex gap-1">
+            Total de sous paiements: {count}
+            <span className="hidden md:flex">paiments</span>
+          </div>
+        </div>
+      </div>
+      <div className="font-medium">
+        {" "}
+        Liste des Sous Paiements pour service: {id}
+      </div>
+      <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+        <div className="flex flex-col md:flex-row items-center gap-4">
+          <button
+            onClick={() => navigateToPayments()}
+            className="bg-btnSecondary my-4 w-full md:w-fit text-white hover:opacity-75 text-sm px-4 py-1.5 rounded-md"
+          >
+            <span>Retour</span>
+          </button>
+        </div>
+      </div>
+      <UnderPaymentBoard />
+    </>
+  );
+}
+
+export default Page;

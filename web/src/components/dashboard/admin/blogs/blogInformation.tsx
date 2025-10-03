@@ -22,7 +22,7 @@ const BlogInformation = ({
   setBlog: Dispatch<SetStateAction<Blog | null | undefined>>
 }) => {
   const { addToFavorites, removeFromFavorites } = useFavorites();
-  const { likeBlog, dislike } = useLike();
+  const { likeBlog, dislike, loading } = useLike();
   const { user } = useAuth();
   const { showAlert } = useAlert();
 
@@ -96,6 +96,7 @@ const BlogInformation = ({
               <button
                 className="relative group overflow-visible"
                 onClick={like}
+                disabled={loading}
               >
                 <Icon
                   icon="mdi:like"

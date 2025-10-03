@@ -3,6 +3,7 @@ import express, { Router } from "express";
 import * as blogsController from "@/controllers/Attorney/Blogs";
 import * as attorneysController from "@/controllers/User/attorneys";
 import * as dashboardStatsController from "@/controllers/Attorney/DashboardStats";
+import * as profileController from "@/controllers/Attorney/Profile";
 
 const attorneyRouter: Router = express.Router();
 
@@ -45,5 +46,17 @@ attorneyRouter.get(
     authMiddleware(["attorney"]),
     blogsController.deleteMyBlogs
   );
+
+  attorneyRouter.put(
+    "/profile/image",
+    authMiddleware(["attorney"]),
+    profileController.updateProfileImage
+  );
+
+  attorneyRouter.get(
+    "/profile",
+    authMiddleware(["attorney"]),
+    profileController.getAttorneyProfile
+  )
 
 export default attorneyRouter;

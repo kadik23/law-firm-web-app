@@ -21,6 +21,7 @@ import * as testimonialsController from "@/controllers/User/testimonials";
 import * as problemsController from "@/controllers/User/problems";
 import * as consultationController from "@/controllers/User/consultation";
 import { upload } from "@/middlewares/FilesMiddleware";
+import { getDashboardStats } from "@/controllers/User/DashboardStats";
 
 const userRouter: Router = express.Router();
 
@@ -350,5 +351,7 @@ userRouter.get(
   authMiddleware(["client"]),
   require("@/controllers/Admin/availableSlot").getAvailableSlotsWithBookings
 );
+
+userRouter.get("/dashboard/stats",authMiddleware(['client']),getDashboardStats)
 
 export default userRouter;

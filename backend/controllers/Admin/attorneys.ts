@@ -1,10 +1,8 @@
 import { Request, Response } from 'express';
 import { db } from '@/models/index';
 import bcrypt from 'bcrypt';
-import { upload } from '@/middlewares/FilesMiddleware';
-import path from 'path';
+import { upload, uploadToDrive, getFileBase64FromDrive, deleteFileFromDrive} from '@/middlewares/FilesMiddleware';
 import { Op } from 'sequelize';
-import fs from 'fs';
 import { Model, ModelCtor } from 'sequelize';
 import { IAttorney } from '@/interfaces/Attorney';
 import { IUser } from '@/interfaces/User';
@@ -123,7 +121,7 @@ export const createAttorney = async (req: Request, res: Response): Promise<void>
         res.status(400).json({ error: 'Profile picture is required.' });
         return;
       }
-      
+
       const { 
         first_name, 
         last_name, 
@@ -134,8 +132,20 @@ export const createAttorney = async (req: Request, res: Response): Promise<void>
         ville, 
         age, 
         sex, 
-        linkedin_url 
+        linkedin_url
       } = req.body;
+
+      const existingUser = await User.findOne({ where: { email } });
+      if (existingUser) {
+        res.status(400).json({ error: "Email already exists." });
+        return;
+      }
+
+      const fileId = await uploadToDrive(
+        req.file.path,
+        req.file.originalname,
+        req.file.mimetype
+      );
       
       const filePath = req.file.path;
       const formattedDate = new Date().toISOString().split("T")[0];
@@ -164,6 +174,7 @@ export const createAttorney = async (req: Request, res: Response): Promise<void>
           date_membership: new Date(formattedDate),
           picture_path: filePath,
           status: 'active',
+          file_id: fileId
         } as IAttorney, { transaction: t });
         
         const base64Image = imageToBase64DataUri(filePath);
@@ -238,16 +249,9 @@ export const getAdminAttorneys = async (req: Request, res: Response): Promise<vo
     });
     attorneys = await Promise.all(
       attorneys.map(async (attorney: Model<IAttorney>) => {
-        const filePath = path.resolve(
-          __dirname,
-          "..",
-          "..",
-          (attorney.getDataValue('picture_path') as string)
-        );
-        let base64Image: string | null = null;
-        if (fs.existsSync(filePath)) {
-          const fileData = fs.readFileSync(filePath);
-          base64Image = `data:image/png;base64,${fileData.toString("base64")}`;
+        let base64Image = null;
+        if (attorney.getDataValue('file_id') && attorney.getDataValue('file_id') !== '') {
+          base64Image = await getFileBase64FromDrive(attorney.getDataValue('file_id'));
         }
         return {
           ...attorney.toJSON(),
@@ -316,12 +320,11 @@ export const deleteAttorneys = async (req: Request, res: Response): Promise<void
       res.status(404).json({ success: false, message: 'No matching attorneys found' });
       return;
     }
-    attorneysToDelete.forEach((attorney: Model<IAttorney>) => {
-      const picturePath = attorney.getDataValue('picture_path');
-      if (picturePath && fs.existsSync(picturePath)) {
-        fs.unlinkSync(picturePath);
+    await Promise.all(attorneysToDelete.map(async (attorney: Model<IAttorney>) => {
+      if (attorney.getDataValue('file_id') && attorney.getDataValue('file_id') !== '') {
+        await deleteFileFromDrive(attorney.getDataValue('file_id'));
       }
-    });
+    }));
     const result = await Attorney.destroy({ where: { id: { [Op.in]: ids } } });
     res.status(200).json({ success: true, message: `${result} attorneys deleted` });
   } catch (e: any) {

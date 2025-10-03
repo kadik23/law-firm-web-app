@@ -5,12 +5,21 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { useState } from "react";
 import EditPersonalInfoModal from "@/components/dashboard/EditPersonalInfoModal";
 import EditPasswordModal from "@/components/dashboard/EditPasswordModal";
+import { useProfile } from "@/hooks/attorney/useProfile";
+import Image from "next/image";
 
 const AdminAccount = () => {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [showEditInfo, setShowEditInfo] = useState(false);
   const [showEditPassword, setShowEditPassword] = useState(false);
+  const { uploading, error, image, uploadProfileImage, profile } = useProfile();
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.[0]) {
+      await uploadProfileImage(e.target.files[0]);
+    }
+  };
 
   if (!user) {
     router.push("/");
@@ -31,21 +40,51 @@ const AdminAccount = () => {
     { label: "Pays", value: user?.pays },
     { label: "Âge", value: user?.age },
     { label: "Ville", value: user?.ville },
-    { label: "Numéro de téléphone", value: user?.phone_number },
+    { label: "Numéro de téléphone", value: "0"+user?.phone_number },
   ];
 
   return (
     <div className="flex flex-col gap-10 w-full md:px-0 px-8">
+      {/* Profile image + name */}
       <div className="flex items-center gap-4">
-        <button className="bg-secondary capitalize w-12 h-12 rounded-full text-center text-lg p-2 btn font-semibold shadow-lg">
-          {user?.name[0]}
-        </button>
+        {image || profile?.picture ? (
+          <Image
+            src={image || profile?.picture as string || "/images/default-avatar.png"}
+            alt="Profile"
+            width={48}
+            height={48}
+            className="rounded-full object-cover"
+          />
+        ) : (
+          <button className="bg-secondary capitalize w-12 h-12 rounded-full text-center text-lg p-2 btn font-semibold shadow-lg">
+            {user?.name[0]}
+          </button>
+        )}
+
         <div className="flex flex-col gap-1">
           <span className="font-semibold">
             {`${user?.name} ${user?.surname}`}
           </span>
           <span className="text-xs text-gray-500">{user?.email}</span>
         </div>
+      </div>
+
+      {/* Upload control */}
+      <div className="flex flex-col gap-2">
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          className="hidden"
+          id="profile-upload"
+        />
+        <label
+          htmlFor="profile-upload"
+          className="cursor-pointer bg-primary text-white px-4 py-2 rounded hover:bg-primary/90 w-fit"
+        >
+          {uploading ? "Uploading..." : "Changer la photo de profil"}
+        </label>
+        {error && <span className="text-red-500 text-sm">{error}</span>}
       </div>
 
       <div className="flex flex-col gap-6">

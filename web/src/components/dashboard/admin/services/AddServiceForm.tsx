@@ -6,6 +6,7 @@ import FileUpload from "../FileUpload";
 import ArrayInput from "./ArrayInput";
 import { base64ToFile } from "@/lib/utils/base64ToFile";
 import { fileToBase64 } from "@/lib/utils/fileToBase64";
+import { arraysEqual } from "@/lib/utils/arrayEqual";
 
 type AddServiceFormProps = {
   onSubmit: (data: ServiceFormData) => void;
@@ -14,6 +15,7 @@ type AddServiceFormProps = {
   isUpdate: boolean;
   service?: serviceEntity;
   setService?: Dispatch<SetStateAction<serviceEntity | null>>;
+  loading: boolean;
 };
 
 export const AddServiceForm = ({
@@ -23,6 +25,7 @@ export const AddServiceForm = ({
   isUpdate,
   setService,
   service,
+  loading
 }: AddServiceFormProps) => {
   const [isDisabled, setIsDisabled] = useState(true);
   const { register, control, handleSubmit, errors, isValid, setValue, watch } =
@@ -53,6 +56,8 @@ export const AddServiceForm = ({
     }
   }, [service, isUpdate]);
 
+  const fileChanged = !!file;
+
   useEffect(() => {
     if (isUpdate) {
       const hasChanges =
@@ -60,8 +65,8 @@ export const AddServiceForm = ({
         formValues.price !==
           oldServiceDataRef.current?.price ||
         formValues.description !== oldServiceDataRef.current?.description ||
-        formValues.requestedFiles !== oldServiceDataRef.current?.requestedFiles ||
-        file !== prevFileRef.current;
+        !arraysEqual(formValues.requestedFiles, oldServiceDataRef.current?.requestedFiles) ||
+        fileChanged;
 
       setIsDisabled(!hasChanges);
     } else {
@@ -109,7 +114,7 @@ export const AddServiceForm = ({
       {process.env.NODE_ENV === "development" && <DevTool control={control} />}
 
       <div className="w-full">
-        <FileUpload file={file} setFile={setFile} />
+        <FileUpload previewSrc={service?.coverImage} file={file} setFile={setFile} />
       </div>
 
       <div className="flex flex-col justify-start gap-2 w-full">
@@ -171,9 +176,9 @@ export const AddServiceForm = ({
       {isUpdate ? (
         <button
           type="submit"
-          disabled={isDisabled}
+          disabled={isDisabled || loading}
           className={`${
-            isDisabled ? "btn_desabled active:scale-100" : "btn bg-textColor"
+            isDisabled || loading ? "btn_desabled active:scale-100" : "btn bg-textColor"
           } text-sm rounded-md p-2 btn font-semibold shadow-lg w-full`}
         >
           Mettre a jour
@@ -181,9 +186,9 @@ export const AddServiceForm = ({
       ) : (
         <button
           type="submit"
-          disabled={isDisabled}
+          disabled={isDisabled || loading}
           className={`${
-            isDisabled ? "btn_desabled active:scale-100" : "btn bg-textColor"
+            isDisabled || loading ? "btn_desabled active:scale-100" : "btn bg-textColor"
           } text-sm rounded-md p-2 btn font-semibold shadow-lg w-full`}
         >
           Ajouter

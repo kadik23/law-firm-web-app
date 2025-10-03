@@ -1,9 +1,10 @@
 "use client";
 import Myservice from "@/components/dashboard/myServiceCard";
+import { LoadingContext } from "@/contexts/LoadingContext";
 import { useAssignService } from "@/hooks/clients/useAssignService";
-import usePagination from "@/hooks/usePagination ";
+import usePagination from "@/hooks/usePagination";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 function Services() {
   const blogsPerPage = 6;
@@ -13,6 +14,7 @@ function Services() {
     assignServices,
     remAssignService,
     remAssignServiceAll,
+    loading
   } = useAssignService();
 
   const {
@@ -37,6 +39,12 @@ function Services() {
   useEffect(() => {
     setfilteredServices(assignServices);
   }, [assignServices]);
+
+  const {setLoading} = useContext(LoadingContext);
+
+  useEffect(() => {
+    setLoading(loading);
+  }, [loading]);
 
   return (
     <div className="flex flex-col md:gap-8 gap-6 px-4 md:px-0">
@@ -82,6 +90,7 @@ function Services() {
 
         <button
           onClick={remAssignServiceAll}
+          disabled={loading}
           className="bg-btnSecondary hidden md:flex text-white uppercase text-sm px-4 py-2 rounded-md items-center gap-1"
         >
           <Icon icon="mdi:delete" width={20} />
@@ -112,7 +121,7 @@ function Services() {
                 onClick={goToPreviousPage}
                 className="px-4 py-2 bg-btnSecondary text-white rounded-md"
               >
-                Previous
+                Précédente
               </button>
             )}
 
@@ -137,7 +146,7 @@ function Services() {
                 onClick={goToNextPage}
                 className="px-4 py-2 bg-btnSecondary text-white rounded-md"
               >
-                Next
+                Suivante
               </button>
             )}
           </div>

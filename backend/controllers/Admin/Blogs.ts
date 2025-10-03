@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { db } from '@/models/index';
-import { upload } from '@/middlewares/FilesMiddleware';
+import { upload, uploadToDrive, getFileBase64FromDrive, deleteFileFromDrive} from '@/middlewares/FilesMiddleware';
 import fs from 'fs';
 import { body as bd, validationResult, ValidationError, Result } from 'express-validator';
 import { Op, Model, ModelCtor } from 'sequelize';
@@ -40,8 +40,11 @@ export const getAllBlogs = async (req: Request, res: Response): Promise<void> =>
 
         const updatedBlogsList = await Promise.all(blogsList.map(async (blog) => {
             const blogData = blog.toJSON() as IBlog;
-            const filePath = resolve(__dirname, '..', '..', blogData.image);
-            const base64Image = imageToBase64DataUri(filePath);
+
+            let base64Image = null;
+            if (blogData.file_id && blogData.file_id !== '') {
+                base64Image = await getFileBase64FromDrive(blogData.file_id);
+            }
 
             return {
                 ...blogData,
@@ -138,10 +141,15 @@ export const addBlog = async (req: Request, res: Response): Promise<void> => {
                 res.status(400).json({ error: 'Image is required.' });
                 return;
             }
+            const fileId = await uploadToDrive(
+                req.file.path,
+                req.file.originalname,
+                req.file.mimetype
+            );
             const { title, body, readingDuration, categoryId } = req.body;
             const imagePath = req.file.path;
             let newBlog: Model<IBlog> = await blogs.create({
-                title, likes: 0, body, readingDuration, image: imagePath, categoryId, userId: (req as any).user.id, accepted: true,
+                title, likes: 0, body, readingDuration, image: imagePath, categoryId, userId: (req as any).user.id, accepted: true, file_id: fileId
             } as IBlog);
             if (!newBlog) {
                 res.status(401).send('Error creating blog');
@@ -232,8 +240,13 @@ export const deleteBlog = async (req: Request, res: Response): Promise<void> => 
             res.status(404).json({ success: false, message: 'No matching blogs found' });
             return;
         }
-        blogsToDelete.forEach((blog) => {
-            if (blog.image) deleteFile(blog.image);
+        blogsToDelete.forEach(async (blog) => {
+            if (blog.image) {
+                if (blog.file_id && blog.file_id !== '') {
+                    await deleteFileFromDrive(blog.file_id);
+                }
+                deleteFile(blog.image);
+            }
         });
         const result = await blogs.destroy({ where: { id: { [Op.in]: ids } } });
         res.status(200).json({ success: true, message: `${result} blogs deleted` });
@@ -327,17 +340,28 @@ export const updateBlog = async (req: Request, res: Response): Promise<void> => 
                 return;
             }
 
+            let fileId;
+
             if (req.file) {
                 deleteFile(blogToUpdate.image);
+                if (blogToUpdate.file_id && blogToUpdate.file_id !== '') {
+                    await deleteFileFromDrive(blogToUpdate.file_id);
+                }
+                fileId  = await uploadToDrive(
+                    req.file.path,
+                    req.file.originalname,
+                    req.file.mimetype
+                );
                 blogToUpdate.image = req.file.path;
             }
 
             blogToUpdate.set({
-                title,
-                body,
-                readingDuration,
-                categoryId,
-                image: blogToUpdate.image
+                title: title || blogToUpdate.title,
+                body: body || blogToUpdate.body,
+                readingDuration: readingDuration || blogToUpdate.readingDuration,
+                categoryId: categoryId || blogToUpdate.categoryId,
+                image: blogToUpdate.image,
+                file_id: fileId
             });
 
             await blogToUpdate.save();
@@ -402,9 +426,10 @@ export const filterBlogs = async (req: Request, res: Response): Promise<void> =>
         });
         const updatedBlogsList = await Promise.all(blogsList.map(async (blog) => {
             const blogData = blog.toJSON() as IBlog;
-            const filePath = resolve(__dirname, '..', '..', blogData.image);
-            const base64Image = imageToBase64DataUri(filePath);
-
+            let base64Image = null;
+            if (blogData.file_id && blogData.file_id !== '') {
+            base64Image = await getFileBase64FromDrive(blogData.file_id);
+            }
             return {
                 ...blogData,
                 image: base64Image

@@ -52,13 +52,12 @@ const OtherBlogs = ({
         {/* Pagination Controls */}
         {totalPages > 1 && (
           <div className="flex gap-3 justify-center items-center mt-4">
-            {/* Previous Button */}
             {currentPage > 1 && (
               <button
                 onClick={()=>handlePageChange(currentPage - 1)}
                 className="px-4 py-2 bg-btnSecondary text-white rounded-md"
               >
-                Previous
+                Précédente
               </button>
             )}
 
@@ -85,7 +84,7 @@ const OtherBlogs = ({
                 onClick={()=>handlePageChange(currentPage + 1)}
                 className="px-4 py-2 bg-btnSecondary text-white rounded-md"
               >
-                Next
+                Suivante
               </button>
             )}
           </div>

@@ -4,14 +4,12 @@ import RecentPayment from "@/components/dashboard/client/RecentPayment";
 import Statistics from "@/components/dashboard/client/statistics";
 import Modal from "@/components/Modal";
 import { Icon } from "@iconify-icon/react/dist/iconify.mjs";
-import { useState } from "react";
 import { useConsultations } from "@/hooks/clients/useConsultations";
-import Link from "next/link";
+import { useState } from "react";
 
 const Dashboard = () => {
   const [showConsultationForm, setShowConsultationForm] = useState(false);
   const { consultations, loading: consultationsLoading } = useConsultations();
-  
   const handleReservationForm = () => {
     setShowConsultationForm(true);
   }
@@ -27,7 +25,7 @@ const Dashboard = () => {
           <div className="text-gray-500">Aucune consultation à venir.</div>
         ) : (
           <ul className="divide-y divide-gray-200">
-            {consultations.slice(0, 3).map((c) => (
+            {consultations.map((c) => (
               <li key={c.id} className="py-2 flex flex-col md:flex-row md:items-center md:gap-4">
                 <span className="font-semibold text-sm text-primary">{c.date} {c.time}</span>
                 <span className="text-sm flex-1">{c.problem_name || c.problem_description}</span>
@@ -45,11 +43,6 @@ const Dashboard = () => {
               </li>
             ))}
           </ul>
-        )}
-        {consultations.length > 3 && (
-          <div className="mt-2 text-right">
-            <Link href="/client/dashboard/consultations" className="text-primary underline text-sm">Voir tout</Link>
-          </div>
         )}
       </div>
       <div className="flex flex-col md:flex-row gap-4 md:gap-4 justify-between">

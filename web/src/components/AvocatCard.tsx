@@ -1,6 +1,6 @@
 import React from "react";
 
-function AvocatCard({ attorney, attorneyNbr }: { attorney: avocatEntity, attorneyNbr: number }) {
+function AvocatCard({ attorney, attorneyNbr }: { attorney: avocatEntity , attorneyNbr: number }) {
   return (
     <div className={`${attorneyNbr >= 4 ? 'lg:w-[calc(100%/4)]' : `lg:w-[calc(100%/${attorneyNbr})]`} w-full md:w-[calc(100%/3)] overflow-hidden rounded-lg bg-white`}>
       <div
@@ -8,7 +8,7 @@ function AvocatCard({ attorney, attorneyNbr }: { attorney: avocatEntity, attorne
         style={{ backgroundImage: `url(${attorney.picture})` }}
       >
         <div className="text-white font-bold text-xl pl-2 pt-2">
-          {attorney.name}
+          {attorney.User && attorney.User.name} {attorney.User && attorney.User.surname}
         </div>
         <div className="text-white text-md pl-2">
           Member since {attorney.createdAt.split("T")[0]}

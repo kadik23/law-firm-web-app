@@ -32,7 +32,7 @@ export const useTestimony = () => {
       showAlert(
         "error",
         "vous n'avez pas commenté",
-        err as string
+        "Une erreur est survenue"
       );
       console.error(err);
     } finally {
@@ -86,7 +86,7 @@ export const useTestimony = () => {
       showAlert(
         "error",
         "vous n'avez pas ",
-        err as string
+        'Une erreur est survenue'
       );
       console.error(err);
     } finally {

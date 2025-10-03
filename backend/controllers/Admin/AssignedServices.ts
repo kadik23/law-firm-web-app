@@ -9,6 +9,7 @@ const Service: ModelCtor<Model<IService>> = db.services;
 const RequestService = db.request_service;
 const ServiceFilesUploaded = db.service_files_uploaded;
 const User: ModelCtor<Model<IUser>> = db.users;
+const Payment = db.payments;
 
 const getAssignedServices = async (
   req: Request,
@@ -44,6 +45,69 @@ const getAssignedServices = async (
     res.status(200).json(serviceRequests);
   } catch (error: any) {
     console.error("Error in getAssignedServices:", error);
+    res.status(500).json({
+      error: "Server error",
+      details: error.message,
+    });
+  }
+};
+
+const getClients = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  if (!req.user || !req.user.id) {
+    res.status(401).json({ error: "Unauthorized: User ID is missing." });
+    return;
+  }
+  try {
+    const users = await User.findAll({
+      where: { type: 'client' },
+      order: [["createdAt", "DESC"]],
+      include: [
+        {
+          model: Payment,
+          required: true,
+          as: "payments",
+        },
+      ],
+
+    });
+    if (!users || users.length === 0) {
+      res.status(200).json([]);
+      return;
+    }
+    res.status(200).json(users);
+  } catch (error: any) {
+    console.error("Error in get clients:", error);
+    res.status(500).json({
+      error: "Server error",
+      details: error.message,
+    });
+  }
+};
+
+const getClientById = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  if (!req.user || !req.user.id) {
+    res.status(401).json({ error: "Unauthorized: User ID is missing." });
+    return;
+  }
+  const { id } = req.params;
+  try {
+    const user = await User.findOne({
+      where: { id },
+      order: [["createdAt", "DESC"]],
+    });
+    if (!user) {
+      res.status(200).json([]);
+      return;
+    }
+    res.status(200).json(user);
+  } catch (error: any) {
+    console.error("Error in get client:", error);
     res.status(500).json({
       error: "Server error",
       details: error.message,
@@ -131,4 +195,4 @@ const updateFolderStatus = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-export { getAssignedServices, updateFileStatus, updateFolderStatus };
+export { getAssignedServices, updateFileStatus, updateFolderStatus, getClients, getClientById };

@@ -51,3 +51,8 @@ type AlertContextType = {
   closeAlert: () => void; 
   setShowAlert: (show: boolean) => void;
 };
+
+type LoadingContextType = {
+  loading: boolean,
+  setLoading: (loading: boolean) => void
+}

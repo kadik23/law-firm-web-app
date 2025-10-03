@@ -22,6 +22,8 @@ const NotificationItem = ({ item, onDelete, onMarkAsRead }: NotificationItemProp
         return "Consultation Update";
       case "Documents":
         return "Document Update";
+      case "Payment":
+        return "Payment Update";
       default:
         return "Notification";
     }
@@ -44,10 +46,16 @@ const NotificationItem = ({ item, onDelete, onMarkAsRead }: NotificationItemProp
       } else {
         router.push(`/${user?.type}/dashboard/clients/files_proccessing/${item.entityId}`);
       }
+    } else if (item.type === "Payment" && item.entityId) {
+      if (user?.type === "client") {
+        router.push(`/${user?.type}/dashboard/payments`);
+      } else {
+        router.push(`/${user?.type}/dashboard/clients/${item.userId}/payments/${item.entityId}`);
+      }
     }
   };
 
-  const clickable = item.type === "Comments" || item.type === "Blogs" || item.type === "Consultation" || item.type === "Documents";
+  const clickable = item.type === "Comments" || item.type === "Blogs" || item.type === "Consultation" || item.type === "Documents" || item.type === "Payment";
 
   return (
     <div

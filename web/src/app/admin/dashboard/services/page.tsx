@@ -6,7 +6,8 @@ import ServiceCard from "@/components/dashboard/admin/services/serviceCard";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import Modal from "@/components/Modal";
 import { useServicesM } from "@/hooks/admin/useServicesM";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { LoadingContext } from "@/contexts/LoadingContext";
 
 const Services = () => {
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -26,7 +27,7 @@ const Services = () => {
     totalPages,
     setCurrentPage,
     loading,
-  } = useServicesM();
+  } = useServicesM(null);
 
   const handlePageChange = (page: number) => {
     setCurrentPage?.(page);
@@ -46,6 +47,12 @@ const Services = () => {
     }
   };
 
+  const {setLoading} = useContext(LoadingContext);
+
+  useEffect(() => {
+    setLoading(loading);
+  }, [loading]);
+
   return (
     <div>
       <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center justify-between">
@@ -58,7 +65,7 @@ const Services = () => {
               onChange={toggleSelectAll}
               className="cursor-pointer"
             />
-            Select All
+            Sélectionner tout
           </label>
 
           <button
@@ -109,7 +116,7 @@ const Services = () => {
                 onClick={() => handlePageChange(currentPage - 1)}
                 className="px-4 py-2 bg-btnSecondary text-white rounded-md"
               >
-                Previous
+                Précédente
               </button>
             )}
 
@@ -136,7 +143,7 @@ const Services = () => {
                 onClick={() => handlePageChange(currentPage + 1)}
                 className="px-4 py-2 bg-btnSecondary text-white rounded-md"
               >
-                Next
+                Suivante
               </button>
             )}
           </div>
@@ -155,7 +162,10 @@ const Services = () => {
           file={file}
           setFile={setFile}
           isUpdate={false}
-          onSubmit={(data) => addService(data, () => setAddModalOpen(false))}
+          onSubmit={(data) => {
+            addService(data, () => setAddModalOpen(false));
+            setAddModalOpen(false);}}
+          loading={loading}
         />
       </FormModal>
 

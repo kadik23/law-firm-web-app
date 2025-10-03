@@ -19,7 +19,7 @@ interface DropdownProps {
   }: DropdownProps) => {
     return (
       <div className="w-full flex-col md:flex-row px-5 py-2 justify-between lg:w-auto flex items-center gap-4 bg-primary p-2 rounded-md">
-        <div className="text-white text-xs">Filter By:</div>
+        <div className="text-white text-xs">Filtrer par:</div>
         <DropDown
           value={categoryValue}
           options={categoryOptions}

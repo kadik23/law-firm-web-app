@@ -17,7 +17,7 @@ import { useNotificationContext } from "@/contexts/NotificationContext";
 
 const Sidebar = () => {
     const pathname = usePathname() || "";
-    const { logout } = useAuth();
+    const { logout, loading } = useAuth();
     const [isNotificationHovered, setIsNotificationHovered] = useState(false);
     const { unreadCount } = useNotificationContext();
 
@@ -86,6 +86,7 @@ const Sidebar = () => {
                 className="flex items-center gap-2 py-2 px-3 bg-white text-textColor 
                 font-semibold w-fit rounded-lg mx-6 hover:opacity-90"
                 onClick={logout}
+                disabled={loading}
             >
                 <LogoutIcon className="text-textColor" />
                 <span>Déconnexion</span>

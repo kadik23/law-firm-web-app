@@ -6,11 +6,19 @@ dotenv.config();
 
 const authMiddleware = (roles: string[] = []): RequestHandler => {
   return (req: Request, res: Response, next: NextFunction): void => {
-    const authToken = req.cookies.authToken;
+    let authToken = req.cookies.authToken;
+    
+    // If no cookie token, check Authorization header
+    if (!authToken) {
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        authToken = authHeader.substring(7); // Remove 'Bearer ' prefix
+      }
+    }
 
     console.log("authToken:", authToken);
 
-      if (!authToken) {
+    if (!authToken) {
       res.status(401).json({ error: "Unauthorized - Missing Token" });
       return;
     }

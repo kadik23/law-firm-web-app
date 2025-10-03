@@ -41,9 +41,9 @@ export const useAdminAccount = () => {
         showAlert(
           "error",
           "Erreur",
-          e?.response?.data?.message ||
-            "Erreur lors de la mise à jour des informations"
+          "Erreur lors de la mise à jour des informations"
         );
+        console.log(e?.response?.data?.message)
       } else {
         console.log(e);
       }
@@ -71,9 +71,9 @@ export const useAdminAccount = () => {
         showAlert(
           "error",
           "Erreur",
-          e?.response?.data?.message ||
-            "Erreur lors de la modification du mot de passe"
+          "Erreur lors de la modification du mot de passe"
         );
+        console.log(e?.response?.data?.message)
       } else {
         console.log(e);
       }

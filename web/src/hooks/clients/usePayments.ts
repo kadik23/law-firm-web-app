@@ -1,85 +1,110 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import axiosClient from "@/lib/utils/axiosClient";
+import { useCallback, useEffect, useState } from "react";
+import { useAuth } from "../useAuth";
 
-function usePayments(paymentData: paimentEntity[]) {
-  const [filteredPaiments, setFilteredPaiments] =
-    useState<paimentEntity[]>(paymentData);
-
+function usePayments(client_id?: number | undefined) {
+  const [payments, setPayments] = useState<PaymentEntity[]>([]);
+  const [filteredPaiments, setFilteredPaiments] = useState<PaymentEntity[]>([]);
+  const [loading, setLoading] = useState(false)
   const [filterValues, setFilterValues] = useState({
-    totalAmount: "",
-    paidAmount: "",
+    total_amount: "",
+    paid_amount: "",
     remainingAmount: "",
-    paymentDate: "",
+    created_at: "",
     service: "",
-    status: "",
+    payment_status: "",
   });
+  const {user} = useAuth();
+  const [count, setCount] = useState(0)
 
   const [activeFilters, setActiveFilters] = useState<{
-    totalAmount: boolean;
-    paidAmount: boolean;
+    total_amount: boolean;
+    paid_amount: boolean;
     remainingAmount: boolean;
-    paymentDate: boolean;
+    created_at: boolean;
     service: boolean;
-    status: boolean;
+    payment_status: boolean;
   }>({
-    totalAmount: false,
-    paidAmount: false,
+    total_amount: false,
+    paid_amount: false,
     remainingAmount: false,
-    paymentDate: false,
+    created_at: false,
     service: false,
-    status: false,
+    payment_status: false,
   });
 
   useEffect(() => {
-    setFilteredPaiments(paymentData);
-  }, [paymentData]);
+    const fetchPayment = async() => {
+      try{
+        setLoading(true)
+        const response = await axiosClient.get(  `api/payments/client${user?.type === 'admin' ? `?client_id=${client_id}` : ''}`);
+        if(response.status == 200){
+          setPayments(response.data.payments)
+          setFilteredPaiments(response.data.payments)
+        }
+      }catch(e){
+        console.log(e)
+      }finally{
+        setLoading(false)
+      }
+    }
+    fetchPayment()
+  }, []);
 
-  useEffect(() => {
-    applyAllFilters();
-  }, [filterValues, activeFilters]);
+  const applyAllFilters = useCallback(() => {
+    let result = [...payments];
 
-  const applyAllFilters = () => {
-    let result = [...paymentData];
-
-    if (activeFilters.totalAmount && filterValues.totalAmount) {
+    if (activeFilters.total_amount && filterValues.total_amount) {
       result = result.filter((paiment) =>
-        String(paiment.totalAmount).includes(filterValues.totalAmount)
+        String(paiment.total_amount).includes(filterValues.total_amount)
       );
     }
 
-    if (activeFilters.paidAmount && filterValues.paidAmount) {
+    if (activeFilters.paid_amount && filterValues.paid_amount) {
       result = result.filter((paiment) =>
-        String(paiment.paidAmount).includes(filterValues.paidAmount)
+        String(paiment.paid_amount).includes(filterValues.paid_amount)
       );
     }
 
     if (activeFilters.remainingAmount && filterValues.remainingAmount) {
       result = result.filter((paiment) => {
-        const remaining = paiment.totalAmount - paiment.paidAmount;
+        const remaining = paiment.total_amount - paiment.paid_amount;
         return String(remaining).includes(filterValues.remainingAmount);
       });
     }
 
-    if (activeFilters.paymentDate && filterValues.paymentDate) {
+    if (activeFilters.created_at && filterValues.created_at) {
       result = result.filter((paiment) =>
-        String(paiment.paymentDate).includes(filterValues.paymentDate)
+        String(paiment.created_at).includes(filterValues.created_at)
       );
     }
 
     if (activeFilters.service && filterValues.service) {
       result = result.filter(
-        (paiment) => paiment.service.name === filterValues.service
+        (paiment) => paiment.service?.name === filterValues.service
       );
     }
 
-    if (activeFilters.status && filterValues.status) {
+    if (activeFilters.payment_status && filterValues.payment_status) {
       result = result.filter(
-        (paiment) => paiment.status === filterValues.status
+        (paiment) => paiment.payment_status === filterValues.payment_status
       );
     }
 
     setFilteredPaiments(result);
+  }, [payments, activeFilters, filterValues]);
+
+  useEffect(() => {
+    applyAllFilters();
+  }, [applyAllFilters]);
+
+  const getCount = async () => {
+    const response = await axiosClient.get("api/payments/count");
+    if (response.status === 200) {
+      setCount(response.data.count);
+    }
   };
 
   const handleFilterChange = (
@@ -101,11 +126,15 @@ function usePayments(paymentData: paimentEntity[]) {
 
   return {
     filteredPaiments,
+    payments,
     filterValues,
     activeFilters,
     setFilterValues,
     setActiveFilters,
     handleFilterChange,
+    loading,
+    getCount,
+    count
   };
 }
 

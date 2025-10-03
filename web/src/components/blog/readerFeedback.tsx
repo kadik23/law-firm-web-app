@@ -38,7 +38,7 @@ const ReaderFeedback = ({ blogId }: { blogId: string }) => {
     <div className="py-4 mb-8">
       <div className="w-full flex flex-col md:flex-row gap-2 items-center justify-between py-4">
         <div className="font-semibold md:font-bold text-xl order-2 md:order-1 md:text-4xl text-center text-primary">
-          Avis des lecteurs de ce blog ({totalComments})
+          Avis des lecteurs de ce blog {totalComments && `({totalComments})`}
         </div>
         <button
           className="text-primary border-[1px] order-1 md:order-2 border-black font-semibold px-4 py-2 rounded-md flex items-center gap-1"

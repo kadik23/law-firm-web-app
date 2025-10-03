@@ -128,7 +128,7 @@ const ConsultationForm: React.FC = () => {
           <button
             type="submit"
             className={`flex-1 bg-secondary text-white py-2 rounded hover:bg-blue-700 transition ${!isValid ? 'opacity-50 cursor-not-allowed' : ''}`}
-            disabled={!isValid}
+            disabled={!isValid || loading}
           >
             Réserver
           </button>
