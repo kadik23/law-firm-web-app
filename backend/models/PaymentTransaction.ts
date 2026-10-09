@@ -22,7 +22,7 @@ const PaymentTransactionFactory = (sequelize: Sequelize, DataTypes: typeof Seque
       defaultValue: DataTypes.NOW,
     },
     chargili_transaction_id: {
-      type: DataTypes.NUMBER,
+      type: DataTypes.STRING,
       allowNull: true,
     },
     chargili_status: {
