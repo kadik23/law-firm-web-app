@@ -325,35 +325,16 @@ db.Consultation.belongsTo(db.users, { foreignKey: 'client_id', as: 'client' });
 db.users.hasMany(db.Consultation, { foreignKey: 'client_id', as: 'consultations' });
 
 
-const syncDatabase = async () => {
-  try {
-    const dialect = db.sequelize.getDialect();
-    if (dialect === 'postgres') {
-      const alterQueries = [
-        'ALTER TABLE attorneys ADD COLUMN IF NOT EXISTS file_id VARCHAR(255);',
-        'ALTER TABLE services ADD COLUMN IF NOT EXISTS file_id VARCHAR(255);',
-        'ALTER TABLE blogs ADD COLUMN IF NOT EXISTS file_id VARCHAR(255);',
-        'ALTER TABLE blogs ADD COLUMN IF NOT EXISTS "rejectionReason" VARCHAR(255);',
-        'ALTER TABLE service_files_uploaded ADD COLUMN IF NOT EXISTS file_id VARCHAR(255);',
-        'ALTER TABLE service_files_uploaded ADD COLUMN IF NOT EXISTS rejection_reason TEXT;',
-        'ALTER TABLE consultations ADD COLUMN IF NOT EXISTS meeting_link VARCHAR(255);',
-      ];
-      for (const q of alterQueries) {
-        try {
-          await db.sequelize.query(q);
-        } catch (_) {}
-      }
-    }
-    await db.sequelize.sync({ alter: true });
-    console.log('Database synchronized successfully.');
-  } catch (err: any) {
-    console.warn('Sync with alter warning, falling back to sync({ force: false }):', err.message);
-    try {
-      await db.sequelize.sync({ force: false });
-    } catch (fallbackErr: any) {
-      console.error('Error during database synchronization:', fallbackErr.message);
-    }
-  }
-};
+const isProduction = process.env.NODE_ENV === 'production';
+const forceSync = process.env.FORCE_SYNC !== undefined
+  ? process.env.FORCE_SYNC === 'true'
+  : isProduction;
 
-syncDatabase();
+db.sequelize
+  .sync({ force: forceSync })
+  .then(() => {
+    console.log(`Database synchronized successfully (force: ${forceSync}).`);
+  })
+  .catch((err: Error) => {
+    console.error('Error during database synchronization:', err);
+  });
