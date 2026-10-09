@@ -98,11 +98,62 @@ async function cleanDatabase(): Promise<void> {
   console.log('✨ Database cleaned successfully.');
 }
 
+async function ensureSchema(): Promise<void> {
+  const dialect = db.sequelize.getDialect();
+  console.log(`🔧 Ensuring schema columns exist in database (${dialect})...`);
+
+  if (dialect === 'postgres') {
+    const alterQueries = [
+      'ALTER TABLE attorneys ADD COLUMN IF NOT EXISTS file_id VARCHAR(255);',
+      'ALTER TABLE services ADD COLUMN IF NOT EXISTS file_id VARCHAR(255);',
+      'ALTER TABLE blogs ADD COLUMN IF NOT EXISTS file_id VARCHAR(255);',
+      'ALTER TABLE blogs ADD COLUMN IF NOT EXISTS "rejectionReason" VARCHAR(255);',
+      'ALTER TABLE service_files_uploaded ADD COLUMN IF NOT EXISTS file_id VARCHAR(255);',
+      'ALTER TABLE service_files_uploaded ADD COLUMN IF NOT EXISTS rejection_reason TEXT;',
+      'ALTER TABLE consultations ADD COLUMN IF NOT EXISTS meeting_link VARCHAR(255);',
+    ];
+    for (const q of alterQueries) {
+      try {
+        await db.sequelize.query(q);
+        console.log(`  ✓ Executed: ${q}`);
+      } catch (err: any) {
+        console.warn(`  ⚠️ Query "${q}":`, err.message);
+      }
+    }
+  } else if (dialect === 'mysql') {
+    const tables = ['attorneys', 'services', 'blogs', 'service_files_uploaded'];
+    for (const tbl of tables) {
+      try {
+        const [results]: any = await db.sequelize.query(
+          `SHOW COLUMNS FROM \`${tbl}\` LIKE 'file_id';`
+        );
+        if (!results || results.length === 0) {
+          await db.sequelize.query(
+            `ALTER TABLE \`${tbl}\` ADD COLUMN \`file_id\` VARCHAR(255) NULL;`
+          );
+          console.log(`  ✓ Added file_id column to ${tbl}`);
+        }
+      } catch (err: any) {
+        console.warn(`  ⚠️ Could not check/add file_id to ${tbl}:`, err.message);
+      }
+    }
+  }
+
+  try {
+    await db.sequelize.sync({ alter: true });
+    console.log('  ✓ Schema synchronized with alter: true.');
+  } catch (err: any) {
+    console.warn('  ⚠️ db.sequelize.sync({ alter: true }) warning:', err.message);
+  }
+}
+
 export async function seedDatabase(options: { exitOnFinish?: boolean } = { exitOnFinish: true }): Promise<void> {
   const exitOnFinish = options.exitOnFinish ?? true;
   try {
     await db.sequelize.authenticate();
     console.log('🔌 Connected to database successfully.');
+
+    await ensureSchema();
 
     await cleanDatabase();
 
