@@ -12,6 +12,11 @@ export async function seedDatabase(options: { exitOnFinish?: boolean } = { exitO
 
     console.log('🔄 Force synchronizing schema from models (sync({ force: true }))...');
     await db.sequelize.sync({ force: true });
+    if (db.sequelize.getDialect() === 'postgres') {
+      try {
+        await db.sequelize.query(`ALTER TYPE "enum_consultations_status" ADD VALUE IF NOT EXISTS 'Completed';`);
+      } catch (_) {}
+    }
     console.log('✨ All tables cleanly recreated according to model definitions.');
 
     console.log('🌱 Seeding fresh data...');
@@ -199,7 +204,7 @@ export async function seedDatabase(options: { exitOnFinish?: boolean } = { exitO
     console.log('  ✓ Services created with linked cover images');
 
     // 5. Problems
-    await db.problems.create({
+    const problem1 = await db.problems.create({
       name: 'Création de SAS / SARL',
       service_id: (service1 as any).id,
       category_id: (catAffaires as any).id,
@@ -209,7 +214,7 @@ export async function seedDatabase(options: { exitOnFinish?: boolean } = { exitO
       service_id: (service1 as any).id,
       category_id: (catAffaires as any).id,
     });
-    await db.problems.create({
+    const problem2 = await db.problems.create({
       name: 'Divorce par consentement',
       service_id: (service2 as any).id,
       category_id: (catFamille as any).id,
@@ -304,6 +309,31 @@ export async function seedDatabase(options: { exitOnFinish?: boolean } = { exitO
       await db.AvailableSlot.create(slot);
     }
     console.log('  ✓ Available Slots created');
+
+    // 9. Consultations
+    await db.Consultation.create({
+      problem_id: (problem1 as any).id,
+      client_id: (clientUser1 as any).id,
+      problem_name: 'Création de SAS / SARL',
+      problem_description: 'Conseil sur la structure juridique et les statuts.',
+      time: '10:00',
+      date: '2026-03-25',
+      status: 'Accepted',
+      mode: 'online',
+      meeting_link: 'https://meet.jit.si/lawfirm-consultation-seed',
+    });
+
+    await db.Consultation.create({
+      problem_id: (problem2 as any).id,
+      client_id: (clientUser2 as any).id,
+      problem_name: 'Divorce par consentement',
+      problem_description: 'Demande de consultation pour procédure amiable.',
+      time: '14:30',
+      date: '2026-03-26',
+      status: 'Pending',
+      mode: 'onsite',
+    });
+    console.log('  ✓ Consultations created');
 
     console.log('🎉 Seeding completed successfully!');
     if (exitOnFinish) {

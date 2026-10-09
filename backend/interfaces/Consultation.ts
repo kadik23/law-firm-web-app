@@ -6,7 +6,7 @@ export interface IConsultation {
   problem_name: string;
   time: string;
   date: string;
-  status: 'Accepted' | 'Pending' | 'Canceled';
+  status: 'Accepted' | 'Pending' | 'Canceled' | 'Completed';
   mode: 'online' | 'onsite';
   meeting_link?: string;
   createdAt?: Date;

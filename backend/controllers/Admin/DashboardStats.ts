@@ -97,7 +97,13 @@ const getDashboardStats = async (req: Request, res: Response): Promise<void> => 
 
     const [pendingConsultations, completedConsultations] = await Promise.all([
       Consultation.count({ where: { status: 'Pending' } }),
-      Consultation.count({ where: { status: 'Completed' } })
+      Consultation.count({
+        where: {
+          status: {
+            [Op.in]: ['Accepted', 'Completed']
+          }
+        }
+      })
     ]);
 
     const [pendingFiles, acceptedFiles, refusedFiles] = await Promise.all([

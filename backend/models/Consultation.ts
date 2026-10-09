@@ -33,7 +33,7 @@ const ConsultationFactory = (sequelize: Sequelize, DataTypes: typeof SequelizeDa
       allowNull: false
     },
     status: {
-      type: DataTypes.ENUM('Accepted', 'Pending', 'Canceled'),
+      type: DataTypes.ENUM('Accepted', 'Pending', 'Canceled', 'Completed'),
       allowNull: false,
       defaultValue: 'Pending'
     },
@@ -88,7 +88,7 @@ export default ConsultationFactory;
 *          example: "2025-02-20"
 *        status:
 *          type: string
-*          enum: ["Accepted", "Pending", "Canceled"]
+*          enum: ["Accepted", "Pending", "Canceled", "Completed"]
 *          example: "Pending"
 *        mode:
 *          type: string

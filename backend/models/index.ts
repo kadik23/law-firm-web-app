@@ -332,7 +332,12 @@ const forceSync = process.env.FORCE_SYNC !== undefined
 
 db.sequelize
   .sync({ force: forceSync })
-  .then(() => {
+  .then(async () => {
+    if (db.sequelize.getDialect() === 'postgres') {
+      try {
+        await db.sequelize.query(`ALTER TYPE "enum_consultations_status" ADD VALUE IF NOT EXISTS 'Completed';`);
+      } catch (_) {}
+    }
     console.log(`Database synchronized successfully (force: ${forceSync}).`);
   })
   .catch((err: Error) => {

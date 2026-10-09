@@ -7,6 +7,7 @@ import { statusTranslations } from "@/lib/utils/statusTranslations ";
 
 const statusColors: Record<string, string> = {
   Accepted: "bg-green-100 text-green-700",
+  Completed: "bg-blue-100 text-blue-700",
   Pending: "bg-yellow-100 text-yellow-700",
   Canceled: "bg-red-100 text-red-700",
 };
@@ -92,6 +93,13 @@ export default function AdminConsultationsPage() {
                       onClick={() => handleStatusChange(c.id, "Accepted")}
                     >
                       Accepter
+                    </button>
+                    <button
+                      className="px-2 py-1 rounded bg-blue-600 text-white text-xs font-bold disabled:opacity-50"
+                      disabled={c.status === "Completed" || updatingId === c.id || loading}
+                      onClick={() => handleStatusChange(c.id, "Completed")}
+                    >
+                      Terminer
                     </button>
                     <button
                       className="px-2 py-1 rounded bg-yellow-500 text-white text-xs font-bold disabled:opacity-50"
