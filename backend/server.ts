@@ -15,6 +15,7 @@ import filesRouter from "./routes/FilesRouter";
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { db } from "./models";
+import { seedDatabase } from "./scripts/seed";
 import bodyParser from "body-parser";
 const connected_users = db.connectedUsers;
 
@@ -126,6 +127,29 @@ app.get("/health", (req, res) => {
   res.json({ status: "OK", timestamp: new Date().toISOString() });
 });
 
+// One-click remote seed trigger endpoint (protected by SECRET key)
+app.all("/api/seed", async (req, res) => {
+  const secretKey = process.env.SECRET || "djkdqsljfdhskljk6fdisj";
+  const providedKey = req.query.key || req.headers["x-seed-key"] || req.body?.key;
+
+  if (!providedKey || providedKey !== secretKey) {
+    res.status(403).json({ error: "Unauthorized: Invalid seed secret key" });
+    return;
+  }
+
+  try {
+    console.log("🌱 Manual seed triggered via /api/seed endpoint");
+    await seedDatabase({ exitOnFinish: false });
+    res.status(200).json({
+      success: true,
+      message: "Database wiped and seeded with fresh data and linked images successfully!"
+    });
+  } catch (error: any) {
+    console.error("❌ Seed endpoint error:", error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 app.use("/user", userRouter);
 app.use("/admin", adminRouter);
 app.use("/attorney", attorneyRouter);
@@ -198,6 +222,22 @@ io.on("connection", (socket) => {
 
 export { io };
 
-server.listen(PORT, () => {
+server.listen(PORT, async () => {
   console.log(`server is running on port ${PORT}`);
+
+  try {
+    const autoSeed = process.env.AUTO_SEED === 'true' || process.env.SEED_DATABASE === 'true';
+    if (autoSeed) {
+      console.log('🌱 AUTO_SEED flag detected. Running fresh database seeder on deploy...');
+      await seedDatabase({ exitOnFinish: false });
+    } else {
+      const servicesCount = await db.services.count();
+      if (servicesCount === 0) {
+        console.log('🌱 Database has 0 services. Auto-seeding initial dataset on deploy...');
+        await seedDatabase({ exitOnFinish: false });
+      }
+    }
+  } catch (err: any) {
+    console.warn('⚠️ Post-startup database auto-seed check:', err.message);
+  }
 });

@@ -24,10 +24,12 @@ import PaymentMethodFactory from './PaymentMethod';
 import { DB } from '../interfaces/DB';
 import TokenFactory from './Token';
 
+const portNumber = dbConfig.port ? parseInt(dbConfig.port as string, 10) : (dbConfig.dialect === 'postgres' ? 5432 : 3306);
+
 const sequelizeOptions: any = {
     host: dbConfig.HOST,
     dialect: dbConfig.dialect as Dialect,
-    port: parseInt(dbConfig.port as string),
+    port: isNaN(portNumber) ? (dbConfig.dialect === 'postgres' ? 5432 : 3306) : portNumber,
     pool: {
         max: dbConfig.pool.max,
         min: dbConfig.pool.min,
@@ -37,12 +39,22 @@ const sequelizeOptions: any = {
     dialectOptions: dbConfig.dialectOptions
 };
 
-const sequelize = new Sequelize(
-    dbConfig.DB as string,
-    dbConfig.USER as string,
-    dbConfig.PASSWORD,
-    sequelizeOptions
-);
+let sequelize: Sequelize;
+
+if (process.env.DATABASE_URL) {
+    sequelize = new Sequelize(process.env.DATABASE_URL, {
+        dialect: (dbConfig.dialect as Dialect) || 'postgres',
+        dialectOptions: dbConfig.dialectOptions,
+        pool: dbConfig.pool,
+    });
+} else {
+    sequelize = new Sequelize(
+        dbConfig.DB as string,
+        dbConfig.USER as string,
+        dbConfig.PASSWORD,
+        sequelizeOptions
+    );
+}
 
 sequelize
   .authenticate()

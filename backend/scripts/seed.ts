@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 dotenv.config();
+import 'module-alias/register';
 import bcrypt from 'bcrypt';
 import { db } from '../models/index';
 
@@ -12,6 +13,41 @@ async function cleanDatabase(): Promise<void> {
       await db.sequelize.query('SET FOREIGN_KEY_CHECKS = 0;');
     } catch (e: any) {
       console.warn('Could not disable foreign key checks:', e.message);
+    }
+  }
+
+  if (dialect === 'postgres') {
+    try {
+      await db.sequelize.query(`
+        TRUNCATE TABLE 
+          consultations,
+          "commentsLikes",
+          blogcomments,
+          favorites,
+          "BlogsLikes",
+          blogs,
+          testimonials,
+          payment_transactions,
+          payments,
+          service_files_uploaded,
+          request_service,
+          problems,
+          services,
+          categories,
+          attorneys,
+          notifications,
+          "connectedUsers",
+          available_slots,
+          tokens,
+          files,
+          users
+        RESTART IDENTITY CASCADE;
+      `);
+      console.log('  ✓ All PostgreSQL tables truncated and sequences restarted (CASCADE)');
+      console.log('✨ Database cleaned successfully.');
+      return;
+    } catch (pgErr: any) {
+      console.warn('PostgreSQL TRUNCATE CASCADE query failed, falling back to model-by-model deletion:', pgErr.message);
     }
   }
 
@@ -62,7 +98,8 @@ async function cleanDatabase(): Promise<void> {
   console.log('✨ Database cleaned successfully.');
 }
 
-async function seedDatabase(): Promise<void> {
+export async function seedDatabase(options: { exitOnFinish?: boolean } = { exitOnFinish: true }): Promise<void> {
+  const exitOnFinish = options.exitOnFinish ?? true;
   try {
     await db.sequelize.authenticate();
     console.log('🔌 Connected to database successfully.');
@@ -72,16 +109,16 @@ async function seedDatabase(): Promise<void> {
     console.log('🌱 Seeding fresh data...');
 
     // 1. Users
-    const hashedPassword = await bcrypt.hash('Password123!', 10);
+    const hashedPassword = await bcrypt.hash('password!', 10);
 
     const admin = await db.users.create({
       name: 'Super',
       surname: 'Admin',
-      email: 'admin@lawfirm.com',
+      email: 'admin@gmail.com',
       password: hashedPassword,
-      phone_number: '+33 1 40 50 60 70',
-      pays: 'France',
-      ville: 'Paris',
+      phone_number: '+213 6 12 34 56 78',
+      pays: 'Algérie',
+      ville: 'Alger',
       age: 40,
       sex: 'Homme',
       terms_accepted: true,
@@ -93,9 +130,9 @@ async function seedDatabase(): Promise<void> {
       surname: 'Jenkins',
       email: 'sarah.jenkins@lawfirm.com',
       password: hashedPassword,
-      phone_number: '+33 6 12 34 56 78',
-      pays: 'France',
-      ville: 'Paris',
+      phone_number: '+213 6 12 34 56 78',
+      pays: 'Algérie',
+      ville: 'Alger',
       age: 36,
       sex: 'Femme',
       terms_accepted: true,
@@ -107,8 +144,8 @@ async function seedDatabase(): Promise<void> {
       surname: 'Mercier',
       email: 'alexandre.mercier@lawfirm.com',
       password: hashedPassword,
-      phone_number: '+33 6 98 76 54 32',
-      pays: 'France',
+      phone_number: '+213 6 98 76 54 32',
+      pays: 'Algérie',
       ville: 'Lyon',
       age: 42,
       sex: 'Homme',
@@ -121,8 +158,8 @@ async function seedDatabase(): Promise<void> {
       surname: 'Rostova',
       email: 'elena.rostova@lawfirm.com',
       password: hashedPassword,
-      phone_number: '+33 6 55 44 33 22',
-      pays: 'France',
+      phone_number: '+213 6 55 44 33 22',
+      pays: 'Algérie',
       ville: 'Marseille',
       age: 38,
       sex: 'Femme',
@@ -135,8 +172,8 @@ async function seedDatabase(): Promise<void> {
       surname: 'Dubois',
       email: 'claire.dubois@gmail.com',
       password: hashedPassword,
-      phone_number: '+33 6 11 22 33 44',
-      pays: 'France',
+      phone_number: '+213 6 11 22 33 44',
+      pays: 'Algérie',
       ville: 'Bordeaux',
       age: 32,
       sex: 'Femme',
@@ -149,8 +186,8 @@ async function seedDatabase(): Promise<void> {
       surname: 'Laurent',
       email: 'marc.laurent@gmail.com',
       password: hashedPassword,
-      phone_number: '+33 6 22 33 44 55',
-      pays: 'France',
+      phone_number: '+213 6 22 33 44 55',
+      pays: 'Algérie',
       ville: 'Nantes',
       age: 45,
       sex: 'Homme',
@@ -163,8 +200,8 @@ async function seedDatabase(): Promise<void> {
       surname: 'Bernard',
       email: 'sophie.bernard@gmail.com',
       password: hashedPassword,
-      phone_number: '+33 6 33 44 55 66',
-      pays: 'France',
+      phone_number: '+213 6 33 44 55 66',
+      pays: 'Algérie',
       ville: 'Toulouse',
       age: 29,
       sex: 'Femme',
@@ -361,15 +398,22 @@ async function seedDatabase(): Promise<void> {
     console.log('  ✓ Available Slots created');
 
     console.log('🎉 Seeding completed successfully!');
-    await db.sequelize.close();
-    process.exit(0);
+    if (exitOnFinish) {
+      await db.sequelize.close();
+      process.exit(0);
+    }
   } catch (error) {
     console.error('❌ Seeding failed:', error);
-    try {
-      await db.sequelize.close();
-    } catch (_) {}
-    process.exit(1);
+    if (exitOnFinish) {
+      try {
+        await db.sequelize.close();
+      } catch (_) {}
+      process.exit(1);
+    }
+    throw error;
   }
 }
 
-seedDatabase();
+if (require.main === module) {
+  seedDatabase({ exitOnFinish: true });
+}
