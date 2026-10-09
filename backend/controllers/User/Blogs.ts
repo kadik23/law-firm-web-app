@@ -68,9 +68,10 @@ const getAllBlogs = async (req: Request, res: Response): Promise<void> => {
             if (blog.getDataValue("file_id") && blog.getDataValue("file_id") !== '') {
                 base64Image = await getFileBase64FromDrive(blog.getDataValue("file_id"));
             }
+            const rawImage = blog.getDataValue("image");
             return {
                 ...blog.toJSON(),
-                image: base64Image
+                image: base64Image || imageToBase64DataUri(rawImage) || rawImage
             };
         }));
         res.status(200).json({
@@ -132,9 +133,10 @@ const getBlogById= async (req: Request, res: Response): Promise<void> => {
         if (blog.getDataValue("file_id") && blog.getDataValue("file_id") !== '') {
             base64Image = await getFileBase64FromDrive(blog.getDataValue("file_id"));
         }
+        const rawImage = blog.getDataValue("image");
         res.status(200).send({
             ...blog.toJSON(),
-            image: base64Image
+            image: base64Image || imageToBase64DataUri(rawImage) || rawImage
         });
     } catch (e) {
         console.error('Error fetching blog', e);
@@ -396,9 +398,10 @@ const sortBlogs = async (req: Request, res: Response): Promise<void> => {
             if (blog.getDataValue("file_id") && blog.getDataValue("file_id") !== '') {
                 base64Image = await getFileBase64FromDrive(blog.getDataValue("file_id"));
             }
+            const rawImage = blog.getDataValue("image");
             return {
                 ...blog.toJSON(),
-                image: base64Image
+                image: base64Image || imageToBase64DataUri(rawImage) || rawImage
             };
         }));
         res.status(200).json({

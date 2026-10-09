@@ -3,7 +3,8 @@
     "setup": "node scripts/setup-module-aliases.js",
     "dev": "npm run setup && nodemon --watch / --ext ts --exec ts-node -r tsconfig-paths/register server.ts",
     "build": "cross-env NODE_ENV=production npm run setup && tsc && node scripts/copy-static-assets.js",
-    "start": "cross-env NODE_ENV=production npm run setup && node dist/server.js"
+    "start": "cross-env NODE_ENV=production npm run setup && node dist/server.js",
+    "seed": "npm run setup && cross-env NODE_ENV=development ts-node -r tsconfig-paths/register scripts/seed.ts"
   },
   "dependencies": {
     "@chargily/chargily-pay": "^2.1.0",
@@ -46,6 +47,6 @@
     "nodemon": "^3.1.9"
   },
   "_moduleAliases": {
-    "@": "./"
+    "@": "./dist/"
   }
 }

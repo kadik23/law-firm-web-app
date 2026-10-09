@@ -253,9 +253,12 @@ export const getAdminAttorneys = async (req: Request, res: Response): Promise<vo
         if (attorney.getDataValue('file_id') && attorney.getDataValue('file_id') !== '') {
           base64Image = await getFileBase64FromDrive(attorney.getDataValue('file_id'));
         }
+        if (!base64Image && attorney.getDataValue('picture_path')) {
+          base64Image = imageToBase64DataUri(attorney.getDataValue('picture_path'));
+        }
         return {
           ...attorney.toJSON(),
-          picture: base64Image,
+          picture: base64Image || attorney.getDataValue('picture_path'),
         } as any;
       })
     );

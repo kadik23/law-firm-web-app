@@ -385,7 +385,7 @@ export const getAdminServices = async (req: Request, res: Response) => {
 
         return {
           ...serviceData,
-          coverImage: base64Image,
+          coverImage: base64Image || imageToBase64DataUri(serviceData.coverImage) || serviceData.coverImage,
         };
       })
     );

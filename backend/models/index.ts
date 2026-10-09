@@ -179,6 +179,7 @@ db.users.hasMany(db.testimonials, {
 });
 db.testimonials.belongsTo(db.services, {
   foreignKey: 'serviceId',
+  as: 'service',
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE',
 });

@@ -9,6 +9,7 @@ import { IProblem } from '@/interfaces/Problem';
 import { IServiceFilesUploaded } from '@/interfaces/ServiceFilesUploaded';
 import { createNotification } from '../createNotification';
 import { deleteFileFromDrive, getFileBase64FromDrive, upload, uploadToDrive } from '@/middlewares/FilesMiddleware';
+import { imageToBase64DataUri } from '@/utils/imageUtils';
 const Service: ModelCtor<Model<IService>> = db.services;
 const RequestService = db.request_service;
 const ServiceFilesUploaded: ModelCtor<Model<IServiceFilesUploaded>> = db.service_files_uploaded;
@@ -108,9 +109,10 @@ const getAllServices = async (req: Request, res: Response): Promise<void> => {
             if (service.getDataValue("file_id") && service.getDataValue("file_id") !== '') {
                 base64Image = await getFileBase64FromDrive(service.getDataValue("file_id"));
             }
+            const rawCover = service.getDataValue("coverImage");
             return {
               ...service.toJSON(),
-              coverImage: base64Image,
+              coverImage: base64Image || imageToBase64DataUri(rawCover) || rawCover,
             };
         })
       );
@@ -197,9 +199,10 @@ const getOneService = async (req: Request, res: Response): Promise<void> => {
       if (service.getDataValue("file_id") && service.getDataValue("file_id") !== '') {
           base64Image = await getFileBase64FromDrive(service.getDataValue("file_id"));
       }
+      const rawCover = service.getDataValue("coverImage");
       res.status(200).json({
         ...service.toJSON(),
-        coverImage: base64Image,
+        coverImage: base64Image || imageToBase64DataUri(rawCover) || rawCover,
       });
       return;
     } else {
@@ -882,7 +885,7 @@ const getAllServicesByProblem = async (req: Request, res: Response): Promise<voi
           attributes: [],
         },
       ],
-      attributes: ['id', 'name', 'description', 'requestedFiles', 'coverImage', 'price', 'createdBy', 'createdAt', 'updatedAt'],
+      attributes: ['id', 'name', 'description', 'requestedFiles', 'coverImage', 'price', 'file_id', 'createdBy', 'createdAt', 'updatedAt'],
       order: [['createdAt', 'DESC']],
     });
     if (services) {
@@ -891,9 +894,10 @@ const getAllServicesByProblem = async (req: Request, res: Response): Promise<voi
         if (service.getDataValue("file_id") && service.getDataValue("file_id") !== '') {
             base64Image = await getFileBase64FromDrive(service.getDataValue("file_id"));
         }
+        const rawCover = service.getDataValue("coverImage");
         return {
           ...service.toJSON(),
-          coverImage: base64Image
+          coverImage: base64Image || imageToBase64DataUri(rawCover) || rawCover
         };
       }));
 
@@ -1062,13 +1066,14 @@ const getAssignedServices = async (req: Request, res: Response): Promise<void> =
         if (service.getDataValue('file_id') && service.getDataValue('file_id') !== '') {
           base64Image = await getFileBase64FromDrive(service.getDataValue('file_id'));
         }
+        const rawCover = service.getDataValue('coverImage');
         return {
           id: service.getDataValue('id'),
           request_service_id: request.getDataValue('id'),
           name: service.getDataValue('name'),
           description: service.getDataValue('description'),
           requestedFiles: service.getDataValue('requestedFiles'),
-          coverImage: base64Image,
+          coverImage: base64Image || imageToBase64DataUri(rawCover) || rawCover,
           price: service.getDataValue('price'),
           status: request.getDataValue('status'),
           is_paid: request.getDataValue('is_paid'),

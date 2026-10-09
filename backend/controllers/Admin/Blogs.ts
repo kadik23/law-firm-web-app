@@ -48,7 +48,7 @@ export const getAllBlogs = async (req: Request, res: Response): Promise<void> =>
 
             return {
                 ...blogData,
-                image: base64Image
+                image: base64Image || imageToBase64DataUri(blogData.image) || blogData.image
             };
         }));
 
@@ -432,7 +432,7 @@ export const filterBlogs = async (req: Request, res: Response): Promise<void> =>
             }
             return {
                 ...blogData,
-                image: base64Image
+                image: base64Image || imageToBase64DataUri(blogData.image) || blogData.image
             };
         }));
 

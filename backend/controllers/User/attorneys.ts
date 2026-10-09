@@ -4,6 +4,7 @@ import { db } from "@/models"
 import path from "path";
 import fs from "fs";
 import { getFileBase64FromDrive, upload } from "@/middlewares/FilesMiddleware";
+import { imageToBase64DataUri } from "@/utils/imageUtils";
 import { body, validationResult } from "express-validator";
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
@@ -59,9 +60,12 @@ const getAllAttorneys = async (
           if (attorney.getDataValue("file_id") && attorney.getDataValue("file_id") !== '') {
               base64Image = await getFileBase64FromDrive(attorney.getDataValue("file_id"));
           }
+          if (!base64Image && attorney.getDataValue("picture_path")) {
+              base64Image = imageToBase64DataUri(attorney.getDataValue("picture_path"));
+          }
           return {
             ...attorney.toJSON(),
-            picture: base64Image,
+            picture: base64Image || attorney.getDataValue("picture_path"),
           };
         })
       );

@@ -16,7 +16,8 @@ pids
 *.pid
 *.seed
 *.pid.lock
-/uploads
+/uploads/*
+!/uploads/seeder/
 # Directory for local environment data
 .env.local
 .env.development.local
