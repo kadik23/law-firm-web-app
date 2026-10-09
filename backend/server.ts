@@ -64,7 +64,7 @@ const corsOptions = {
     const allowedOrigins = [
       "http://localhost:3000",
       "http://localhost:3001", 
-      "https://law-site-beryl.vercel.app",
+      "https://law-firm27.netlify.app/",
       process.env.FRONTEND_URL,
       process.env.NEXT_PUBLIC_FRONTEND_URL
     ].filter(Boolean);
@@ -120,6 +120,10 @@ app.get("/debug-auth", (req, res) => {
       'user-agent': req.headers['user-agent']
     }
   });
+});
+
+app.get("/health", (req, res) => {
+  res.json({ status: "OK", timestamp: new Date().toISOString() });
 });
 
 app.use("/user", userRouter);
